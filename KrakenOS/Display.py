@@ -581,6 +581,234 @@ def plot3d(SYSTEM, view, p, OPA):
 
 
     return #TTT
+###############################################################################
+def display2d_colab(
+    SYSTEM,
+    RAYS=None,
+    view=0,
+    nrays=0,
+    title="KrakenOS 2D (Plotly - Colab)",
+    show=True,
+    width=1100,
+    height=450,
+    line_width_surfaces=1.0,
+    line_width_rays=1.0,
+    surface_color="black",
+    axis_equal=True,
+):
+    """
+    display2d_colab()
+    Alternativa a display2d() para Google Colab usando Plotly (zoom/pan nativo).
+
+    Parámetros
+    ----------
+    SYSTEM : object o list[object]
+        Tu sistema óptico (o lista de sistemas). Debe ser compatible con Plot2DSurf logic.
+        Aquí NO usamos pyvista, solo datos ya calculados para 2D.
+
+    RAYS : object o list[object] o None
+        Rayos (o lista). Debe tener .CC y opcionalmente .RayWave como en KrakenOS.
+
+    view : int
+        0 => Y vs Z
+        1 => X vs Z
+
+    nrays : int
+        0 => usa todos
+        >0 => limita a N rayos
+
+    axis_equal : bool
+        True => igual escala en X/Y (más “óptico”, sin deformar)
+        False => escala libre
+    """
+
+    import numpy as np
+    import plotly.graph_objects as go
+
+    # --- helpers internos (copiados/adaptados de tu estilo KrakenOS) ---
+    def wavelength_to_rgb(wavelength, gamma=1.0):
+        wavelength = float(wavelength)
+        if 380 <= wavelength <= 440:
+            attenuation = 0.3 + (0.7 * (wavelength - 380) / (440 - 380))
+            R = ((-(wavelength - 440) / (440 - 380)) * attenuation) ** gamma
+            G = 0.0
+            B = (1.0 * attenuation) ** gamma
+        elif 440 <= wavelength <= 490:
+            R = 0.0
+            G = ((wavelength - 440) / (490 - 440)) ** gamma
+            B = 1.0
+        elif 490 <= wavelength <= 510:
+            R = 0.0
+            G = 1.0
+            B = (-(wavelength - 510) / (510 - 490)) ** gamma
+        elif 510 <= wavelength <= 580:
+            R = ((wavelength - 510) / (580 - 510)) ** gamma
+            G = 1.0
+            B = 0.0
+        elif 580 <= wavelength <= 645:
+            R = 1.0
+            G = (-(wavelength - 645) / (645 - 580)) ** gamma
+            B = 0.0
+        elif 645 <= wavelength <= 750:
+            attenuation = 0.3 + (0.7 * (750 - wavelength) / (750 - 645))
+            R = (1.0 * attenuation) ** gamma
+            G = 0.0
+            B = 0.0
+        else:
+            R = G = B = 0.0
+
+        R = int(R * 255) / 255.0
+        G = int(G * 255) / 255.0
+        B = int(B * 255) / 255.0
+        return (R, G, B)
+
+    def rgb_to_hex(rgb):
+        r, g, b = rgb
+        return f"rgb({int(255*r)},{int(255*g)},{int(255*b)})"
+
+    # --- Normaliza inputs a lista ---
+    if not isinstance(SYSTEM, list):
+        SYSTEMS = [SYSTEM]
+    else:
+        SYSTEMS = SYSTEM
+
+    if RAYS is None:
+        RLIST = []
+    elif not isinstance(RAYS, list):
+        RLIST = [RAYS]
+    else:
+        RLIST = RAYS
+
+    fig = go.Figure()
+
+    # ==============================================================
+    # 1) DIBUJAR SUPERFICIES 2D
+    # ==============================================================
+    # Nota: En tu KrakenOS original, Plot2DSurf usa PyVista para sacar bordes 2D.
+    # Aquí hacemos un enfoque "minimal": usamos SYSTEM.AAA (si existe como PolyData)
+    # pero si no existe, no rompemos. La idea es que puedas extenderlo fácilmente.
+
+    for SYS in SYSTEMS:
+        # Si tu SYSTEM tiene un objeto ya construido con puntos 3D de superficies:
+        # intentamos graficar contornos en corte.
+        # Lo más robusto: si existe SYS.AAA (MultiBlock) con .points
+        if hasattr(SYS, "AAA"):
+            try:
+                blocks = SYS.AAA
+                # MultiBlock: iterable
+                for obj in blocks:
+                    if obj is None:
+                        continue
+                    pts = obj.points
+                    if pts is None or len(pts) == 0:
+                        continue
+
+                    z = pts[:, 2]
+                    if view == 0:
+                        y = pts[:, 1]  # Y vs Z
+                        fig.add_trace(go.Scatter(
+                            x=z,
+                            y=y,
+                            mode="lines",
+                            line=dict(color=surface_color, width=line_width_surfaces),
+                            name="Surface",
+                            showlegend=False,
+                        ))
+                    else:
+                        x = pts[:, 0]  # X vs Z
+                        fig.add_trace(go.Scatter(
+                            x=z,
+                            y=x,
+                            mode="lines",
+                            line=dict(color=surface_color, width=line_width_surfaces),
+                            name="Surface",
+                            showlegend=False,
+                        ))
+            except Exception as e:
+                print("⚠️ No pude graficar superficies desde SYSTEM.AAA:", e)
+
+    # ==============================================================
+    # 2) DIBUJAR RAYOS 2D
+    # ==============================================================
+    for R in RLIST:
+        if not hasattr(R, "CC"):
+            continue
+
+        CC = R.CC
+        if CC is None:
+            continue
+
+        # Número de rayos
+        NR = len(CC)
+        if hasattr(R, "RayWave") and len(getattr(R, "RayWave", [])) == NR:
+            waves = np.asarray(R.RayWave)
+        else:
+            waves = None
+
+        if nrays and nrays > 0:
+            NR = min(NR, nrays)
+
+        for i in range(NR):
+            ray_pts = np.asarray(CC[i])
+            if ray_pts.ndim != 2 or ray_pts.shape[1] < 3:
+                continue
+
+            z = ray_pts[:, 2]
+            if view == 0:
+                yy = ray_pts[:, 1]
+                ylab = "Y (mm)"
+            else:
+                yy = ray_pts[:, 0]
+                ylab = "X (mm)"
+
+            # color por longitud de onda si existe
+            if waves is not None:
+                col = rgb_to_hex(wavelength_to_rgb(waves[i] * 1000.0))
+            else:
+                col = "royalblue"
+
+            fig.add_trace(go.Scatter(
+                x=z,
+                y=yy,
+                mode="lines",
+                line=dict(width=line_width_rays, color=col),
+                name="Rays",
+                showlegend=False,
+            ))
+
+    # ==============================================================
+    # 3) Layout + Zoom
+    # ==============================================================
+    fig.update_layout(
+        title=title,
+        width=width,
+        height=height,
+        template="plotly_white",
+        xaxis_title="Z (mm)",
+        yaxis_title="Y (mm)" if view == 0 else "X (mm)",
+        dragmode="pan",  # pan por default (zoom con rueda)
+    )
+
+    # Zoom/pan + botones
+    fig.update_layout(
+        xaxis=dict(
+            showgrid=True,
+            zeroline=True,
+        ),
+        yaxis=dict(
+            showgrid=True,
+            zeroline=True,
+            scaleanchor="x" if axis_equal else None,  # relación 1:1 tipo óptico
+            scaleratio=1 if axis_equal else None,
+        ),
+        margin=dict(l=40, r=20, t=60, b=40),
+    )
+
+    if show:
+        fig.show()
+
+    return fig
+
 
 ###############################################################################
 def display2d(SYSTEM, RAYS, view=0, arrow=0, nrays = 0, figsize: Tuple=(10, 4), fs: int=11):

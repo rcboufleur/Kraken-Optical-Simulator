@@ -16,7 +16,7 @@ import numpy as np
 import pkg_resources
 
 # =============================================================================
-# Check if KrakenOS is installed. If not, assume that the code is run from a 
+# Check if KrakenOS is installed. If not, assume that the code is run from a
 # downloaded GitHub folder and add the relative path.
 # =============================================================================
 required = {'KrakenOS'}
@@ -35,7 +35,7 @@ import KrakenOS as Kos  # Using KrakenOS for optical simulation
 # =============================================================================
 def R_RMS(L, M, N, X, Y, delta_Z):
     """
-    Calculate the RMS radius (spot size) of rays on the image plane after a 
+    Calculate the RMS radius (spot size) of rays on the image plane after a
     shift in the Z direction (delta_Z).
     """
     cenX = np.mean(X)
@@ -50,7 +50,7 @@ def R_RMS(L, M, N, X, Y, delta_Z):
 
 def DER_R_RMS(L, M, N, X, Y, delta_Z):
     """
-    Compute the numerical derivative of R_RMS with respect to delta_Z using 
+    Compute the numerical derivative of R_RMS with respect to delta_Z using
     a central difference method.
     """
     h = 0.001  # Small step for numerical differentiation
@@ -135,19 +135,19 @@ for j in range(-grid_resolution, grid_resolution + 1):
             angle_deg = 0.0
             pSource = [x0, y0, 0.0]
             dCos = [0.0, np.sin(np.deg2rad(angle_deg)), np.cos(np.deg2rad(angle_deg))]
-            
+
             # Trace ray at wavelength 0.4
             wavelength = 0.4
             Doublet.Trace(pSource, dCos, wavelength)
             raysWavelength1.push()
             raysTotal.push()
-            
+
             # Trace ray at wavelength 0.5
             wavelength = 0.5
             Doublet.Trace(pSource, dCos, wavelength)
             raysWavelength2.push()
             raysTotal.push()
-            
+
             # Trace ray at wavelength 0.6
             wavelength = 0.6
             Doublet.Trace(pSource, dCos, wavelength)
@@ -182,12 +182,12 @@ while iteration < max_iterations:
           "R_RMS:", rms_value,
           "dR_RMS/dZ:", rms_derivative,
           "new delta_Z:", new_dz)
-    
+
     # If the change is smaller than the tolerance, we consider the algorithm converged.
     if abs(new_dz - dz) < tolerance:
         dz = new_dz
         break
-    
+
     dz = new_dz
     iteration += 1
 
@@ -220,17 +220,17 @@ for j in range(-grid_resolution, grid_resolution + 1):
             angle_deg = 0.0
             pSource = [x0, y0, 0.0]
             dCos = [0.0, np.sin(np.deg2rad(angle_deg)), np.cos(np.deg2rad(angle_deg))]
-            
+
             # Re-trace for wavelength 0.4
             wavelength = 0.4
             Doublet.Trace(pSource, dCos, wavelength)
             newRaysTotal.push()
-            
+
             # Re-trace for wavelength 0.5
             wavelength = 0.5
             Doublet.Trace(pSource, dCos, wavelength)
             newRaysTotal.push()
-            
+
             # Re-trace for wavelength 0.6
             wavelength = 0.6
             Doublet.Trace(pSource, dCos, wavelength)
@@ -239,4 +239,6 @@ for j in range(-grid_resolution, grid_resolution + 1):
 # =============================================================================
 # Display the updated 2D plot after the focus adjustment.
 # =============================================================================
-Kos.display2d(Doublet, newRaysTotal, 0)
+# Kos.display2d(Doublet, newRaysTotal, 0)
+
+Kos.display2d_colab(Doublet, newRaysTotal, 0)
