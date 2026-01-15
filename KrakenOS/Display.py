@@ -269,7 +269,133 @@ def display3d_old(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', Bac
     [cpx,cpy,cpz]=p.camera_position
 
 ###############################################################################
+def display3d_colab(
+    SYSTEM,
+    RAYS,
+    view=0,
+    BackgCol="white",
+    BackgColTop="white",
+    GridCol="black",
+    nrays=0,
+    filename="/content/krakenos_display3d.png",
+    window_size=(1200, 700),
+    show_grid=True,
+    show_axes=True,
+    text="KrakenOS (Colab static)",
+):
+    """
+    display3d_colab: versión especial para Google Colab (render estático a PNG)
 
+    - Usa pv.start_xvfb() + off_screen=True para que funcione sin display.
+    - Renderiza la escena y la muestra como imagen (screenshot).
+    - No es interactiva (pero es confiable y estable para clase).
+    """
+
+    import numpy as np
+    import pyvista as pv
+
+    # Para mostrar imagen en notebook
+    try:
+        from IPython.display import Image, display
+        _HAS_IPY = True
+    except Exception:
+        _HAS_IPY = False
+
+    # 1) Asegura Xvfb (headless render) en Colab
+    # Si no estás en colab igual funciona en modo off_screen si hay soporte
+    try:
+        pv.start_xvfb()
+    except Exception:
+        pass
+
+    # 2) Asegurar sólidos
+    # (tu lógica actual)
+    if not isinstance(SYSTEM, list):
+        SYSTEM_list = [SYSTEM]
+    else:
+        SYSTEM_list = SYSTEM
+
+    BLD0 = None
+    for sys_ in SYSTEM_list:
+        try:
+            if sys_.Pr3D.ExistSolid == 0:
+                BLD0 = sys_.BUILD
+                sys_.BUILD = 1
+                sys_.build()
+                sys_.BUILD = BLD0
+        except Exception:
+            # Si algo no existe, no truena aquí
+            pass
+
+    # RAYS como lista
+    if not isinstance(RAYS, list):
+        RAYS_list = [RAYS]
+    else:
+        RAYS_list = RAYS
+
+    # 3) Plotter OFFSCREEN
+    ST1 = "KrakenOS Colab Static"
+    OPA = 0.95
+
+    p = pv.Plotter(
+        shape=(1, 1),
+        title=ST1,
+        notebook=True,
+        off_screen=True,
+        window_size=window_size,
+    )
+
+    # 4) Dibuja sistemas y rayos usando TUS funciones
+    # (Estas ya existen en tu módulo)
+    for sys_ in SYSTEM_list:
+        plot3d(sys_, view, p, OPA)
+
+    for rays_ in RAYS_list:
+        rayplot3d(rays_, view, p, OPA, nrays)
+
+    # 5) Estética
+    if show_axes:
+        p.add_axes(line_width=3)
+
+    # Centrado / cámara (tus defaults)
+    try:
+        cx, cy, cz = p.center
+        p.set_focus([cx, cy, cz])
+        p.camera_position = [-1.0, 0.5, 1.0]
+        p.set_viewup([0, 1.0, 0])
+    except Exception:
+        pass
+
+    p.set_background(BackgCol, top=BackgColTop)
+
+    if text:
+        try:
+            p.add_text(text, position="upper_left", font_size=18, color="royalblue")
+        except Exception:
+            pass
+
+    if show_grid:
+        try:
+            p.show_grid(font_size=8, color=GridCol)
+        except Exception:
+            pass
+
+    # 6) Render a PNG
+    # Nota: screenshot funciona bien en off_screen
+    try:
+        p.show(screenshot=filename, auto_close=True)
+    except Exception:
+        # fallback
+        p.screenshot(filename)
+        p.close()
+
+    # 7) Mostrar la imagen en Colab
+    if _HAS_IPY:
+        display(Image(filename))
+
+    return filename
+
+###############################################################################
 def display3d(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', BackgColTop = 'white', GridCol="black", nrays = 0):
 
     """display3d.

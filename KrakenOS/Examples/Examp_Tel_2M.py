@@ -119,7 +119,7 @@ for i in range(0, len(xc)):
 
 # # ______________________________________#
 
-Kos.display3d(Telescopio, Rayos, 2)
+Kos.display3d_colab(Telescopio, Rayos, 2)
 X, Y, Z, L, M, N = Rayos.pick(-1)
 
 # # ______________________________________#
