@@ -2,10 +2,28 @@
 import numpy as np
 import pyvista as pv
 import matplotlib.pyplot as plt
-plt.rcParams["font.family"] = "Times New Roman"
+# plt.rcParams["font.family"] = "Times New Roman"
 import sys
 from matplotlib import rc
 from typing import Tuple
+
+import matplotlib.pyplot as plt
+
+def set_krakenos_fonts():
+    """
+    Fuerza una tipografía tipo Times si existe,
+    pero sin warnings si no está instalada (Colab/Linux).
+    """
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = [
+        "Times New Roman",  # Windows/mac a veces
+        "Times",            # alternativa
+        "STIXGeneral",      # muy común en entornos científicos
+        "DejaVu Serif",     # siempre existe en matplotlib/colab
+    ]
+    plt.rcParams["mathtext.fontset"] = "stix"
+
+set_krakenos_fonts()
 
 
 
