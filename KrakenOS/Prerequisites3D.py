@@ -223,15 +223,22 @@ class Prerequisites():
 
 
 
-                if (self.SDT[j].InDiameter > 0):
-                    tri = L_te_h.delaunay_2d()
+                #if (self.SDT[j].InDiameter > 0):
+                #    tri = L_te_h.delaunay_2d()
                     # Guardar referencia (si la necesitabas) como atributo PRIVADO
-                    tri._edge_source = L_te_h
-                    L_te_h = tri
-                else:
-                    L_te_h = L_te_h.delaunay_2d()
+                #    tri._edge_source = L_te_h
+                #    L_te_h = tri
+                #else:
+                #    L_te_h = L_te_h.delaunay_2d()
+
+                # L_te_h ya viene de un mesh (Disc) y debe conservar el hueco
+                L_te_h = self.Flat2SigmaSurface(disc, j)
+
+                # Asegura triangulación, pero SIN reconstruir desde puntos
+                L_te_h = L_te_h.triangulate()
 
 
+            
 
 
                 # if (self.SDT[j].InDiameter > 0):
