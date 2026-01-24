@@ -941,10 +941,16 @@ def display2d_colab(
         margin=dict(l=40, r=20, t=60, b=40),
     )
 
+    #if show:
+     #   fig.show()
+
+    #return fig
+
     if show:
         fig.show()
-
+        return None
     return fig
+    
 
 
 ###############################################################################
