@@ -259,6 +259,52 @@ def render_bullets(lines: list[str]) -> list[str]:
     return rendered
 
 
+def image_kind(image_name: str) -> str:
+    if image_name.endswith("_3d.png"):
+        return "3D"
+    if image_name.endswith("_plot.png"):
+        return "Plot"
+    if image_name.endswith("_2d.png"):
+        return "2D"
+    return "Image"
+
+
+def render_illustrated_examples(examples: list[Example]) -> list[str]:
+    illustrated = [example for example in examples if example.image_candidates()]
+    if not illustrated:
+        return []
+
+    lines = [
+        "## Illustrated Examples",
+        "",
+        "These examples currently include generated or curated figures. Use this",
+        "table as the fastest visual entry point into the manual.",
+        "",
+        "| Example | Topic | Figures | Visual focus |",
+        "| --- | --- | --- | --- |",
+    ]
+
+    for example in sorted(illustrated, key=lambda item: (item.topic, item.file_name)):
+        images = example.image_candidates()
+        figure_links = []
+        captions = []
+        for image in images:
+            image_name = image.name
+            image_link = f"assets/examples/{quote_link_path(image_name)}"
+            figure_links.append(f"[{image_kind(image_name)}]({image_link})")
+            caption = IMAGE_CAPTIONS.get(image_name)
+            if caption:
+                captions.append(caption)
+        focus = captions[0] if captions else example.description
+        lines.append(
+            f"| [`{example.file_name}`](#{example.anchor}) | {example.topic} | "
+            f"{', '.join(figure_links)} | {focus} |"
+        )
+
+    lines.append("")
+    return lines
+
+
 def render_manual(examples: list[Example]) -> str:
     by_topic: dict[str, list[Example]] = defaultdict(list)
     for example in examples:
@@ -281,9 +327,10 @@ def render_manual(examples: list[Example]) -> str:
         "be created with `python tools/generate_example_images.py --all` or added",
         "manually with names such as `Examp_Ray_2d.png` and `Examp_Ray_3d.png`.",
         "",
-        "## Quick Index",
-        "",
     ]
+
+    lines.extend(render_illustrated_examples(examples))
+    lines.extend(["## Quick Index", ""])
 
     for topic in sorted(by_topic):
         lines.append(f"- [{topic}](#{quote_anchor(topic)})")
