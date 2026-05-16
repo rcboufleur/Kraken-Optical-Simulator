@@ -108,6 +108,27 @@ IMAGE_CAPTIONS = {
         "how `SurfBlock` and `alignment` expand named components into ordinary "
         "surfaces for tracing."
     ),
+    "Examp_Diffraction_Grating_Transmission_2d.png": (
+        "Transmission grating trend showing how diffracted angle changes with "
+        "wavelength and diffraction order."
+    ),
+    "Examp_Diffraction_Grating_Reflection_2d.png": (
+        "Reflection grating angular dispersion for several orders. The figure "
+        "helps connect grating order, incidence angle, and wavelength."
+    ),
+    "Examp_Tel_2M_2d.png": (
+        "Schematic 2 m telescope workflow diagram. It summarizes the large-system "
+        "geometry without requiring the full interactive telescope model."
+    ),
+    "Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png": (
+        "Differential atmospheric refraction trend versus wavelength. It explains "
+        "why atmospheric correction examples depend on zenith angle and bandpass."
+    ),
+    "Examp_Doublet_Optimization_2d.png": (
+        "Optimization convergence sketch for a merit function and effective focal "
+        "length error. It illustrates the expected diagnostic shape of an "
+        "optimization run."
+    ),
 }
 
 

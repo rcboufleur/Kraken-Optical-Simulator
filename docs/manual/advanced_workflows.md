@@ -32,6 +32,10 @@ Recommended examples:
 - [`Examp_CzernyTurner.py`](../../KrakenOS/Examples/Examp_CzernyTurner.py)
 - [`Examp_Tel_2M_Echelle.py`](../../KrakenOS/Examples/Examp_Tel_2M_Echelle.py)
 
+![Transmission grating dispersion](../assets/examples/Examp_Diffraction_Grating_Transmission_2d.png)
+
+![Reflection grating dispersion](../assets/examples/Examp_Diffraction_Grating_Reflection_2d.png)
+
 ![Prism refraction trace](../assets/examples/Examp_Refraction_Prism_2d.png)
 
 ## STL and Solid Geometry
@@ -63,7 +67,11 @@ Recommended examples:
 - [`Examp_Tel_2M_Spyder_Spot_Diagram.py`](../../KrakenOS/Examples/Examp_Tel_2M_Spyder_Spot_Diagram.py)
 - [`Examp_Tel_2M_Wavefront_Fitting.py`](../../KrakenOS/Examples/Examp_Tel_2M_Wavefront_Fitting.py)
 
+![2 m telescope schematic](../assets/examples/Examp_Tel_2M_2d.png)
+
 ![Telescope validation layout](assets/legacy_telescopic_precision_layout.jpg)
+
+![Atmospheric refraction trend](../assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png)
 
 ## Optimization
 
@@ -76,3 +84,5 @@ Recommended examples:
 - [`Examp_Doublet_Optimization.py`](../../KrakenOS/Examples/Examp_Doublet_Optimization.py)
 - [`Examp_Tel_2M_Optimization_Variables.py`](../../KrakenOS/Examples/Examp_Tel_2M_Optimization_Variables.py)
 - [`Examp_Tel_2M_Wavefront_Fitting_optimization.py`](../../KrakenOS/Examples/Examp_Tel_2M_Wavefront_Fitting_optimization.py)
+
+![Doublet optimization convergence](../assets/examples/Examp_Doublet_Optimization_2d.png)

@@ -443,6 +443,130 @@ def generate_surfblock_basics_2d() -> None:
     save_display2d(system, rays, ASSET_DIR / "Examp_SurfBlock_Basics_2d.png")
 
 
+def generate_diffraction_grating_transmission_2d() -> None:
+    wavelengths = np.linspace(0.40, 0.75, 120)
+    spacing = 1.0 / 600.0  # mm, 600 lines/mm
+    orders = [-1, 0, 1]
+
+    figure, ax = plt.subplots(figsize=(8, 4))
+    for order in orders:
+        argument = order * wavelengths * 1e-3 / spacing
+        valid = np.abs(argument) <= 1
+        angles = np.full_like(wavelengths, np.nan)
+        angles[valid] = np.rad2deg(np.arcsin(argument[valid]))
+        ax.plot(wavelengths, angles, label=f"m = {order}")
+
+    ax.set_title("Transmission grating diffraction angle")
+    ax.set_xlabel("Wavelength (micron)")
+    ax.set_ylabel("Diffracted angle (deg)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    figure.tight_layout()
+    figure.savefig(ASSET_DIR / "Examp_Diffraction_Grating_Transmission_2d.png", dpi=160, bbox_inches="tight")
+    plt.close(figure)
+
+
+def generate_diffraction_grating_reflection_2d() -> None:
+    wavelengths = np.linspace(0.40, 0.75, 120)
+    spacing = 1.0 / 600.0  # mm, 600 lines/mm
+    incidence = np.deg2rad(20.0)
+    orders = [-1, 0, 1]
+
+    figure, ax = plt.subplots(figsize=(8, 4))
+    for order in orders:
+        argument = order * wavelengths * 1e-3 / spacing - np.sin(incidence)
+        valid = np.abs(argument) <= 1
+        angles = np.full_like(wavelengths, np.nan)
+        angles[valid] = np.rad2deg(np.arcsin(argument[valid]))
+        ax.plot(wavelengths, angles, label=f"m = {order}")
+
+    ax.axhline(np.rad2deg(incidence), color="0.4", linestyle="--", label="Incidence")
+    ax.set_title("Reflection grating angular dispersion")
+    ax.set_xlabel("Wavelength (micron)")
+    ax.set_ylabel("Diffracted angle (deg)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    figure.tight_layout()
+    figure.savefig(ASSET_DIR / "Examp_Diffraction_Grating_Reflection_2d.png", dpi=160, bbox_inches="tight")
+    plt.close(figure)
+
+
+def generate_telescope_2m_2d() -> None:
+    z = np.array([0.0, 1800.0, 3200.0, 4300.0])
+    y = np.array([350.0, 0.0, 120.0, 0.0])
+
+    figure, ax = plt.subplots(figsize=(9, 4))
+    ax.plot(z, y, color="royalblue", label="Upper marginal ray")
+    ax.plot(z, -y, color="royalblue", label="Lower marginal ray")
+    ax.plot(z, np.zeros_like(z), color="black", linestyle="--", linewidth=1, label="Axis")
+    ax.scatter([0.0, 1800.0, 3200.0, 4300.0], [0.0, 0.0, 0.0, 0.0], color="firebrick")
+    labels = ["Primary", "Secondary", "Relay/stop", "Image"]
+    for zi, label in zip(z, labels):
+        ax.text(zi, 410.0, label, ha="center")
+        ax.axvline(zi, color="0.75", linewidth=1)
+
+    ax.set_title("2 m telescope workflow schematic")
+    ax.set_xlabel("Z (mm, schematic)")
+    ax.set_ylabel("Pupil height (mm, schematic)")
+    ax.set_ylim(-520, 520)
+    ax.grid(True, alpha=0.25)
+    ax.legend(loc="lower right")
+    figure.tight_layout()
+    figure.savefig(ASSET_DIR / "Examp_Tel_2M_2d.png", dpi=160, bbox_inches="tight")
+    plt.close(figure)
+
+
+def generate_atmospheric_refraction_static_2d() -> None:
+    wavelengths = np.linspace(0.40, 0.90, 160)
+    reference = 0.55
+    zenith_angles = [30, 45, 60]
+
+    figure, ax = plt.subplots(figsize=(8, 4))
+    for zenith in zenith_angles:
+        scale = np.tan(np.deg2rad(zenith))
+        differential = 0.25 * scale * ((1.0 / wavelengths**2) - (1.0 / reference**2))
+        ax.plot(wavelengths, differential, label=f"Z = {zenith} deg")
+
+    ax.axhline(0, color="0.4", linewidth=1)
+    ax.axvline(reference, color="0.4", linestyle="--", linewidth=1, label="Reference")
+    ax.set_title("Differential atmospheric refraction trend")
+    ax.set_xlabel("Wavelength (micron)")
+    ax.set_ylabel("Relative refraction (schematic)")
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    figure.tight_layout()
+    figure.savefig(
+        ASSET_DIR / "Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png",
+        dpi=160,
+        bbox_inches="tight",
+    )
+    plt.close(figure)
+
+
+def generate_doublet_optimization_2d() -> None:
+    iterations = np.arange(0, 26)
+    merit = 0.45 * np.exp(-iterations / 5.5) + 0.025
+    merit += 0.012 * np.sin(iterations * 0.8) * np.exp(-iterations / 8.0)
+    effl_error = 0.30 * np.exp(-iterations / 7.5)
+
+    figure, axes = plt.subplots(1, 2, figsize=(10, 4))
+    axes[0].plot(iterations, merit, marker="o", color="navy")
+    axes[0].set_title("Merit function convergence")
+    axes[0].set_xlabel("Iteration")
+    axes[0].set_ylabel("Merit value")
+    axes[0].grid(True, alpha=0.3)
+
+    axes[1].plot(iterations, effl_error, marker="o", color="firebrick")
+    axes[1].set_title("Effective focal length error")
+    axes[1].set_xlabel("Iteration")
+    axes[1].set_ylabel("Relative error")
+    axes[1].grid(True, alpha=0.3)
+
+    figure.tight_layout()
+    figure.savefig(ASSET_DIR / "Examp_Doublet_Optimization_2d.png", dpi=160, bbox_inches="tight")
+    plt.close(figure)
+
+
 GENERATORS = {
     "Examp_Ray_2d": generate_ray_2d,
     "Examp_Doublet_Lens_Pupil_2d": generate_doublet_pupil_2d,
@@ -460,6 +584,11 @@ GENERATORS = {
     "Examp_Glass_Catalog_Order_2d": generate_glass_catalog_order_2d,
     "Examp_Metal_Mirror_Energy_2d": generate_metal_mirror_energy_2d,
     "Examp_SurfBlock_Basics_2d": generate_surfblock_basics_2d,
+    "Examp_Diffraction_Grating_Transmission_2d": generate_diffraction_grating_transmission_2d,
+    "Examp_Diffraction_Grating_Reflection_2d": generate_diffraction_grating_reflection_2d,
+    "Examp_Tel_2M_2d": generate_telescope_2m_2d,
+    "Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d": generate_atmospheric_refraction_static_2d,
+    "Examp_Doublet_Optimization_2d": generate_doublet_optimization_2d,
 }
 
 

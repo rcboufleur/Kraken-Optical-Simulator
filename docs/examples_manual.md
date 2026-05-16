@@ -23,9 +23,12 @@ table as the fastest visual entry point into the manual.
 
 | Example | Topic | Figures | Visual focus |
 | --- | --- | --- | --- |
+| [`Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static.py`](#examp-tel-2m-atmospheric-refraction-corrector-static) | Atmospheric refraction correction | [2D](assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png) | Differential atmospheric refraction trend versus wavelength. It explains why atmospheric correction examples depend on zenith angle and bandpass. |
 | [`Examp_Ray.py`](#examp-ray) | Basic ray tracing | [2D](assets/examples/Examp_Ray_2d.png) | 2D layout of a single ray traced through a cemented doublet. The green line shows the ray path, while the black profiles show the optical surfaces and the image plane. |
 | [`Examp_Glass_Catalog_Order.py`](#examp-glass-catalog-order) | Catalog configuration | [2D](assets/examples/Examp_Glass_Catalog_Order_2d.png) | Catalog-priority chart for a duplicated glass name. The first matching catalog in the ordered list is the one KrakenOS will use by default. |
 | [`Examp_Coating_Energy_Basics.py`](#examp-coating-energy-basics) | Coating and energy | [2D](assets/examples/Examp_Coating_Energy_Basics_2d.png) | Coating lookup example showing reflected and transmitted energy terms for two incidence-angle samples. It illustrates how RP, RS, TP, and TS are interpreted. |
+| [`Examp_Diffraction_Grating_Reflection.py`](#examp-diffraction-grating-reflection) | Diffraction grating | [2D](assets/examples/Examp_Diffraction_Grating_Reflection_2d.png) | Reflection grating angular dispersion for several orders. The figure helps connect grating order, incidence angle, and wavelength. |
+| [`Examp_Diffraction_Grating_Transmission.py`](#examp-diffraction-grating-transmission) | Diffraction grating | [2D](assets/examples/Examp_Diffraction_Grating_Transmission_2d.png) | Transmission grating trend showing how diffracted angle changes with wavelength and diffraction order. |
 | [`Examp_Perfect_lens.py`](#examp-perfect-lens) | Idealized lens | [2D](assets/examples/Examp_Perfect_lens_2d.png), [Plot](assets/examples/Examp_Perfect_lens_plot.png) | 2D layout of an ideal thin-lens system. The simplified surfaces make it easier to see thin-lens behavior before using real refractive curvatures and glass data. |
 | [`Examp_Perfect_lens_Telescope.py`](#examp-perfect-lens-telescope) | Idealized telescope | [2D](assets/examples/Examp_Perfect_lens_Telescope_2d.png) | Ideal telescope layout generated from objective and eyepiece thin lenses. The traced field fans show the simplified telescope geometry. |
 | [`Examp_Lens_Catalog_Basics.py`](#examp-lens-catalog-basics) | Lens catalogs | [2D](assets/examples/Examp_Lens_Catalog_Basics_2d.png) | 2D layout generated from a Zemax-style THORLABS catalog entry. The figure confirms that catalog surfaces can be converted into KrakenOS surfaces and traced like ordinary systems. |
@@ -33,11 +36,13 @@ table as the fastest visual entry point into the manual.
 | [`Examp_Dispersion_By_AbbeNumber.py`](#examp-dispersion-by-abbenumber) | Material dispersion | [2D](assets/examples/Examp_Dispersion_By_AbbeNumber_2d.png) | Chromatic 2D ray trace through the doublet at three wavelengths. The separation of the colored bundles illustrates how material dispersion appears in a traced system. |
 | [`Examp_Metal_Mirror_Energy.py`](#examp-metal-mirror-energy) | Metal coatings | [2D](assets/examples/Examp_Metal_Mirror_Energy_2d.png) | Energy comparison for aluminum and gold mirror data. The bars summarize average reflection and total transmission terms stored after tracing. |
 | [`Examp_Flat_Mirror_45Deg.py`](#examp-flat-mirror-45deg) | Mirror tracing | [2D](assets/examples/Examp_Flat_Mirror_45Deg_2d.png) | Folded optical path after a 45 degree mirror. The layout is useful for checking mirror orientation, reflection direction, and coordinate sign conventions. |
+| [`Examp_Doublet_Optimization.py`](#examp-doublet-optimization) | Optimization | [2D](assets/examples/Examp_Doublet_Optimization_2d.png) | Optimization convergence sketch for a merit function and effective focal length error. It illustrates the expected diagnostic shape of an optimization run. |
 | [`Examp_PSF_MTF_From_Zernike.py`](#examp-psf-mtf-from-zernike) | PSF and MTF | [2D](assets/examples/Examp_PSF_MTF_From_Zernike_2d.png) | Point-spread function and MTF profiles computed from a small set of Zernike coefficients. The image connects wavefront terms with image quality metrics. |
 | [`Examp_Refraction_Prism.py`](#examp-refraction-prism) | Prism refraction | [2D](assets/examples/Examp_Refraction_Prism_2d.png) | Prism-only refraction trace at multiple wavelengths. The tilted flat faces bend the ray bundle and make the chromatic angular separation visible. |
 | [`Examp_Doublet_Lens_Pupil.py`](#examp-doublet-lens-pupil) | Pupil tracing | [Image](assets/examples/Examp_Doublet_Lens_Pupil.png), [2D](assets/examples/Examp_Doublet_Lens_Pupil_2d.png), [3D](assets/examples/Examp_Doublet_Lens_Pupil_3d.png) | Pupil sampling result copied from the example output. It gives a quick visual check of the sampled pupil coordinates used for the ray bundle. |
 | [`Examp_Reverse_Trace.py`](#examp-reverse-trace) | Reverse tracing | [2D](assets/examples/Examp_Reverse_Trace_2d.png) | Forward and reverse ray paths through the same doublet. This image helps verify that `RvTrace` walks the optical path back from image space toward object space. |
 | [`Examp_RMS_BestFocus.py`](#examp-rms-bestfocus) | Spot analysis | [2D](assets/examples/Examp_RMS_BestFocus_2d.png) | Best-focus diagnostic plot. The left panel shows RMS radius as the image plane is shifted, and the right panel compares nominal and best-focus spot coordinates. |
+| [`Examp_Tel_2M.py`](#examp-tel-2m) | Telescope model | [2D](assets/examples/Examp_Tel_2M_2d.png) | Schematic 2 m telescope workflow diagram. It summarizes the large-system geometry without requiring the full interactive telescope model. |
 
 ## Quick Index
 
@@ -224,11 +229,11 @@ pupil generation.
 python KrakenOS/Examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png
-or docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png](assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png)
+
+*Differential atmospheric refraction trend versus wavelength. It explains why atmospheric correction examples depend on zenith angle and bandpass.*
 
 ## Basic ray tracing
 
@@ -778,11 +783,11 @@ multi-wavelength ray bundle to show angular separation by diffraction order.
 python KrakenOS/Examples/Examp_Diffraction_Grating_Reflection.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Diffraction_Grating_Reflection_2d.png
-or docs/assets/examples/Examp_Diffraction_Grating_Reflection_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Diffraction_Grating_Reflection_2d.png](assets/examples/Examp_Diffraction_Grating_Reflection_2d.png)
+
+*Reflection grating angular dispersion for several orders. The figure helps connect grating order, incidence angle, and wavelength.*
 
 ### Examp_Diffraction_Grating_Reflection_Single.py
 
@@ -854,11 +859,11 @@ multi-wavelength ray bundle through the system.
 python KrakenOS/Examples/Examp_Diffraction_Grating_Transmission.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Diffraction_Grating_Transmission_2d.png
-or docs/assets/examples/Examp_Diffraction_Grating_Transmission_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Diffraction_Grating_Transmission_2d.png](assets/examples/Examp_Diffraction_Grating_Transmission_2d.png)
+
+*Transmission grating trend showing how diffracted angle changes with wavelength and diffraction order.*
 
 ## External catalogs
 
@@ -1647,11 +1652,11 @@ and RMS spot radius after tracing.
 python KrakenOS/Examples/Examp_Doublet_Optimization.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Optimization_2d.png
-or docs/assets/examples/Examp_Doublet_Optimization_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Doublet_Optimization_2d.png](assets/examples/Examp_Doublet_Optimization_2d.png)
+
+*Optimization convergence sketch for a merit function and effective focal length error. It illustrates the expected diagnostic shape of an optimization run.*
 
 ## Optimization setup
 
@@ -2727,11 +2732,11 @@ diagram.
 python KrakenOS/Examples/Examp_Tel_2M.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_2d.png
-or docs/assets/examples/Examp_Tel_2M_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Tel_2M_2d.png](assets/examples/Examp_Tel_2M_2d.png)
+
+*Schematic 2 m telescope workflow diagram. It summarizes the large-system geometry without requiring the full interactive telescope model.*
 
 ## Tilted components
 
