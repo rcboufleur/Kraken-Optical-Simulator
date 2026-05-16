@@ -52,9 +52,15 @@ class Example:
     def image_path(self) -> Path:
         return ASSET_DIR / self.image_file_name
 
-    @property
-    def image_link(self) -> str:
-        return f"assets/examples/{quote_link_path(self.image_file_name)}"
+    def image_candidates(self) -> list[Path]:
+        stem = self.file_name.replace(".py", "")
+        names = [
+            f"{stem}.png",
+            f"{stem}_2d.png",
+            f"{stem}_3d.png",
+            f"{stem}_plot.png",
+        ]
+        return [ASSET_DIR / name for name in names if (ASSET_DIR / name).exists()]
 
 
 def quote_link_path(path: str) -> str:
@@ -185,9 +191,9 @@ def render_manual(examples: list[Example]) -> str:
         "python tools/generate_examples_manual.py",
         "```",
         "",
-        "Images can be added manually under `docs/assets/examples/` and linked from",
-        "the relevant example sections. The generator does not run examples because",
-        "many scripts open interactive 2D or 3D viewers.",
+        "Images are loaded from `docs/assets/examples/` when available. They can",
+        "be created with `python tools/generate_example_images.py --all` or added",
+        "manually with names such as `Examp_Ray_2d.png` and `Examp_Ray_3d.png`.",
         "",
         "## Quick Index",
         "",
@@ -259,20 +265,26 @@ def render_manual(examples: list[Example]) -> str:
                 ]
             )
 
-            if example.image_path.exists():
+            images = example.image_candidates()
+            if images:
                 lines.extend(
                     [
-                        "**Example Image**",
-                        "",
-                        f"![{example.file_name}]({example.image_link})",
+                        "**Example Images**",
                         "",
                     ]
                 )
+                for image in images:
+                    image_name = image.name
+                    image_link = f"assets/examples/{quote_link_path(image_name)}"
+                    lines.append(f"![{image_name}]({image_link})")
+                    lines.append("")
             else:
                 lines.extend(
                     [
                         "<!-- Optional image placeholder:",
-                        f"Add docs/assets/examples/{example.image_file_name} to show an image here.",
+                        f"Add docs/assets/examples/{example.file_name.replace('.py', '')}_2d.png",
+                        f"or docs/assets/examples/{example.file_name.replace('.py', '')}_3d.png",
+                        "to show images here.",
                         "-->",
                         "",
                     ]

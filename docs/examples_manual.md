@@ -10,9 +10,9 @@ Generated with:
 python tools/generate_examples_manual.py
 ```
 
-Images can be added manually under `docs/assets/examples/` and linked from
-the relevant example sections. The generator does not run examples because
-many scripts open interactive 2D or 3D viewers.
+Images are loaded from `docs/assets/examples/` when available. They can
+be created with `python tools/generate_example_images.py --all` or added
+manually with names such as `Examp_Ray_2d.png` and `Examp_Ray_3d.png`.
 
 ## Quick Index
 
@@ -107,7 +107,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Pupil_Seidel.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Pupil_Seidel.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Pupil_Seidel_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Pupil_Seidel_3d.png
+to show images here.
 -->
 
 ## Atmospheric refraction correction
@@ -155,7 +157,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Adaptable
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Adaptable.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Adaptable_2d.png
+or docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Adaptable_3d.png
+to show images here.
 -->
 
 ### Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static.py
@@ -196,7 +200,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_2d.png
+or docs/assets/examples/Examp_Tel_2M_Atmospheric_Refraction_Corrector_Static_3d.png
+to show images here.
 -->
 
 ## Basic ray tracing
@@ -237,9 +243,9 @@ plots the ray path in 2D.
 python KrakenOS/Examples/Examp_Ray.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Ray.png to show an image here.
--->
+**Example Images**
+
+![Examp_Ray_2d.png](assets/examples/Examp_Ray_2d.png)
 
 ## Basic surface tracing
 
@@ -274,7 +280,9 @@ python KrakenOS/Examples/Examp_Sphere.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Sphere.png to show an image here.
+Add docs/assets/examples/Examp_Sphere_2d.png
+or docs/assets/examples/Examp_Sphere_3d.png
+to show images here.
 -->
 
 ## Catalog configuration
@@ -316,7 +324,9 @@ python KrakenOS/Examples/Examp_Glass_Catalog_Order.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Glass_Catalog_Order.png to show an image here.
+Add docs/assets/examples/Examp_Glass_Catalog_Order_2d.png
+or docs/assets/examples/Examp_Glass_Catalog_Order_3d.png
+to show images here.
 -->
 
 ## Coating and energy
@@ -360,9 +370,9 @@ format and the reflected/transmitted energy terms stored by KrakenOS.
 python KrakenOS/Examples/Examp_Coating_Energy_Basics.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Coating_Energy_Basics.png to show an image here.
--->
+**Example Images**
+
+![Examp_Coating_Energy_Basics_2d.png](assets/examples/Examp_Coating_Energy_Basics_2d.png)
 
 ## Coating and non-sequential tracing
 
@@ -396,7 +406,9 @@ python KrakenOS/Examples/Examp_Flat_NonSec_AR-caoating.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Flat_NonSec_AR-caoating.png to show an image here.
+Add docs/assets/examples/Examp_Flat_NonSec_AR-caoating_2d.png
+or docs/assets/examples/Examp_Flat_NonSec_AR-caoating_3d.png
+to show images here.
 -->
 
 ## Custom surface profile
@@ -439,7 +451,9 @@ python KrakenOS/Examples/Examp_Fresnel.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Fresnel.png to show an image here.
+Add docs/assets/examples/Examp_Fresnel_2d.png
+or docs/assets/examples/Examp_Fresnel_3d.png
+to show images here.
 -->
 
 ## Custom surface shape
@@ -488,7 +502,9 @@ python KrakenOS/Examples/Examp_ExtraShape_Micro_Lens_Array.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ExtraShape_Micro_Lens_Array.png to show an image here.
+Add docs/assets/examples/Examp_ExtraShape_Micro_Lens_Array_2d.png
+or docs/assets/examples/Examp_ExtraShape_Micro_Lens_Array_3d.png
+to show images here.
 -->
 
 ### Examp_ExtraShape_UserFacets.py
@@ -527,7 +543,9 @@ python KrakenOS/Examples/Examp_ExtraShape_UserFacets.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ExtraShape_UserFacets.png to show an image here.
+Add docs/assets/examples/Examp_ExtraShape_UserFacets_2d.png
+or docs/assets/examples/Examp_ExtraShape_UserFacets_3d.png
+to show images here.
 -->
 
 ### Examp_ExtraShape_XY_Cosines_UDA.py
@@ -566,7 +584,9 @@ python KrakenOS/Examples/Examp_ExtraShape_XY_Cosines_UDA.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ExtraShape_XY_Cosines_UDA.png to show an image here.
+Add docs/assets/examples/Examp_ExtraShape_XY_Cosines_UDA_2d.png
+or docs/assets/examples/Examp_ExtraShape_XY_Cosines_UDA_3d.png
+to show images here.
 -->
 
 ### Examp_ExtraShape_Radial_Sine.py
@@ -601,7 +621,9 @@ python KrakenOS/Examples/Examp_ExtraShape_Radial_Sine.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ExtraShape_Radial_Sine.png to show an image here.
+Add docs/assets/examples/Examp_ExtraShape_Radial_Sine_2d.png
+or docs/assets/examples/Examp_ExtraShape_Radial_Sine_3d.png
+to show images here.
 -->
 
 ### Examp_ExtraShape_XY_Cosines.py
@@ -636,7 +658,9 @@ python KrakenOS/Examples/Examp_ExtraShape_XY_Cosines.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ExtraShape_XY_Cosines.png to show an image here.
+Add docs/assets/examples/Examp_ExtraShape_XY_Cosines_2d.png
+or docs/assets/examples/Examp_ExtraShape_XY_Cosines_3d.png
+to show images here.
 -->
 
 ## Cylindrical optics
@@ -677,7 +701,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Cylinder.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Cylinder.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Cylinder_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Cylinder_3d.png
+to show images here.
 -->
 
 ## Diffraction grating
@@ -724,7 +750,9 @@ python KrakenOS/Examples/Examp_Diffraction_Grating_Reflection.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Diffraction_Grating_Reflection.png to show an image here.
+Add docs/assets/examples/Examp_Diffraction_Grating_Reflection_2d.png
+or docs/assets/examples/Examp_Diffraction_Grating_Reflection_3d.png
+to show images here.
 -->
 
 ### Examp_Diffraction_Grating_Reflection_Single.py
@@ -761,7 +789,9 @@ python KrakenOS/Examples/Examp_Diffraction_Grating_Reflection_Single.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Diffraction_Grating_Reflection_Single.png to show an image here.
+Add docs/assets/examples/Examp_Diffraction_Grating_Reflection_Single_2d.png
+or docs/assets/examples/Examp_Diffraction_Grating_Reflection_Single_3d.png
+to show images here.
 -->
 
 ### Examp_Diffraction_Grating_Transmission.py
@@ -796,7 +826,9 @@ python KrakenOS/Examples/Examp_Diffraction_Grating_Transmission.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Diffraction_Grating_Transmission.png to show an image here.
+Add docs/assets/examples/Examp_Diffraction_Grating_Transmission_2d.png
+or docs/assets/examples/Examp_Diffraction_Grating_Transmission_3d.png
+to show images here.
 -->
 
 ## External catalogs
@@ -843,7 +875,9 @@ python KrakenOS/Examples/"Examp_Spruce-tone_Github_User(Loading_Zemax_and_Catalo
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Spruce-tone_Github_User(Loading_Zemax_and_Catalogs).png to show an image here.
+Add docs/assets/examples/Examp_Spruce-tone_Github_User(Loading_Zemax_and_Catalogs)_2d.png
+or docs/assets/examples/Examp_Spruce-tone_Github_User(Loading_Zemax_and_Catalogs)_3d.png
+to show images here.
 -->
 
 ## Idealized lens
@@ -878,7 +912,9 @@ python KrakenOS/Examples/Examp_Perfect_lens.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Perfect_lens.png to show an image here.
+Add docs/assets/examples/Examp_Perfect_lens_2d.png
+or docs/assets/examples/Examp_Perfect_lens_3d.png
+to show images here.
 -->
 
 ## Idealized telescope
@@ -913,7 +949,9 @@ python KrakenOS/Examples/Examp_Perfect_lens_Telescope.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Perfect_lens_Telescope.png to show an image here.
+Add docs/assets/examples/Examp_Perfect_lens_Telescope_2d.png
+or docs/assets/examples/Examp_Perfect_lens_Telescope_3d.png
+to show images here.
 -->
 
 ## Lens catalogs
@@ -963,9 +1001,9 @@ single on-axis ray through the converted lens.
 python KrakenOS/Examples/Examp_Lens_Catalog_Basics.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Lens_Catalog_Basics.png to show an image here.
--->
+**Example Images**
+
+![Examp_Lens_Catalog_Basics_2d.png](assets/examples/Examp_Lens_Catalog_Basics_2d.png)
 
 ### Examp_SurfBlock_Basics.py
 
@@ -1006,7 +1044,9 @@ python KrakenOS/Examples/Examp_SurfBlock_Basics.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_SurfBlock_Basics.png to show an image here.
+Add docs/assets/examples/Examp_SurfBlock_Basics_2d.png
+or docs/assets/examples/Examp_SurfBlock_Basics_3d.png
+to show images here.
 -->
 
 ## Lens design and focus
@@ -1055,7 +1095,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_3d.png
+to show images here.
 -->
 
 ## Material dispersion
@@ -1102,7 +1144,9 @@ python KrakenOS/Examples/Examp_Dispersion_By_AbbeNumber.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Dispersion_By_AbbeNumber.png to show an image here.
+Add docs/assets/examples/Examp_Dispersion_By_AbbeNumber_2d.png
+or docs/assets/examples/Examp_Dispersion_By_AbbeNumber_3d.png
+to show images here.
 -->
 
 ## Metal coatings
@@ -1146,7 +1190,9 @@ python KrakenOS/Examples/Examp_Metal_Mirror_Energy.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Metal_Mirror_Energy.png to show an image here.
+Add docs/assets/examples/Examp_Metal_Mirror_Energy_2d.png
+or docs/assets/examples/Examp_Metal_Mirror_Energy_3d.png
+to show images here.
 -->
 
 ## Mirror tracing
@@ -1190,7 +1236,9 @@ python KrakenOS/Examples/Examp_ParaboleMirror_Shift_UDA.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ParaboleMirror_Shift_UDA.png to show an image here.
+Add docs/assets/examples/Examp_ParaboleMirror_Shift_UDA_2d.png
+or docs/assets/examples/Examp_ParaboleMirror_Shift_UDA_3d.png
+to show images here.
 -->
 
 ### Examp_Flat_Mirror_45Deg.py
@@ -1219,7 +1267,9 @@ python KrakenOS/Examples/Examp_Flat_Mirror_45Deg.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Flat_Mirror_45Deg.png to show an image here.
+Add docs/assets/examples/Examp_Flat_Mirror_45Deg_2d.png
+or docs/assets/examples/Examp_Flat_Mirror_45Deg_3d.png
+to show images here.
 -->
 
 ### Examp_ParaboleMirror_Shift.py
@@ -1260,7 +1310,9 @@ python KrakenOS/Examples/Examp_ParaboleMirror_Shift.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_ParaboleMirror_Shift.png to show an image here.
+Add docs/assets/examples/Examp_ParaboleMirror_Shift_2d.png
+or docs/assets/examples/Examp_ParaboleMirror_Shift_3d.png
+to show images here.
 -->
 
 ## Non-sequential tracing
@@ -1298,7 +1350,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_NonSec-AR_Coating.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_NonSec-AR_Coating.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_NonSec-AR_Coating_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_NonSec-AR_Coating_3d.png
+to show images here.
 -->
 
 ### Examp_Doublet_Lens_NonSec.py
@@ -1327,7 +1381,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_NonSec.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_NonSec.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_NonSec_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_NonSec_3d.png
+to show images here.
 -->
 
 ### Examp_Doublet_Lens_Tilt_non_sec-AR-Coating.py
@@ -1356,7 +1412,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Tilt_non_sec-AR-Coating.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Tilt_non_sec-AR-Coating.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Tilt_non_sec-AR-Coating_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Tilt_non_sec-AR-Coating_3d.png
+to show images here.
 -->
 
 ### Examp_Doublet_Lens_Tilt_non_sec.py
@@ -1391,7 +1449,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Tilt_non_sec.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Tilt_non_sec.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Tilt_non_sec_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Tilt_non_sec_3d.png
+to show images here.
 -->
 
 ## Obscuration and RMS analysis
@@ -1433,7 +1493,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Spyder_Spot_RMS.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Spyder_Spot_RMS.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Spyder_Spot_RMS_2d.png
+or docs/assets/examples/Examp_Tel_2M_Spyder_Spot_RMS_3d.png
+to show images here.
 -->
 
 ## Obscuration and spot diagrams
@@ -1475,7 +1537,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Spyder_Spot_Diagram.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Spyder_Spot_Diagram.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Spyder_Spot_Diagram_2d.png
+or docs/assets/examples/Examp_Tel_2M_Spyder_Spot_Diagram_3d.png
+to show images here.
 -->
 
 ## Optical testing
@@ -1511,7 +1575,9 @@ python KrakenOS/Examples/Examp_RonchiTest.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_RonchiTest.png to show an image here.
+Add docs/assets/examples/Examp_RonchiTest_2d.png
+or docs/assets/examples/Examp_RonchiTest_3d.png
+to show images here.
 -->
 
 ## Optimization
@@ -1547,7 +1613,9 @@ python KrakenOS/Examples/Examp_Doublet_Optimization.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Optimization.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Optimization_2d.png
+or docs/assets/examples/Examp_Doublet_Optimization_3d.png
+to show images here.
 -->
 
 ## Optimization setup
@@ -1594,7 +1662,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Optimization_Variables.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Optimization_Variables.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Optimization_Variables_2d.png
+or docs/assets/examples/Examp_Tel_2M_Optimization_Variables_3d.png
+to show images here.
 -->
 
 ## PSF and MTF
@@ -1643,9 +1713,9 @@ that keeps the example focused on the analysis helpers in `PSFCalc.py`.
 python KrakenOS/Examples/Examp_PSF_MTF_From_Zernike.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_PSF_MTF_From_Zernike.png to show an image here.
--->
+**Example Images**
+
+![Examp_PSF_MTF_From_Zernike_2d.png](assets/examples/Examp_PSF_MTF_From_Zernike_2d.png)
 
 ## Paraxial optics
 
@@ -1687,7 +1757,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens-ParaxMatrix.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens-ParaxMatrix.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens-ParaxMatrix_2d.png
+or docs/assets/examples/Examp_Doublet_Lens-ParaxMatrix_3d.png
+to show images here.
 -->
 
 ## Prism refraction
@@ -1733,7 +1805,9 @@ python KrakenOS/Examples/Examp_Refraction_Prism.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Refraction_Prism.png to show an image here.
+Add docs/assets/examples/Examp_Refraction_Prism_2d.png
+or docs/assets/examples/Examp_Refraction_Prism_3d.png
+to show images here.
 -->
 
 ### Examp_Refraction_Prism_OneRay.py
@@ -1773,7 +1847,9 @@ python KrakenOS/Examples/Examp_Refraction_Prism_OneRay.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Refraction_Prism_OneRay.png to show an image here.
+Add docs/assets/examples/Examp_Refraction_Prism_OneRay_2d.png
+or docs/assets/examples/Examp_Refraction_Prism_OneRay_3d.png
+to show images here.
 -->
 
 ## Pupil tracing
@@ -1820,9 +1896,13 @@ rays before tracing them through a doublet lens.
 python KrakenOS/Examples/Examp_Doublet_Lens_Pupil.py
 ```
 
-**Example Image**
+**Example Images**
 
-![Examp_Doublet_Lens_Pupil.py](assets/examples/Examp_Doublet_Lens_Pupil.png)
+![Examp_Doublet_Lens_Pupil.png](assets/examples/Examp_Doublet_Lens_Pupil.png)
+
+![Examp_Doublet_Lens_Pupil_2d.png](assets/examples/Examp_Doublet_Lens_Pupil_2d.png)
+
+![Examp_Doublet_Lens_Pupil_3d.png](assets/examples/Examp_Doublet_Lens_Pupil_3d.png)
 
 ### Examp_Tel_2M_Pupila.py
 
@@ -1860,7 +1940,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Pupila.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Pupila.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Pupila_2d.png
+or docs/assets/examples/Examp_Tel_2M_Pupila_3d.png
+to show images here.
 -->
 
 ## Ray source sampling
@@ -1896,7 +1978,9 @@ python KrakenOS/Examples/Examp_Source_Distribution_Function.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Source_Distribution_Function.png to show an image here.
+Add docs/assets/examples/Examp_Source_Distribution_Function_2d.png
+or docs/assets/examples/Examp_Source_Distribution_Function_3d.png
+to show images here.
 -->
 
 ## Reverse tracing
@@ -1940,7 +2024,9 @@ python KrakenOS/Examples/Examp_Reverse_Trace.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Reverse_Trace.png to show an image here.
+Add docs/assets/examples/Examp_Reverse_Trace_2d.png
+or docs/assets/examples/Examp_Reverse_Trace_3d.png
+to show images here.
 -->
 
 ## STL geometry
@@ -1986,7 +2072,9 @@ python KrakenOS/Examples/Examp_Prism_STL-AR_coating.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Prism_STL-AR_coating.png to show an image here.
+Add docs/assets/examples/Examp_Prism_STL-AR_coating_2d.png
+or docs/assets/examples/Examp_Prism_STL-AR_coating_3d.png
+to show images here.
 -->
 
 ### Examp_Prism_STL.py
@@ -2023,7 +2111,9 @@ python KrakenOS/Examples/Examp_Prism_STL.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Prism_STL.png to show an image here.
+Add docs/assets/examples/Examp_Prism_STL_2d.png
+or docs/assets/examples/Examp_Prism_STL_3d.png
+to show images here.
 -->
 
 ### Examp_Solid_Object_STL.py
@@ -2065,7 +2155,9 @@ python KrakenOS/Examples/Examp_Solid_Object_STL.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Solid_Object_STL.png to show an image here.
+Add docs/assets/examples/Examp_Solid_Object_STL_2d.png
+or docs/assets/examples/Examp_Solid_Object_STL_3d.png
+to show images here.
 -->
 
 ### Examp_Solid_Object_STL_ARRAY.py
@@ -2107,7 +2199,9 @@ python KrakenOS/Examples/Examp_Solid_Object_STL_ARRAY.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Solid_Object_STL_ARRAY.png to show an image here.
+Add docs/assets/examples/Examp_Solid_Object_STL_ARRAY_2d.png
+or docs/assets/examples/Examp_Solid_Object_STL_ARRAY_3d.png
+to show images here.
 -->
 
 ## Solid geometry
@@ -2150,7 +2244,9 @@ python KrakenOS/Examples/Examp_Refraction_Prism_solid.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Refraction_Prism_solid.png to show an image here.
+Add docs/assets/examples/Examp_Refraction_Prism_solid_2d.png
+or docs/assets/examples/Examp_Refraction_Prism_solid_3d.png
+to show images here.
 -->
 
 ### Examp_Refraction_Prism_solid_Generation.py
@@ -2185,7 +2281,9 @@ python KrakenOS/Examples/Examp_Refraction_Prism_solid_Generation.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Refraction_Prism_solid_Generation.png to show an image here.
+Add docs/assets/examples/Examp_Refraction_Prism_solid_Generation_2d.png
+or docs/assets/examples/Examp_Refraction_Prism_solid_Generation_3d.png
+to show images here.
 -->
 
 ## Special surfaces
@@ -2227,7 +2325,9 @@ python KrakenOS/Examples/Examp_Axicon.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Axicon.png to show an image here.
+Add docs/assets/examples/Examp_Axicon_2d.png
+or docs/assets/examples/Examp_Axicon_3d.png
+to show images here.
 -->
 
 ### Examp_Axicon_And_Cylinder.py
@@ -2262,7 +2362,9 @@ python KrakenOS/Examples/Examp_Axicon_And_Cylinder.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Axicon_And_Cylinder.png to show an image here.
+Add docs/assets/examples/Examp_Axicon_And_Cylinder_2d.png
+or docs/assets/examples/Examp_Axicon_And_Cylinder_3d.png
+to show images here.
 -->
 
 ## Spectrograph geometry
@@ -2297,7 +2399,9 @@ python KrakenOS/Examples/Examp_CzernyTurner.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_CzernyTurner.png to show an image here.
+Add docs/assets/examples/Examp_CzernyTurner_2d.png
+or docs/assets/examples/Examp_CzernyTurner_3d.png
+to show images here.
 -->
 
 ## Spot analysis
@@ -2346,7 +2450,9 @@ python KrakenOS/Examples/Examp_RMS_BestFocus.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_RMS_BestFocus.png to show an image here.
+Add docs/assets/examples/Examp_RMS_BestFocus_2d.png
+or docs/assets/examples/Examp_RMS_BestFocus_3d.png
+to show images here.
 -->
 
 ## System diagnostics
@@ -2388,7 +2494,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_CommandsSystem.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_CommandsSystem.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_CommandsSystem_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_CommandsSystem_3d.png
+to show images here.
 -->
 
 ## Telescope accessory optics
@@ -2432,7 +2540,9 @@ python KrakenOS/Examples/"Examp_Tel_2M_Cu#U00f1a.py"
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Cu#U00f1a.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Cu#U00f1a_2d.png
+or docs/assets/examples/Examp_Tel_2M_Cu#U00f1a_3d.png
+to show images here.
 -->
 
 ## Telescope and STL geometry
@@ -2479,7 +2589,9 @@ python KrakenOS/Examples/Examp_Tel_2M-STL_ImageSlicer.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M-STL_ImageSlicer.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M-STL_ImageSlicer_2d.png
+or docs/assets/examples/Examp_Tel_2M-STL_ImageSlicer_3d.png
+to show images here.
 -->
 
 ## Telescope and spectrograph model
@@ -2523,7 +2635,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Echelle.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Echelle.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Echelle_2d.png
+or docs/assets/examples/Examp_Tel_2M_Echelle_3d.png
+to show images here.
 -->
 
 ## Telescope model
@@ -2571,7 +2685,9 @@ python KrakenOS/Examples/Examp_Tel_2M.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_2d.png
+or docs/assets/examples/Examp_Tel_2M_3d.png
+to show images here.
 -->
 
 ## Tilted components
@@ -2607,7 +2723,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Tilt-Nulls.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Tilt-Nulls.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Tilt-Nulls_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Tilt-Nulls_3d.png
+to show images here.
 -->
 
 ### Examp_Doublet_Lens_Tilt.py
@@ -2642,7 +2760,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Tilt.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Tilt.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Tilt_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Tilt_3d.png
+to show images here.
 -->
 
 ## User material model
@@ -2689,7 +2809,9 @@ python KrakenOS/Examples/"Examp_Spruce-tone_Github_User (Manually enter the refr
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Spruce-tone_Github_User (Manually enter the refractive index, dispersion and alpha).png to show an image here.
+Add docs/assets/examples/Examp_Spruce-tone_Github_User (Manually enter the refractive index, dispersion and alpha)_2d.png
+or docs/assets/examples/Examp_Spruce-tone_Github_User (Manually enter the refractive index, dispersion and alpha)_3d.png
+to show images here.
 -->
 
 ## Visualization
@@ -2731,7 +2853,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_3Dcolor.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_3Dcolor.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_3Dcolor_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_3Dcolor_3d.png
+to show images here.
 -->
 
 ### Examp_Pickle_Doublet_Lens_3Dcolor.py
@@ -2771,7 +2895,9 @@ python KrakenOS/Examples/Examp_Pickle_Doublet_Lens_3Dcolor.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Pickle_Doublet_Lens_3Dcolor.png to show an image here.
+Add docs/assets/examples/Examp_Pickle_Doublet_Lens_3Dcolor_2d.png
+or docs/assets/examples/Examp_Pickle_Doublet_Lens_3Dcolor_3d.png
+to show images here.
 -->
 
 ## Wavefront analysis
@@ -2813,7 +2939,9 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Zernike.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Doublet_Lens_Zernike.png to show an image here.
+Add docs/assets/examples/Examp_Doublet_Lens_Zernike_2d.png
+or docs/assets/examples/Examp_Doublet_Lens_Zernike_3d.png
+to show images here.
 -->
 
 ### Examp_Tel_2M_Wavefront_Fitting.py
@@ -2853,7 +2981,9 @@ python KrakenOS/Examples/Examp_Tel_2M_Wavefront_Fitting.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Wavefront_Fitting.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Wavefront_Fitting_2d.png
+or docs/assets/examples/Examp_Tel_2M_Wavefront_Fitting_3d.png
+to show images here.
 -->
 
 ## Wavefront optimization
@@ -2901,5 +3031,7 @@ python KrakenOS/Examples/Examp_Tel_2M_Wavefront_Fitting_optimization.py
 ```
 
 <!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Tel_2M_Wavefront_Fitting_optimization.png to show an image here.
+Add docs/assets/examples/Examp_Tel_2M_Wavefront_Fitting_optimization_2d.png
+or docs/assets/examples/Examp_Tel_2M_Wavefront_Fitting_optimization_3d.png
+to show images here.
 -->
