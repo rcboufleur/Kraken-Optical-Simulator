@@ -31,9 +31,11 @@ For a first pass, use this order:
 3. `Examp_Doublet_Lens.py` - a full sequential lens example with best-focus logic.
 4. `Examp_Doublet_Lens_Pupil.py` - pupil calculation and ray sampling.
 5. `Examp_RMS_BestFocus.py` - RMS spot radius and best-focus adjustment.
-6. `Examp_Diffraction_Grating_Transmission.py` and `Examp_CzernyTurner.py` - dispersive systems.
-7. `Examp_Prism_STL.py` and `Examp_Solid_Object_STL.py` - non-sequential STL geometry.
-8. `Examp_Tel_2M.py` and the other `Examp_Tel_2M_*` files - telescope-level examples.
+6. `Examp_PSF_MTF_From_Zernike.py` - PSF and MTF from Zernike coefficients.
+7. `Examp_Coating_Energy_Basics.py` - basic coating table and energy terms.
+8. `Examp_Diffraction_Grating_Transmission.py` and `Examp_CzernyTurner.py` - dispersive systems.
+9. `Examp_Prism_STL.py` and `Examp_Solid_Object_STL.py` - non-sequential STL geometry.
+10. `Examp_Tel_2M.py` and the other `Examp_Tel_2M_*` files - telescope-level examples.
 
 ## Naming note
 

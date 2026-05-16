@@ -12,6 +12,7 @@ Use this guide to find a starting example depending on what you want to do.
 | Calculate Seidel aberrations | [`Examp_Doublet_Lens_Pupil_Seidel.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Pupil_Seidel.py) |
 | Calculate RMS spot radius and best focus | [`Examp_RMS_BestFocus.py`](../KrakenOS/Examples/Examp_RMS_BestFocus.py) |
 | Use Zernike surfaces | [`Examp_Doublet_Lens_Zernike.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Zernike.py) |
+| Calculate PSF and MTF from Zernike terms | [`Examp_PSF_MTF_From_Zernike.py`](../KrakenOS/Examples/Examp_PSF_MTF_From_Zernike.py) |
 | Work with cylindrical surfaces | [`Examp_Doublet_Lens_Cylinder.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Cylinder.py) |
 | Work with tilted surfaces | [`Examp_Doublet_Lens_Tilt.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Tilt.py) |
 | Work with tilted non-sequential surfaces | [`Examp_Doublet_Lens_Tilt_non_sec.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Tilt_non_sec.py) |
@@ -22,6 +23,7 @@ Use this guide to find a starting example depending on what you want to do.
 | Use faceted user-defined surfaces | [`Examp_ExtraShape_UserFacets.py`](../KrakenOS/Examples/Examp_ExtraShape_UserFacets.py) |
 | Trace non-sequential rays | [`Examp_Doublet_Lens_NonSec.py`](../KrakenOS/Examples/Examp_Doublet_Lens_NonSec.py) |
 | Add anti-reflection coatings | [`Examp_Doublet_Lens_NonSec-AR_Coating.py`](../KrakenOS/Examples/Examp_Doublet_Lens_NonSec-AR_Coating.py) |
+| Inspect coating energy terms | [`Examp_Coating_Energy_Basics.py`](../KrakenOS/Examples/Examp_Coating_Energy_Basics.py) |
 | Use diffraction gratings | [`Examp_Diffraction_Grating_Reflection.py`](../KrakenOS/Examples/Examp_Diffraction_Grating_Reflection.py) |
 | Use a transmission grating | [`Examp_Diffraction_Grating_Transmission.py`](../KrakenOS/Examples/Examp_Diffraction_Grating_Transmission.py) |
 | Study dispersion with Abbe number | [`Examp_Dispersion_By_AbbeNumber.py`](../KrakenOS/Examples/Examp_Dispersion_By_AbbeNumber.py) |

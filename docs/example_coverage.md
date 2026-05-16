@@ -28,9 +28,9 @@ large, or not ideal as first-contact tutorials:
 
 | Area | Current state | Suggested improvement |
 | --- | --- | --- |
-| Coating tables and energy behavior | Covered in non-sequential examples, but mixed with tilted geometry or STL cases. | Add one small coating-only tutorial that prints/plots reflected and transmitted energy. |
+| Coating tables and energy behavior | `Examp_Coating_Energy_Basics.py` now shows a small coating-only tutorial with reflected and transmitted energy terms. | Larger non-sequential coating examples remain useful for advanced workflows. |
 | Metal coatings and polarization terms | `Examp_Sphere.py` loads `Gold.csv` and prints S/P reflection values. | Add a clearer metal-mirror example that compares dielectric mirror behavior with metal data. |
-| PSF and MTF | PSF is shown through wavefront examples. MTF helpers exist in `PSFCalc.py`. | Add a compact `Examp_PSF_MTF_From_Zernike.py`. |
+| PSF and MTF | `Examp_PSF_MTF_From_Zernike.py` now shows direct PSF and MTF calculation from Zernike coefficients. | Add a deeper note later about PSF/MTF sampling and units. |
 | RMS and best-focus tools | `Examp_RMS_BestFocus.py` now shows `Kos.RMS` and RMS minimization in a compact example. | Consider adding a deeper API note if `Kos.BestFocus` is revised in the future. |
 | Zemax lens catalog conversion | Covered by the Spruce-tone user example. | Add a shorter lens-catalog example using one packaged ZMF entry and showing the converted surfaces. |
 | Reverse tracing | `system.RvTrace` exists, but there is no obvious beginner example. | Add a minimal reverse-trace example from image plane back toward the object space. |
@@ -47,12 +47,12 @@ tasks in a focused way:
    Purpose: show how to trace a compact ray bundle, extract image-plane rays,
    calculate RMS, move to best focus, and report before/after RMS.
 
-2. `Examp_PSF_MTF_From_Zernike.py`
+2. `Examp_PSF_MTF_From_Zernike.py` - added
 
    Purpose: show how to use a simple Zernike coefficient vector with the PSF
    and MTF helpers, independent of a large telescope model.
 
-3. `Examp_Coating_Energy_Basics.py`
+3. `Examp_Coating_Energy_Basics.py` - added
 
    Purpose: show the coating table format, trace one or a few rays, and inspect
    the resulting reflected/transmitted energy terms.
@@ -81,9 +81,9 @@ tasks in a focused way:
 
 The next practical batch should add:
 
-1. `Examp_PSF_MTF_From_Zernike.py`
-2. `Examp_Coating_Energy_Basics.py`
-3. `Examp_Lens_Catalog_Basics.py`
+1. `Examp_Lens_Catalog_Basics.py`
+2. `Examp_Reverse_Trace.py`
+3. A deeper API note for PSF/MTF sampling and units
 
 Then update:
 

@@ -4,6 +4,7 @@
 |---|---|---|---|---|
 | `Examp_Axicon.py` | Intermediate | Special surfaces | Axicon surface example. | - |
 | `Examp_Axicon_And_Cylinder.py` | Intermediate | Special surfaces | Axicon combined with cylindrical power. | - |
+| `Examp_Coating_Energy_Basics.py` | Beginner | Coating and energy | Basic coating table and energy terms. | - |
 | `Examp_CzernyTurner.py` | Advanced | Spectrograph geometry | Czerny-Turner spectrograph with two wavelength bands. | - |
 | `Examp_Diffraction_Grating_Reflection.py` | Intermediate | Diffraction grating | Reflection diffraction grating. | - |
 | `Examp_Diffraction_Grating_Reflection_Single.py` | Intermediate | Diffraction grating | Single-ray reflection grating trace. | - |
@@ -38,6 +39,7 @@
 | `Examp_Perfect_lens.py` | Beginner | Idealized lens | Ideal thin-lens element. | - |
 | `Examp_Perfect_lens_Telescope.py` | Intermediate | Idealized telescope | Telescope made from ideal thin lenses. | - |
 | `Examp_Pickle_Doublet_Lens_3Dcolor.py` | Beginner | Visualization | Doublet lens in a colored 3D view. | - |
+| `Examp_PSF_MTF_From_Zernike.py` | Beginner | PSF and MTF | PSF and MTF from Zernike coefficients. | - |
 | `Examp_Prism_STL-AR_coating.py` | Advanced | STL geometry | STL prism with coating data. | prism.stl |
 | `Examp_Prism_STL.py` | Advanced | STL geometry | STL prism trace. | prism.stl |
 | `Examp_Ray.py` | Beginner | Basic ray tracing | Single-ray trace through a simple doublet. | - |
