@@ -52,7 +52,8 @@ print(Kos.surf())
 ```
 
 For a broader map of the library, see
-[KrakenOS Capabilities](docs/capabilities.md).
+[KrakenOS Capabilities](docs/capabilities.md). To find examples by task, see
+[KrakenOS Example Guide](docs/examples.md).
 
 ### A little fun before class ... and objects
 

@@ -6,7 +6,8 @@ toolbox for optical design, visualization, catalog handling, wavefront analysis,
 and practical system examples.
 
 This document is an overview of the main capabilities currently represented in
-the codebase and examples.
+the codebase and examples. For a task-oriented list of scripts, see the
+[KrakenOS Example Guide](examples.md).
 
 ## Core Ray Tracing
 
