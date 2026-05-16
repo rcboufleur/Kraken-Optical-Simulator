@@ -1,19 +1,14 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Parabole Mirror Shift"""
 
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 import os
 
@@ -33,7 +28,6 @@ M1.k = -1.0 * 0
 M1.Glass = "MIRROR"
 M1.Diameter = 2000
 M1.CoatingMet = 0
-
 
 
 # ______________________________________#
@@ -75,8 +69,6 @@ x, y, z, L, M, N = Pup.Pattern2Field()
 Rayos = Kos.raykeeper(Espejo)
 
 
-
-
 Kos.TraceLoop(x, y, z, L, M, N, W, Rayos, clean = 1)
 Kos.display3d(Espejo, Rayos, 0)
 
@@ -101,14 +93,10 @@ print(Rayos.RP[0], Rayos.RP[1], Rayos.RP[2])
 # configuracion_1.IT
 
 
-
 # [Dispersion_Formula, MIL, Nd, Vd, *_] = NM[r]
 
 
 # x,y,z,l,m,n = Rayos.pick(-1, coordinates="local")
-
-
-
 
 
 

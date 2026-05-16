@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Solid Objects STL ARRAY"""
 
@@ -12,19 +12,13 @@ Using stl or vtk solid elements in non-sequential mode is not accurate,
 import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 P_Obj = Kos.surf()
@@ -109,7 +103,6 @@ for A in range(-n, n + 1):
     for B in range(-n, n + 1):
 
 
-
         x_0 = A * Lx
         y_0 = B * Ly
         r = np.sqrt((x_0 * x_0) + (y_0 * y_0))
@@ -127,3 +120,5 @@ for A in range(-n, n + 1):
 plt.axis('square')
 plt.show()
 Kos.display3d(MirrorArray, Rays, 0)
+
+

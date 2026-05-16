@@ -1,22 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Axicon"""
 
 import numpy as np
 
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
+import sys
+from pathlib import Path
 
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 P_Obj = Kos.surf()
@@ -89,3 +82,5 @@ for i in range(-tam, tam + 1):
 # ______________________________________#
 
 Kos.display3d(Doblete, Rayos, 0)
+
+

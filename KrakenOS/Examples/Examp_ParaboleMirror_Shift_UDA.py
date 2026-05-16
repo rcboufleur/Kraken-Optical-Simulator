@@ -1,21 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Parabole Mirror Shift"""
 
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 P_Obj = Kos.surf()
@@ -73,7 +67,6 @@ px.extend(px1)
 py.extend(py1)
 
 
-
 M1.UDA = [px, py]
 
 # ______________________________________#
@@ -95,7 +88,6 @@ Espejo = Kos.system(A, configuracion_1, build = 1)
 Rayos = Kos.raykeeper(Espejo)
 
 # ______________________________________#
-
 
 
 diametro = 300
@@ -125,7 +117,6 @@ for i in range(0,len(X)):
 Kos.display3d(Espejo, Rayos, 0)
 
 
-
 def R_RMS_delta(Z1, L, M, N, X0, Y0):
     X1 = ((L / N) * Z1) + X0
     Y1 = ((M / N) * Z1) + Y0
@@ -140,3 +131,5 @@ def R_RMS_delta(Z1, L, M, N, X0, Y0):
 x,y,z,l,m,n = Rayos.pick(-1, coordinates="local")
 
 print(R_RMS_delta(z, l, m, n, x, y))
+
+

@@ -1,24 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Doublet Lens Tilt"""
 
 import numpy as np
-import pkg_resources
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
-
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 P_Obj = Kos.surf()
@@ -101,3 +92,5 @@ for i in range(-tam, tam + 1):
 
 Kos.display3d(Doblete, Rayos, 2)
 Kos.display2d(Doblete, Rayos, 0)
+
+

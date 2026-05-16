@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Tel 2M Wavefront Fitting"""
 
@@ -6,23 +6,12 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import pkg_resources
-
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
-
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
 
 
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 currentDirectory = os.getcwd()
@@ -278,7 +267,6 @@ n=a[:,0]
 lam=a[:,1]/10000.0
 
 
-
 a=np.arange(-35, -80, -1)
 
 x=[]
@@ -325,5 +313,6 @@ plt.axis('square')
 plt.show()
 
 
-
 Kos.display3d(Telescope, Rays, 0)
+
+

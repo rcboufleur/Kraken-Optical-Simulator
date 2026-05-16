@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Tel 2M Wavefront Fitting"""
 
@@ -6,19 +6,12 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 currentDirectory = os.getcwd()
@@ -139,7 +132,6 @@ Type = "interferogram"
 Kos.ZernikeDataImage2Plot(ima, Type)
 
 
-
 Surf = 1
 W = 0.5016
 AperVal = 2000.
@@ -185,3 +177,5 @@ from scipy.optimize import fsolve
 
 root = fsolve(SeidelFun.Fun, [0, 0])
 print(root)
+
+

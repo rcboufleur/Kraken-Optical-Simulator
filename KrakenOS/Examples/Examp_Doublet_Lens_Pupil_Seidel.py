@@ -1,21 +1,12 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Doublet Lens Pupil Seidel"""
 
-import pkg_resources
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
 
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
+import sys
+from pathlib import Path
 
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
-
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 import numpy as np
 
@@ -134,7 +125,6 @@ print(AB.CL)
 print(AB.CT)
 
 
-
 # print( AB[0][0])
 # print(np.sum(AB[1][0]), np.sum(AB[1][1]), np.sum(AB[1][2]), np.sum(AB[1][3]), np.sum(AB[1][4]))
 
@@ -167,3 +157,5 @@ for i in range(0, len(x)):
 # _________________________________________#
 
 Kos.display2d(Doblete, Rayos, 0)
+
+

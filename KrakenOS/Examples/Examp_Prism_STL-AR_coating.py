@@ -1,21 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Parabole Mirror Shift"""
 
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 P_Obj = Kos.surf()
 P_Obj.Thickness = 5.0
 P_Obj.Diameter = 10
@@ -24,7 +18,6 @@ P_Obj.Drawing = 0
 P = Kos.surf()
 P.Thickness = 10.0
 P.Diameter = 5
-
 
 
 file = r"prism.stl"
@@ -50,9 +43,6 @@ THETA = [0, 45]
 # anti reflection coating
 Solid.Coating =[R, A, W, THETA]
 """Note: this cannot change the total internal reflection """
-
-
-
 
 
 P2 = Kos.surf()
@@ -81,13 +71,8 @@ Rays = Kos.raykeeper(SOLID)
 SOLID.energy_probability = 0
 
 
-
-
 AA = [P_Obj, P, P_Ima]
 SOLID2 = Kos.system(AA, configuracion_1)
-
-
-
 
 
 W= 0.65
@@ -101,4 +86,6 @@ Kos.NsTraceLoop(x, y, z, L, M, N, W, Rays, clean = 1)
 
 Kos.display2d(SOLID, Rays, 0, arrow = 1)
 Kos.display3d(SOLID, Rays, 1)
+
+
 

@@ -1,6 +1,15 @@
 # Visual Studio Code
 .vscode/
 
+# Local IDE settings
+.idea/
+
+# Local cleanup backups
+_cleanup_backup/
+
+# Local test output
+tests/test_report.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -84,6 +93,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+.ipynb_checkpoints/
 
 # IPython
 profile_default/

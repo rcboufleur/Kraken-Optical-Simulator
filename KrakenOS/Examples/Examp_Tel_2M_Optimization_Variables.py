@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Tel 2M Wavefront Fitting"""
 
@@ -6,19 +6,12 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 currentDirectory = os.getcwd()
@@ -76,7 +69,6 @@ configuracion_1 = Kos.Setup()
 Telescopio = Kos.system(A, configuracion_1)
 
 
-
 def FunVar(system):
     L0 = dir(system.SDT[0])
 
@@ -127,7 +119,6 @@ class FunHandl:
         return(VarList, SurfNum)
 
 
-
     def GetAtri(self, index, attr_name):
         return getattr(self.obj.SDT[index], attr_name)
 
@@ -157,12 +148,6 @@ class FunHandl:
         self.obj.SetData()
 
 
-
-
-
-
-
-
 # ______________________________________#
 
 Surf = 1
@@ -177,10 +162,6 @@ Pupil.FieldType = "angle"
 
 
 AB = Kos.Seidel(Pupil)
-
-
-
-
 
 
 class Aberr:
@@ -199,8 +180,9 @@ MeritFun = Aberr(AB)
 MFVI = FunHandl(MeritFun)
 
 
-
 from scipy.optimize import fsolve
 
 root = fsolve(MFVI.Fun, MFVI.Vars)
 print(root)
+
+

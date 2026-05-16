@@ -1,22 +1,14 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Diffraction Grating Transmission"""
 
 import numpy as np
-import pkg_resources
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
-
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 # _________________________________________#
 
@@ -88,7 +80,6 @@ for ii in range(0,40):
     # _________________________________________#
 
 
-
     x0,y0,z0,l0,m0,n0 = Rayos.pick(1)
     x1,y1,z1,l1,m1,n1 = Rayos.pick(-1,coordinates="local")
 
@@ -104,11 +95,8 @@ for ii in range(0,40):
     print("Sigma: ", ii, np.rad2deg(sigma))
 
 
-
-
 N = np.sin((1/2) * (sigma + alpha)) / np.sin((1/2) * alpha)
 print(N)
-
 
 
 [SistemMatrix, S_Matrix, N_Matrix, a, b, c, d, EFFL, APP, PPP, C, N, D] = Doblete.Parax(0.4)
@@ -119,5 +107,6 @@ print(N)
 print(N)
 
 
-
 Kos.display2d(Doblete, Rayos, 0)
+
+

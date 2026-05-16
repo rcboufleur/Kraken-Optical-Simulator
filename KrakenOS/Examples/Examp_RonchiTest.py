@@ -1,23 +1,13 @@
-import matplotlib.pyplot as plt
+﻿import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 import scipy
 
 
-import pkg_resources
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
+import sys
+from pathlib import Path
 
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
-
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 ######################################################################################
 
@@ -28,7 +18,6 @@ P_Obj.Thickness = 1.0
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 100
 P_Obj.Drawing = 0
-
 
 
 Ronchi = Kos.surf()
@@ -54,14 +43,12 @@ Mirror.Thickness = -5000
 Mirror.Glass = "MIRROR"
 
 
-
 Ronchi2 = Kos.surf()
 Ronchi2.Diameter = 100
 Ronchi2.Thickness = -5000
 Ronchi2.Glass = "AIR"
 Ronchi2.Mask_Shape = AAA
 Ronchi2.Mask_Type = 2
-
 
 
 P_Ima = Kos.surf()
@@ -129,3 +116,5 @@ plt.show()
 
 #             Rays.push()
 Kos.display3d(Telescope, Rays, 1)
+
+

@@ -1,26 +1,17 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Doublet Lens"""
 
 
 import numpy as np
-import pkg_resources
 import os
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
-
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 LENSCAT_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)) + "/KrakenOS/LensCat"
 
 
@@ -50,19 +41,12 @@ surf_list = Kos.cat2surf(cat['84383'], inverse=True, Thickness=0, DespY=5, TiltX
 cat_dictionary = Kos.surflist2dict(surf_list)
 
 
-
-
-
-
-
-
 Zf = os.path.join(LENSCAT_PATH, 'zmax_84383.zmx')
 
 Z = Kos.zmx_read(Zf)
 
 
 config = Kos.Setup()
-
 
 
 def rays_2D(system, angle: float=0, src: list=[-12.5, 12.5], num_rays: int=20, wavelength: float=0.55):
@@ -77,7 +61,6 @@ def rays_2D(system, angle: float=0, src: list=[-12.5, 12.5], num_rays: int=20, w
             system.Trace(source, dCos, wavelength)
             rays.push()
     return rays
-
 
 
 angle = np.rad2deg(np.arcsin(0.6))
@@ -113,5 +96,7 @@ xlim = [0, 180]
 ylim = [-15, 15]
 
 # plt.show()
+
+
 
 

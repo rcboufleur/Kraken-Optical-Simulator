@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Simulation of a Fresnel lens using KrakenOS
@@ -8,26 +8,15 @@ builds an optical system in KrakenOS, and traces rays through the system to
 visualize the lens behavior.
 """
 
-import pkg_resources
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
-# -----------------------------------------------------------------------------
-# Check that KrakenOS is available
-# -----------------------------------------------------------------------------
+from pathlib import Path
 
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("KrakenOS is not installed. Adding relative path for local environment.")
-    sys.path.append("../..")
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # -----------------------------------------------------------------------------
 # Object surface (input of the system)
 # -----------------------------------------------------------------------------
@@ -174,3 +163,5 @@ for i in I:
 
 Kos.display3d(Lens, Rays, 0)  # 3D view
 Kos.display2d(Lens, Rays, 0)  # 2D view
+
+

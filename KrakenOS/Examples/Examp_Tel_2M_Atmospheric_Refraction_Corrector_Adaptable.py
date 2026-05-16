@@ -1,25 +1,16 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp-Tel_2M_Atmospheric_Refraction_Corrector"""
 
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
+import sys
+from pathlib import Path
 
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
-
-
-
 
 
 def MyPlot(RK,surf, figure= "Spot", mk=["x"], col = [[0.8,0.0,0.0]]):
@@ -36,7 +27,6 @@ def MyPlot(RK,surf, figure= "Spot", mk=["x"], col = [[0.8,0.0,0.0]]):
     ax.set_ylabel('y (mm)')
     ax.set_title('Spot diagram')
     plt.show()
-
 
 
 def R_RMS_delta(Z1, L, M, N, X0, Y0):
@@ -164,9 +154,6 @@ Rays2 = Kos.raykeeper(Tel)
 Rays3 = Kos.raykeeper(Tel)
 
 
-
-
-
 W = 0.60169
 sup = 1  # Difining M1 as enter pupil diameter
 AperVal = 2000
@@ -202,3 +189,5 @@ MK = [".", ".", "."]
 COL = [[0.8,0.0,0.0], [0.0,0.8,0.0], [0.0,0.0,0.8]]
 SURF = [-1, -1, -1]
 MyPlot(RAYS, SURF, figure= "Spot", mk = MK, col = COL)
+
+

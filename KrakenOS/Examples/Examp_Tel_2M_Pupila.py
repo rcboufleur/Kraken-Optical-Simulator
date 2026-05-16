@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp  TEl 2M Pupila"""
 
@@ -8,19 +8,11 @@ import numpy as np
 import sys
 sys.path.insert(1, '/Users/joelherreravazquez/Documents/GitHub/Kraken-Optical-Simulator/')
 
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
+from pathlib import Path
 
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 P_Obj = Kos.surf()
@@ -85,7 +77,7 @@ print("Posicion pupila de salida: ")
 print(Pup.PosPupOut)
 print("Posicion pupila de salida respecto al plano focal: ")
 print(Pup.PosPupOutFoc)
-print("Orientación pupila de salida")
+print("OrientaciÃ³n pupila de salida")
 print(Pup.DirPupSal)
 [L, M, N] = Pup.DirPupSal
 print(L, M, N)
@@ -123,3 +115,5 @@ plt.figure(300)
 plt.plot(X, Y, 'x')
 plt.axis('square')
 plt.show(block=False)
+
+

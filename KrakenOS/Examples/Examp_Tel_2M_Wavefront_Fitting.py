@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Tel 2M Wavefront Fitting"""
 
@@ -6,23 +6,12 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import pkg_resources
-
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
-
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
 
 
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 currentDirectory = os.getcwd()
@@ -79,7 +68,7 @@ configuracion_1 = Kos.Setup()
 Telescopio = Kos.system(A, configuracion_1)
 
 # ______________________________________#
-"""Vamos a definir los parámetros de la pupila del sistema,
+"""Vamos a definir los parÃ¡metros de la pupila del sistema,
 definiremos esta pupila en la superficie 1, esta corresponde al
 espejo primario"""
 Surf = 1
@@ -87,7 +76,7 @@ Surf = 1
 """Definimos la longitud de onda en micras"""
 W = 0.50169
 
-"""Indicamos que la apertura del sistema definirá la pupila"""
+"""Indicamos que la apertura del sistema definirÃ¡ la pupila"""
 AperType = "EPD"
 
 """ Definimos el Diametro de la apertura del sistema"""
@@ -95,19 +84,17 @@ AperVal = 2000.
 Pupil = Kos.PupilCalc(Telescopio, Surf, W, AperType, AperVal)
 
 
-
-
 print("Radio pupila de entrada: ")
 print(Pupil.RadPupInp)
-print("Posición pupila de entrada: ")
+print("PosiciÃ³n pupila de entrada: ")
 print(Pupil.PosPupInp)
-print("Rádio pupila de salida: ")
+print("RÃ¡dio pupila de salida: ")
 print(Pupil.RadPupOut)
 print("Posicion pupila de salida: ")
 print(Pupil.PosPupOut)
 print("Posicion pupila de salida respecto al plano focal: ")
 print(Pupil.PosPupOutFoc)
-print("Orientación pupila de salida")
+print("OrientaciÃ³n pupila de salida")
 print(Pupil.DirPupSal)
 
 print("Airy disk radius focal distance (micrometers)")
@@ -118,22 +105,17 @@ print("Distancia focal")
 print(Pupil.EFFL)
 
 
-
-
-
-
-
 """ Para los calculos internos de la fase del frente de onda indicamos que
-la pupila tendrá un arreglo exapolar con 10 anillos"""
+la pupila tendrÃ¡ un arreglo exapolar con 10 anillos"""
 
 Pupil.Samp = 11
 Pupil.Ptype = "hexapolar"
 """Indicamos que los campos son tel tipo angulo, como en el caso de los telescopios
-con luz desde el infinito, para diseños con objeto certano este parametro es la altura
+con luz desde el infinito, para diseÃ±os con objeto certano este parametro es la altura
  del objeto"""
 
 Pupil.FieldType = "angle"
-""" Definimos que el campo es 0 en x y cero en y, es decir, está en el eje óptico"""
+""" Definimos que el campo es 0 en x y cero en y, es decir, estÃ¡ en el eje Ã³ptico"""
 
 
 Pupil.FieldX = 0.0
@@ -148,15 +130,15 @@ X, Y, Z, P2V = Kos.Phase2(Pupil)
 print("Peak to valley: ", P2V)
 
 
-"""Indicamos el grado de expanción para los polinomios de Zernike"""
+"""Indicamos el grado de expanciÃ³n para los polinomios de Zernike"""
 NC = 15
 
-"""Generamos un arreglo numpy conlas mismas dimensiones de la expanción definida"""
+"""Generamos un arreglo numpy conlas mismas dimensiones de la expanciÃ³n definida"""
 A = np.ones(NC)
 
 """Calculamos los polinomios de Zernike con la fase calculada y el numero de
- elementos deseados en la expanción, Zcoef son los coeficientes en longitudes de
- onda, Mat es la expreción matematica de Zeidel para dicho coeficiente,
+ elementos deseados en la expanciÃ³n, Zcoef son los coeficientes en longitudes de
+ onda, Mat es la expreciÃ³n matematica de Zeidel para dicho coeficiente,
  esto con fines ilustrativos, w_rms es el error del ajuste"""
 
 Zcoef, Mat, RMS2Chief, RMS2Centroid, FITTINGERROR = Kos.Zernike_Fitting(X, Y, Z, A)
@@ -172,7 +154,6 @@ print(RMS2Chief, "RMS(to chief) From fitted coefficents")
 print(RMS2Centroid, "RMS(to centroid) From fitted coefficents")
 
 
-
 COEF = Zcoef
 Focal = Pupil.EFFL
 Diameter = 2.0 * Pupil.RadPupInp
@@ -180,12 +161,11 @@ Wave = W
 I= Kos.psf(COEF, Focal, Diameter, Wave,pixels=265, plot=1, sqr = 1)
 
 
-
 # """Se genera un contenedor de rayos"""
 
 # RR = Kos.raykeeper(Telescopio)
 
-# """ Se generan rayos que pasan por la pupila con la configuración realizada antes"""
+# """ Se generan rayos que pasan por la pupila con la configuraciÃ³n realizada antes"""
 # x, y, z, L, M, N = Pupil.Pattern2Field()
 
 # # ______________________________________#
@@ -230,9 +210,6 @@ I= Kos.psf(COEF, Focal, Diameter, Wave,pixels=265, plot=1, sqr = 1)
 # plt.show()
 
 
-
-
-
 # X = X - np.mean(X)
 # Y = Y - np.mean(Y)
 
@@ -249,7 +226,6 @@ I= Kos.psf(COEF, Focal, Diameter, Wave,pixels=265, plot=1, sqr = 1)
 # print("Peak 2 valley. ", np.max(ima)-np.min(ima))
 
 
-
 # """ Se grafica el interferograma """
 # Type = "interferogram"
 
@@ -264,6 +240,7 @@ I= Kos.psf(COEF, Focal, Diameter, Wave,pixels=265, plot=1, sqr = 1)
 # # print(AB.SCW_AN)
 # # print(AB.SCW_NM)
 # # print(AB.SCW_TOTAL)
+
 
 
 

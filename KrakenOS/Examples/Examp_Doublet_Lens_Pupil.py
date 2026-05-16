@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Example: Doublet Lens with Pupil Calculation
-
 This script demonstrates how to simulate a doublet lens system with pupil calculation using KrakenOS.
 The system includes:
   - Object Plane (source)
@@ -19,21 +18,11 @@ Author: Joel Herrera V.
 Date: 10/03/2025
 """
 
-import pkg_resources
+import sys
+from pathlib import Path
 
-# =============================================================================
-# Check if KrakenOS is installed.
-# If not, assume that the code is run from a downloaded GitHub folder and add the relative path.
-# =============================================================================
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("KrakenOS is not installed. Using local GitHub folder.")
-    import sys
-    sys.path.append("../..")  # Adjust this path if necessary
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos  # Import KrakenOS for optical simulation
 
 # =============================================================================
@@ -184,3 +173,5 @@ for i in range(len(x)):
 # Uncomment the following line for 3D visualization:
 # Kos.display3d(Doublet, RayKeeper, 2)
 Kos.display2d(Doublet, RayKeeper, 0, 1)
+
+

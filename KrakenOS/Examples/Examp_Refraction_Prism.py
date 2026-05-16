@@ -1,24 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Diffraction Grating Transmission"""
 
 import numpy as np
-import pkg_resources
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
-
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 P_Obj = Kos.surf(Thickness = 10, Diameter = 30.0)
 
 Prism_f1 = Kos.surf()
@@ -79,9 +70,6 @@ for i in range(-nr, nr + 1):
                 Rays.push()
 
 Kos.display2d(Prism, Rays, 0)
-
-
-
 
 
 

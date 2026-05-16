@@ -1,22 +1,15 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Parabole Mirror Shift"""
 
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-
 F = 300
 D = 50
 h = 50
@@ -97,8 +90,6 @@ for dw in DW:
     Kos.TraceLoop(x, y, z, L, M, N, W + dw, Rays, clean = 0)
 
 
-
-
 W =0.35
 Rays2 = Kos.raykeeper(ZernTurn)
 
@@ -114,8 +105,6 @@ for dw in DW:
     Kos.TraceLoop(x, y, z, L, M, N, W + dw, Rays2, clean = 0)
 
 
-
-
 # Kos.display3d(ZernTurn, Rays, 0)
 
 
@@ -124,7 +113,6 @@ P3D = Kos.display3d_OB()
 P3D.SYSTEM = ZernTurn
 P3D.RAYS = Rays
 P3D.plot()
-
 
 
 P3D.RAYS = Rays2
@@ -139,3 +127,5 @@ P3D.plot()
 
 # Tm = np.rad2deg(Tm)
 # print(Tm)
+
+

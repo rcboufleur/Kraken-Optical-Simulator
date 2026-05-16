@@ -4,6 +4,7 @@ import os
 from .SystemTools import *
 RUTE=inspect.getmodule(load_Catalog).__file__
 rute=RUTE[:-15]+ "/Cat/"
+DEFAULT_CATALOG_PRIORITY = ("SCHOTT.AGF",)
 
 
 def read_material_data(file_path):
@@ -60,7 +61,10 @@ class Setup():
         # cat1 = (rute + 'SCHOTT.AGF')
         # cat2 = (rute + 'infrared.agf')
 
-        self.GlassCat =[rute + cat for cat in os.listdir(rute) if cat.endswith(('.AGF', '.agf'))]
+        catalog_names = sorted([cat for cat in os.listdir(rute) if cat.endswith(('.AGF', '.agf'))])
+        priority_names = [cat for cat in DEFAULT_CATALOG_PRIORITY if cat in catalog_names]
+        remaining_names = [cat for cat in catalog_names if cat not in priority_names]
+        self.GlassCat = [rute + cat for cat in priority_names + remaining_names]
         # self.GlassCat.append(cat1)
         # self.GlassCat.append(cat2)
 

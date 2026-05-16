@@ -1,20 +1,14 @@
-import matplotlib.pyplot as plt
+﻿import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 import scipy
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 P_Obj = Kos.surf()
 
 P_Obj.Thickness = 5000.0
@@ -153,3 +147,5 @@ plt.show()
 
 #             Rays.push()
 # Kos.display3d(Telescope, Rays, 0)
+
+

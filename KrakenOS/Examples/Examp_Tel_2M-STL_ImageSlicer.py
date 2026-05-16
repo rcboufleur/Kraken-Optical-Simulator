@@ -1,26 +1,15 @@
-# !/usr/bin/env python3
+﻿# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Examp-2M-STL_ImageSlicer.py
 """
 
-import pkg_resources
-""" Looking for if KrakenOS is installed, if not, it assumes that
-an folder downloaded from github is run"""
 
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
+import sys
+from pathlib import Path
 
-if missing:
-    print("Not installed")
-    import sys
-    sys.path.append("../..")
-
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
@@ -131,13 +120,6 @@ if A1 == 0:
     np.save(outfile, Rays)
 
 
-
-
-
-
-
-
-
 ################################################################
 
 else:
@@ -160,7 +142,6 @@ else:
         print("El archivo existe.")
     else:
         print("El archivo no existe.")
-
 
 
     direc = ruta
@@ -270,3 +251,5 @@ else:
 
     #             Rays.push()
     Kos.display3d(ImageSlicer, Rayos, 0)
+
+

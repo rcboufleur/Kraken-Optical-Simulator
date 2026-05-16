@@ -1,18 +1,12 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Extra Shape XY Cosines"""
 
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
+import sys
+from pathlib import Path
 
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,7 +26,6 @@ L1a.Rc = 55.134 * 0
 L1a.Thickness = 9.0
 L1a.Glass = "BK7"
 L1a.Diameter = 30.0
-
 
 
 radio = 15
@@ -112,3 +105,5 @@ for i in range(-100, 100 + 1):
 
 Kos.display3d(Lens, Rays, 0)
 # Kos.display2d(Lens, Rays, 0)
+
+

@@ -1,23 +1,17 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Perfect Lens"""
 
 import time
 import matplotlib.pyplot as plt
 import numpy as np
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 import scipy
 
 
@@ -36,7 +30,6 @@ def MyPlot(RK,surf, figure= "Spot", mk=["x"], col = [[0.8,0.0,0.0]]):
     ax.set_ylabel('y (mm)')
     ax.set_title('Spot diagram')
     plt.show()
-
 
 
 def R_RMS_delta(Z1, L, M, N, X0, Y0):
@@ -121,8 +114,6 @@ class Function2Optimize:
 
         self.system.RestoreData()
         return [D_EFFL, r, B]
-
-
 
 
 P_Obj = Kos.surf()
@@ -228,11 +219,7 @@ Lens.Parax(W - DW)
 print("Initial effective focal length: ", Lens.EFFL)
 
 
-
 Kos.display2d(Lens, Rays, 1)
-
-
-
 
 
 Surf, W, AperVal, AperType = 1, W, Fa.Diameter, "EPD"
@@ -261,17 +248,11 @@ Kos.TraceLoop(x, y, z, L, M, N, W+DW, Rays2, clean = 1)
 Kos.TraceLoop(x, y, z, L, M, N, W-DW, Rays3, clean = 1)
 
 
-
 RAYS = [Rays, Rays2, Rays3]
 MK = ["x", "*", "+"]
 COL = [[0.8,0.0,0.0], [0.0,0.8,0.0], [0.0,0.0,0.8]]
 SURF = [-1, -1, -1]
 MyPlot(RAYS, SURF, figure= "Spot", mk = MK, col = COL)
-
-
-
-
-
 
 
 # rays = Trace_Array(Lens, 0.5)
@@ -290,3 +271,5 @@ MyPlot(RAYS, SURF, figure= "Spot", mk = MK, col = COL)
 # Lens.Parax(0.5)
 # print("Final effective focal length: ", Lens.EFFL)
 # print("Final RMS radius in best focus: ", BestRMS(Lens, Wave))
+
+

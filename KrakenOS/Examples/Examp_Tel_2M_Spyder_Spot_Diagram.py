@@ -1,23 +1,17 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Tel 2M Spyder Spot Diagram"""
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
 
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # ______________________________________#
 
 P_Obj = Kos.surf()
@@ -116,3 +110,5 @@ plt.ylabel('y')
 plt.title('Spot Diagram')
 plt.axis('square')
 plt.show()
+
+

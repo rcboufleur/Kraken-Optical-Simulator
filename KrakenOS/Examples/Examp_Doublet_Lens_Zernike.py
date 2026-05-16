@@ -1,21 +1,13 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Doublet Lens Zernike"""
 
-import pkg_resources
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("No instalado")
-    import sys
-    sys.path.append("../..")
+import sys
+from pathlib import Path
 
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -107,3 +99,5 @@ for i in range(-tam, tam + 1):
 
 Kos.display3d(Doblete, Rayos, 2)
 Kos.display2d(Doblete, Rayos, 1)
+
+

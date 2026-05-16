@@ -1,33 +1,24 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Example: Doublet Lens with Focus Optimization
 This script demonstrates how to:
   1. Build a doublet lens system using KrakenOS.
   2. Trace rays for multiple wavelengths.
-  3. Optimize the image plane focus using a Newton–Raphson method.
+  3. Optimize the image plane focus using a Newtonâ€“Raphson method.
   4. Adjust the image plane position, re-trace the rays, and display an updated 2D plot.
 
 Author: Joel Herrera V.
 Date: 10/03/2025
 """
 
+import sys
+from pathlib import Path
+
 import numpy as np
-import pkg_resources
 
-# =============================================================================
-# Check if KrakenOS is installed. If not, assume that the code is run from a
-# downloaded GitHub folder and add the relative path.
-# =============================================================================
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
 
-if missing:
-    print("KrakenOS is not installed. Using local GitHub folder.")
-    import sys
-    sys.path.append("../..")  # Adjust this path if necessary
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos  # Using KrakenOS for optical simulation
 
 # =============================================================================
@@ -131,7 +122,7 @@ for j in range(-grid_resolution, grid_resolution + 1):
         x0 = (i / grid_resolution) * aperture_radius
         y0 = (j / grid_resolution) * aperture_radius
         if np.sqrt(x0**2 + y0**2) < aperture_radius:
-            # For simplicity, rays are launched parallel to the optical axis (0° tilt).
+            # For simplicity, rays are launched parallel to the optical axis (0Â° tilt).
             angle_deg = 0.0
             pSource = [x0, y0, 0.0]
             dCos = [0.0, np.sin(np.deg2rad(angle_deg)), np.cos(np.deg2rad(angle_deg))]
@@ -160,7 +151,7 @@ for j in range(-grid_resolution, grid_resolution + 1):
 Kos.display2d(Doublet, raysTotal, 0)
 
 # =============================================================================
-# Focus optimization using the Newton–Raphson method.
+# Focus optimization using the Newtonâ€“Raphson method.
 #
 # Extract the ray data from the last surface (image plane) to compute the RMS
 # spot size and its derivative.
@@ -242,3 +233,5 @@ for j in range(-grid_resolution, grid_resolution + 1):
 # Kos.display2d(Doublet, newRaysTotal, 0)
 
 Kos.display2d_colab(Doublet, newRaysTotal, 0)
+
+

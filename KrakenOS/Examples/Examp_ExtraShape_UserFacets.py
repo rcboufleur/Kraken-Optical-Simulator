@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Example: Faceted Optical Surface Using KrakenOS
@@ -14,23 +14,15 @@ Author: Joel H. V.
 Date:12/04/25
 """
 
-import pkg_resources
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-# --- Dependency check: ensure KrakenOS is installed or load from local path ---
-required = {'KrakenOS'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
+from pathlib import Path
 
-if missing:
-    print("KrakenOS not installed. Adding relative path.")
-    sys.path.append("../..")
-
+sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
 # --- Define the entrance pupil surface ---
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0              # Radius of curvature (flat)
@@ -186,3 +178,5 @@ for i in range(n):
 
 Kos.display3d(Lens, Rays, 0)
 Kos.display2d(Lens, Rays, 0)
+
+
