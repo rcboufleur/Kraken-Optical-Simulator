@@ -38,6 +38,7 @@ Issues = "https://github.com/Garchupiter/Kraken-Optical-Simulator/issues"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["KrakenOS*"]
+exclude = ["*.egg-info*", "build*", "dist*"]
 
 [tool.setuptools.package-data]
 KrakenOS = [
