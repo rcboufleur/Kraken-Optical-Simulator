@@ -4,7 +4,7 @@
 
 
 import numpy as np
-import os
+from importlib import resources
 
 
 import sys
@@ -12,17 +12,14 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-LENSCAT_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)) + "/KrakenOS/LensCat"
 
 
-ED_CAT_PATH = os.path.join(LENSCAT_PATH, 'Edmund Optics 2019.ZMF')
-
-THOR_CAT_PATH = os.path.join(LENSCAT_PATH, 'THORLABS.ZMF')
+ED_CAT_PATH = resources.files("KrakenOS") / "LensCat" / "Edmund Optics 2019.ZMF"
+THOR_CAT_PATH = resources.files("KrakenOS") / "LensCat" / "THORLABS.ZMF"
 
 # load lens catalog
-PATH1 = os.path.join(LENSCAT_PATH, ED_CAT_PATH)
-
-PATH2 = os.path.join(LENSCAT_PATH, THOR_CAT_PATH)
+PATH1 = ED_CAT_PATH
+PATH2 = THOR_CAT_PATH
 
 cat = Kos.zmf2dict([PATH1, PATH2])
 
@@ -41,7 +38,7 @@ surf_list = Kos.cat2surf(cat['84383'], inverse=True, Thickness=0, DespY=5, TiltX
 cat_dictionary = Kos.surflist2dict(surf_list)
 
 
-Zf = os.path.join(LENSCAT_PATH, 'zmax_84383.zmx')
+Zf = resources.files("KrakenOS") / "LensCat" / "zmax_84383.zmx"
 
 Z = Kos.zmx_read(Zf)
 

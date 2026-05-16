@@ -1,4 +1,5 @@
 from pathlib import Path
+from importlib import resources
 
 
 REPORT = Path(__file__).with_name("test_report.txt")
@@ -45,6 +46,20 @@ def main():
         for required_file in required_files:
             assert required_file.exists(), f"Missing required file: {required_file}"
             lines.append(f"PASS found data file: {required_file.relative_to(package_root)}")
+
+        kraken_resources = resources.files("KrakenOS")
+        gold_csv = kraken_resources / "Cat" / "Gold.csv"
+        fresnel_profile = kraken_resources / "Examples" / "R1064_F1800.txt"
+        thorlabs_catalog = kraken_resources / "LensCat" / "THORLABS.ZMF"
+        zemax_lens = kraken_resources / "LensCat" / "zmax_84383.zmx"
+        assert gold_csv.exists(), f"Missing resource: {gold_csv}"
+        assert fresnel_profile.exists(), f"Missing resource: {fresnel_profile}"
+        assert thorlabs_catalog.exists(), f"Missing resource: {thorlabs_catalog}"
+        assert zemax_lens.exists(), f"Missing resource: {zemax_lens}"
+        lines.append("PASS importlib.resources finds Cat/Gold.csv")
+        lines.append("PASS importlib.resources finds Examples/R1064_F1800.txt")
+        lines.append("PASS importlib.resources finds LensCat/THORLABS.ZMF")
+        lines.append("PASS importlib.resources finds LensCat/zmax_84383.zmx")
 
         lines.append("RESULT PASS")
         write_report(lines)

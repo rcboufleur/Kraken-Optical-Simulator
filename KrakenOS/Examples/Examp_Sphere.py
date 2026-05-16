@@ -3,6 +3,7 @@
 """Examp Parabole Mirror Shift"""
 
 import numpy as np
+from importlib import resources
 
 
 import sys
@@ -10,7 +11,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-import os
 
 # ______________________________________#
 
@@ -43,8 +43,7 @@ P_Ima.Name = "Plano imagen"
 A = [P_Obj, M1, P_Ima]
 configuracion_1 = Kos.Setup()
 
-GLASCAT_PATH = os.path.abspath(os.path.join(os.getcwd(), os.pardir, os.pardir)) + "/KrakenOS/Cat"
-MATERIAL_PATH = os.path.join(GLASCAT_PATH, 'Gold.csv')
+MATERIAL_PATH = resources.files("KrakenOS.Cat") / "Gold.csv"
 
 configuracion_1.LoadMetal(MATERIAL_PATH, "Gold", 1)
 

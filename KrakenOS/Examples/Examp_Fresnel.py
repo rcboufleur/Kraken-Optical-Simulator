@@ -9,6 +9,8 @@ visualize the lens behavior.
 """
 
 import sys
+from importlib import resources
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
@@ -98,7 +100,7 @@ class FresnelPrepare:
 # Define the Fresnel lens from the profile file
 # -----------------------------------------------------------------------------
 
-file = "R1064_F1800.txt"  # Lens profile file
+file = resources.files("KrakenOS.Examples") / "R1064_F1800.txt"  # Lens profile file
 fresnel = FresnelPrepare(file)
 E = []  # Placeholder for additional data if needed
 
