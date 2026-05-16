@@ -43,7 +43,6 @@ exclude = ["*.egg-info*", "build*", "dist*"]
 [tool.setuptools.package-data]
 KrakenOS = [
   "Cat/*",
-  "Docs/*",
   "Examples/*",
   "LensCat/*",
   "AstroAtmosphere/*.txt",

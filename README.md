@@ -300,7 +300,8 @@ Kos.display2d(Doublet, Rays,0,1)
 
 ## User Manual and Examples
 
-The included user manual is [MU-2022-01.pdf](KrakenOS/Docs/MU-2022-01.pdf).
+The current user manual starts at [docs/user_manual/README.md](docs/user_manual/README.md).
+The complete documentation index is [docs/README.md](docs/README.md).
 
 Example scripts are available in `KrakenOS/Examples`:
 
