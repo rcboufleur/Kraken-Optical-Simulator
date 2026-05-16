@@ -1,6 +1,8 @@
 # KrakenOS Example Guide
 
 Use this guide to find a starting example depending on what you want to do.
+For a generated topic-by-topic manual, see
+[KrakenOS Examples Manual](examples_manual.md).
 
 | I want to... | Start with this example |
 | --- | --- |
