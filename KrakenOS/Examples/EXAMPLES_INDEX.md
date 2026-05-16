@@ -46,6 +46,7 @@
 | `Examp_Refraction_Prism_solid.py` | Advanced | Solid geometry | Solid prism refraction. | - |
 | `Examp_Refraction_Prism_solid_Generation.py` | Advanced | Solid geometry | Generated solid prism refraction. | - |
 | `Examp_RonchiTest.py` | Intermediate | Optical testing | Ronchi test with PyVista mask planes. | - |
+| `Examp_RMS_BestFocus.py` | Beginner | Spot analysis | RMS spot radius and best-focus shift. | - |
 | `Examp_Solid_Object_STL.py` | Advanced | STL geometry | Single STL solid object. | Prisma.stl |
 | `Examp_Solid_Object_STL_ARRAY.py` | Advanced | STL geometry | Array of STL solid objects. | - |
 | `Examp_Source_Distribution_Function.py` | Intermediate | Ray source sampling | Custom source distribution functions. | - |

@@ -31,7 +31,7 @@ large, or not ideal as first-contact tutorials:
 | Coating tables and energy behavior | Covered in non-sequential examples, but mixed with tilted geometry or STL cases. | Add one small coating-only tutorial that prints/plots reflected and transmitted energy. |
 | Metal coatings and polarization terms | `Examp_Sphere.py` loads `Gold.csv` and prints S/P reflection values. | Add a clearer metal-mirror example that compares dielectric mirror behavior with metal data. |
 | PSF and MTF | PSF is shown through wavefront examples. MTF helpers exist in `PSFCalc.py`. | Add a compact `Examp_PSF_MTF_From_Zernike.py`. |
-| RMS and best-focus tools | Many examples implement local RMS helpers; `LibRMS.py` has reusable functions. | Add one small example using `Kos.RMS` and `Kos.BestFocus` directly. |
+| RMS and best-focus tools | `Examp_RMS_BestFocus.py` now shows `Kos.RMS` and RMS minimization in a compact example. | Consider adding a deeper API note if `Kos.BestFocus` is revised in the future. |
 | Zemax lens catalog conversion | Covered by the Spruce-tone user example. | Add a shorter lens-catalog example using one packaged ZMF entry and showing the converted surfaces. |
 | Reverse tracing | `system.RvTrace` exists, but there is no obvious beginner example. | Add a minimal reverse-trace example from image plane back toward the object space. |
 | Fast tracing | `FastTrace` exists in the system class, but is not presented as a workflow. | Add a performance-oriented example only after confirming the intended public API. |
@@ -42,7 +42,7 @@ large, or not ideal as first-contact tutorials:
 These are the best candidates for new examples because they would teach common
 tasks in a focused way:
 
-1. `Examp_RMS_BestFocus.py`
+1. `Examp_RMS_BestFocus.py` - added
 
    Purpose: show how to trace a compact ray bundle, extract image-plane rays,
    calculate RMS, move to best focus, and report before/after RMS.
@@ -81,9 +81,9 @@ tasks in a focused way:
 
 The next practical batch should add:
 
-1. `Examp_RMS_BestFocus.py`
-2. `Examp_PSF_MTF_From_Zernike.py`
-3. `Examp_Coating_Energy_Basics.py`
+1. `Examp_PSF_MTF_From_Zernike.py`
+2. `Examp_Coating_Energy_Basics.py`
+3. `Examp_Lens_Catalog_Basics.py`
 
 Then update:
 

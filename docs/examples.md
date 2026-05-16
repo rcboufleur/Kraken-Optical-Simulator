@@ -10,6 +10,7 @@ Use this guide to find a starting example depending on what you want to do.
 | Save and reload a traced system | [`Examp_Pickle_Doublet_Lens_3Dcolor.py`](../KrakenOS/Examples/Examp_Pickle_Doublet_Lens_3Dcolor.py) |
 | Use a pupil definition | [`Examp_Doublet_Lens_Pupil.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Pupil.py) |
 | Calculate Seidel aberrations | [`Examp_Doublet_Lens_Pupil_Seidel.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Pupil_Seidel.py) |
+| Calculate RMS spot radius and best focus | [`Examp_RMS_BestFocus.py`](../KrakenOS/Examples/Examp_RMS_BestFocus.py) |
 | Use Zernike surfaces | [`Examp_Doublet_Lens_Zernike.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Zernike.py) |
 | Work with cylindrical surfaces | [`Examp_Doublet_Lens_Cylinder.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Cylinder.py) |
 | Work with tilted surfaces | [`Examp_Doublet_Lens_Tilt.py`](../KrakenOS/Examples/Examp_Doublet_Lens_Tilt.py) |
