@@ -1,24 +1,29 @@
-"""
-2 m telescope feeding an echelle-style dispersive layout.
+"""Example: 2 m telescope feeding an echelle-style dispersive layout.
 
-Combines a telescope model with dispersive elements and a spectral-line input file to trace an echelle-like configuration.
+This example combines a 2 m telescope, collimator, echelle-like grating layout,
+and a packaged ThAr spectral-line table to trace an instrument-style dispersive
+configuration.
 
-What to look at:
-- the telescope surface sequence.
-- the grating order and orientation parameters.
-- the external spectral-line table used by the trace.
+What this example teaches:
+- how a telescope model can feed a spectrograph-like optical sequence
+- how null surfaces and coordinate transformations organize folded layouts
+- how grating order and spacing are assigned for echelle-style dispersion
+- how packaged spectral-line data can drive a wavelength trace
 
-Required local files:
-- thar_uves.dat.txt
+Required packaged file:
+- `KrakenOS/Examples/thar_uves.dat.txt`
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a spectrograph-style ray trace and spectral-line plot/output
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 from importlib import resources
 import matplotlib.pyplot as plt
@@ -29,10 +34,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-currentDirectory = os.getcwd()
-sys.path.insert(1, currentDirectory + '/library')
-
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0

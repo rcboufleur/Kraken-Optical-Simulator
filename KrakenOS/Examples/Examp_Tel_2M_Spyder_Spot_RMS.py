@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-2 m telescope spider RMS spot analysis.
+"""Example: 2 m telescope spider RMS spot analysis.
 
-Extends the spider spot-diagram example by calculating RMS spot behavior.
+This example extends the spider-mask telescope model by tracing three
+wavelengths and plotting the resulting spot distribution.
 
-What to look at:
-- the ray source, direction cosines, and wavelength passed to Trace.
-- the merit quantity used to compare optical performance.
+What this example teaches:
+- how to reuse a PyVista mask as a telescope obstruction
+- how tilt/decenter values on M2 affect the spot diagram
+- how to compare multi-wavelength ray bundles at the image plane
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a 3D telescope view
+- a Matplotlib spot diagram
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 import matplotlib.pyplot as plt

@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-2 m telescope spider spot diagram.
+"""Example: 2 m telescope spider spot diagram.
 
-Traces rays through a 2 m telescope model that includes spider or support-structure effects.
+This example adds a spider/support mask to the 2 m telescope and traces rays to
+show how the obstruction appears in the spot diagram.
 
-What to look at:
-- the ray source, direction cosines, and wavelength passed to Trace.
+What this example teaches:
+- how to build a mask from PyVista planes and discs
+- how `Mask_Shape` and `Mask_Type` represent an obstruction
+- how a small focus shift can make the spider signature visible
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a 3D telescope view with the masked ray bundle
+- a Matplotlib spot diagram
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 import matplotlib.pyplot as plt
@@ -62,7 +69,7 @@ M1.InDiameter = 250 * 2.0
 
 M2 = Kos.surf()
 M2.Rc = -3.93E+003
-focusShift = 1.0  # Set cero to focus, 1 is only to see the spider is the spot diagram
+focusShift = 1.0  # Set to 0 for focus; 1 makes the spider visible in the spot diagram.
 M2.Thickness = Thickness + 1.037179115116706E+003 + focusShift
 M2.k = -4.328100000000000E+000
 M2.Glass = "MIRROR"

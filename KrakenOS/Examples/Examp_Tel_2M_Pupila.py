@@ -1,14 +1,23 @@
-"""
-2 m telescope pupil example.
+"""Example: pupil calculation in a 2 m telescope.
 
-Computes and traces a pupil-based ray set for the 2 m telescope model.
+This example computes input and output pupil properties for the 2 m telescope,
+generates a hexapolar pupil ray pattern, traces it, and plots the image-plane
+spot positions.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the ray source, direction cosines, and wavelength passed to Trace.
+What this example teaches:
+- how to configure `PupilCalc` for a telescope
+- how to inspect input and output pupil radius, position, and orientation
+- how to derive approximate angular pupil orientation from direction cosines
+- how to trace the pupil-generated ray set
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- printed pupil properties
+- a 2D telescope layout
+- a spot diagram at the image plane
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
@@ -18,9 +27,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import sys
-sys.path.insert(1, '/Users/joelherreravazquez/Documents/GitHub/Kraken-Optical-Simulator/')
-
-
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
@@ -72,17 +78,17 @@ AperType = "EPD"  # "STOP"
 Pup = Kos.PupilCalc(Telescopio, sup, W, AperType, AperVal)
 
 
-print("Radio pupila de entrada: ")
+print("Input pupil radius:")
 print(Pup.RadPupInp)
-print("Posicion pupila de entrada: ")
+print("Input pupil position:")
 print(Pup.PosPupInp)
-print("Radio pupila de salida: ")
+print("Output pupil radius:")
 print(Pup.RadPupOut)
-print("Posicion pupila de salida: ")
+print("Output pupil position:")
 print(Pup.PosPupOut)
-print("Posicion pupila de salida respecto al plano focal: ")
+print("Output pupil position relative to focal plane:")
 print(Pup.PosPupOutFoc)
-print("OrientaciÃ³n pupila de salida")
+print("Output pupil orientation:")
 print(Pup.DirPupSal)
 [L, M, N] = Pup.DirPupSal
 print(L, M, N)

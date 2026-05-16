@@ -1,22 +1,31 @@
-"""
-2 m telescope wavefront fitting with optimization.
+"""Example: 2 m telescope wavefront fitting with optimization.
 
-Combines Zernike or Seidel wavefront fitting with optimization variables in the 2 m telescope model.
+This example combines wavefront fitting, spot plotting, Seidel aberrations, and
+a small SciPy optimization loop for a 2 m telescope model.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the ray source, direction cosines, and wavelength passed to Trace.
-- the aberration output produced after tracing.
-- the merit quantity used to compare optical performance.
+What this example teaches:
+- how fitted Zernike coefficients can be visualized as an interferogram
+- how `Seidel` can provide merit-function terms
+- how `fsolve` can adjust mirror conic constants to reduce selected aberrations
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- printed Zernike coefficients
+- a 2D telescope layout and spot diagram
+- an interferogram-style plot
+- optimized conic-constant values printed by SciPy
+
+Didactic note:
+- commented RMS snippets are left as optional checks for users who want to
+  compare different RMS definitions.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,10 +35,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-currentDirectory = os.getcwd()
-sys.path.insert(1, currentDirectory + '/library')
-
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0

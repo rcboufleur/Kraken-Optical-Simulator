@@ -1,20 +1,30 @@
-"""
-2 m telescope optimization variables.
+"""Example: optimization variables in a 2 m telescope.
 
-Defines the optical variables used for optimization and aberration checks in the 2 m telescope model.
+This example marks selected surface attributes as optimization variables,
+builds a merit-function wrapper around Seidel aberrations, and solves for
+mirror conic constants with SciPy.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the aberration output produced after tracing.
+What this example teaches:
+- how the `surf.Var` list identifies variables to optimize
+- how to collect variable names and surface indices from a `system`
+- how to update surfaces, recompute data, and restore the original system state
+- how a Seidel-based merit function can be passed to `fsolve`
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- optimized variable values printed to the console
+
+Didactic note:
+- the commented starting values for `M1.k` and `M2.k` are intentionally left in
+  the file so users can compare fixed conic constants with optimized ones.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,10 +34,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-currentDirectory = os.getcwd()
-sys.path.insert(1, currentDirectory + '/library')
-
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -95,11 +101,7 @@ def FunVar(system):
 class FunHandl:
     def __init__(self, fun):
 
-        """
-        self.VarList : Lista de variables
-        self.SurfNum : Superficies relacionadas a las variables
-        self.Vars : Arreglo con variables con ceros
-        """
+        """Store optimization variable names, surface indices, and values."""
 
         self.obj = fun.SYSTEM
         self.attr_name = ""

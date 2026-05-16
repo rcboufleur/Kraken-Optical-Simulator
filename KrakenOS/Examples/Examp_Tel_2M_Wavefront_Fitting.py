@@ -1,22 +1,30 @@
-"""
-2 m telescope wavefront fitting.
+"""Example: 2 m telescope wavefront fitting.
 
-Traces a 2 m telescope model and fits the resulting wavefront using aberration coefficients.
+This example computes a wavefront phase over the telescope pupil, fits Zernike
+coefficients to that phase, and uses those coefficients to generate a PSF.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the ray source, direction cosines, and wavelength passed to Trace.
-- the aberration output produced after tracing.
-- the merit quantity used to compare optical performance.
+What this example teaches:
+- how `Phase2` samples the wavefront over a configured pupil
+- how `Zernike_Fitting` returns coefficients, notation, RMS terms, and fit error
+- how fitted wavefront coefficients can be sent to `psf`
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- printed pupil and Zernike fitting information
+- a PSF plot from the fitted coefficients
+
+Didactic note:
+- the long ray-tracing and interferogram block near the end is intentionally
+  commented. It is an optional exploration path for comparing wavefront fitting
+  with traced spot diagrams and interferogram-style plots.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,10 +34,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-
-currentDirectory = os.getcwd()
-sys.path.insert(1, currentDirectory + '/library')
-
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -60,7 +64,7 @@ M2.Diameter = 336.5 * 2.0
 M2.TiltY = 0.0
 M2.TiltX = 0.0
 M2.DespY = 0.0
-""" Se inclina el secundario """
+# Secondary mirror tilt/decenter parameters can be changed here.
 M2.DespX = 0.0
 M2.AxisMove = 0
 
@@ -75,82 +79,69 @@ A = [P_Obj, M1, M2, P_Ima]
 configuracion_1 = Kos.Setup()
 Telescopio = Kos.system(A, configuracion_1)
 
-"""Vamos a definir los parÃ¡metros de la pupila del sistema,
-definiremos esta pupila en la superficie 1, esta corresponde al
-espejo primario"""
+# Define the system pupil on surface 1, corresponding to the primary mirror.
 Surf = 1
 
-"""Definimos la longitud de onda en micras"""
+# Wavelength in micrometers.
 W = 0.50169
 
-"""Indicamos que la apertura del sistema definirÃ¡ la pupila"""
+# The system aperture defines the pupil.
 AperType = "EPD"
 
-""" Definimos el Diametro de la apertura del sistema"""
+# Aperture diameter.
 AperVal = 2000.
 Pupil = Kos.PupilCalc(Telescopio, Surf, W, AperType, AperVal)
 
 
-print("Radio pupila de entrada: ")
+print("Input pupil radius:")
 print(Pupil.RadPupInp)
-print("PosiciÃ³n pupila de entrada: ")
+print("Input pupil position:")
 print(Pupil.PosPupInp)
-print("RÃ¡dio pupila de salida: ")
+print("Output pupil radius:")
 print(Pupil.RadPupOut)
-print("Posicion pupila de salida: ")
+print("Output pupil position:")
 print(Pupil.PosPupOut)
-print("Posicion pupila de salida respecto al plano focal: ")
+print("Output pupil position relative to focal plane:")
 print(Pupil.PosPupOutFoc)
-print("OrientaciÃ³n pupila de salida")
+print("Output pupil orientation:")
 print(Pupil.DirPupSal)
 
 print("Airy disk radius focal distance (micrometers)")
 print(Pupil.FocusAiryRadius)
 
 
-print("Distancia focal")
+print("Effective focal length")
 print(Pupil.EFFL)
 
 
-""" Para los calculos internos de la fase del frente de onda indicamos que
-la pupila tendrÃ¡ un arreglo exapolar con 10 anillos"""
-
+# Use a hexapolar sampling pattern for the internal wavefront phase calculation.
 Pupil.Samp = 11
 Pupil.Ptype = "hexapolar"
-"""Indicamos que los campos son tel tipo angulo, como en el caso de los telescopios
-con luz desde el infinito, para diseÃ±os con objeto certano este parametro es la altura
- del objeto"""
 
+# Telescope fields are defined as angles for light arriving from infinity.
 Pupil.FieldType = "angle"
-""" Definimos que el campo es 0 en x y cero en y, es decir, estÃ¡ en el eje Ã³ptico"""
 
-
+# On-axis field.
 Pupil.FieldX = 0.0
 Pupil.FieldY = 0.0
 
 
-""" Ahora calculamos la fase del frente de onda en la pupila, las coordenadas X, Y
-son las coordendas en la pupila, el valor de Z es la fase en cada punto X, Y y P2V
-es el valor pico a valle."""
-
+# Calculate the wavefront phase on the pupil. X and Y are pupil coordinates,
+# Z is the phase at each point, and P2V is the peak-to-valley value.
 X, Y, Z, P2V = Kos.Phase2(Pupil)
 print("Peak to valley: ", P2V)
 
 
-"""Indicamos el grado de expanciÃ³n para los polinomios de Zernike"""
+# Number of Zernike terms to report.
 NC = 15
 
-"""Generamos un arreglo numpy conlas mismas dimensiones de la expanciÃ³n definida"""
+# Request array for the Zernike expansion.
 A = np.ones(NC)
 
-"""Calculamos los polinomios de Zernike con la fase calculada y el numero de
- elementos deseados en la expanciÃ³n, Zcoef son los coeficientes en longitudes de
- onda, Mat es la expreciÃ³n matematica de Zeidel para dicho coeficiente,
- esto con fines ilustrativos, w_rms es el error del ajuste"""
-
+# Fit Zernike polynomials to the calculated wavefront phase.
 Zcoef, Mat, RMS2Chief, RMS2Centroid, FITTINGERROR = Kos.Zernike_Fitting(X, Y, Z, A)
 
-""""Se despliegan los resultados"""
+# Print the fitted coefficients.
 for i in range(0, NC):
     print("z", i + 1, "  ", "{0:.8f}".format(float(Zcoef[i])), ":", Mat[i])
 
@@ -166,12 +157,15 @@ Diameter = 2.0 * Pupil.RadPupInp
 Wave = W
 I= Kos.psf(COEF, Focal, Diameter, Wave,pixels=265, plot=1, sqr = 1)
 
+# Optional didactic ray-tracing and interferogram exploration:
+# Uncomment this block to compare the fitted wavefront with traced rays,
+# spot diagrams, RMS values, and an interferogram-style plot.
 
 # """Se genera un contenedor de rayos"""
 
 # RR = Kos.raykeeper(Telescopio)
 
-# """ Se generan rayos que pasan por la pupila con la configuraciÃ³n realizada antes"""
+# """Generate rays through the previously configured pupil."""
 # x, y, z, L, M, N = Pupil.Pattern2Field()
 
 # # ______________________________________#

@@ -1,18 +1,29 @@
-"""
-2 m telescope with an STL image slicer.
+"""Example: 2 m telescope with an STL image slicer.
 
-Adds an STL image slicer to a 2 m telescope layout and uses non-sequential tracing through the combined model.
+This example uses precomputed telescope rays or, optionally, generates them,
+then traces them through a packaged STL image slicer with non-sequential
+geometry.
 
-What to look at:
-- the difference between sequential Trace and non-sequential NsTrace.
-- the STL geometry file and its orientation in the optical path.
+What this example teaches:
+- how packaged `savedRays.npy` data can be used to keep a heavy example fast
+- how to regenerate the telescope rays when needed
+- how an STL image slicer is attached to a KrakenOS surface
+- how `NsTraceLoop` is used for the slicer section
 
-Required local files:
-- savedRays.npy
-- Jherrera-ImageSlicerBW-00.stl
+Required packaged files:
+- `KrakenOS/Examples/savedRays.npy`
+- `KrakenOS/Examples/Jherrera-ImageSlicerBW-00.stl`
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a non-sequential 2D/3D trace through the image slicer section
+
+Didactic note:
+- set `A1 = 0` to regenerate the telescope rays. That path is intentionally
+  disabled by default because it traces many rays and can take a long time.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
@@ -35,6 +46,8 @@ SAVED_RAYS_FILE = Path("savedRays.npy")
 A1 = 1
 
 if A1 == 0:
+    # Optional heavy path: regenerate the telescope rays instead of using the
+    # packaged savedRays.npy data.
     P_Obj = Kos.surf()
     P_Obj.Rc = 0
     P_Obj.Thickness = 1000 + 3.452200000000000E+003

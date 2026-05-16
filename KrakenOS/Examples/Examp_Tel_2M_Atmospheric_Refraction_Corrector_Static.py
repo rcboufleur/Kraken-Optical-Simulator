@@ -1,15 +1,27 @@
-"""
-2 m telescope with static atmospheric refraction corrector.
+"""Example: static atmospheric refraction corrector for a 2 m telescope.
 
-Models a fixed atmospheric refraction corrector in the 2 m telescope optical path.
+This example places a fixed atmospheric refraction corrector in the 2 m
+telescope optical path and traces three wavelengths using atmosphere-aware
+pupil generation.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the ray source, direction cosines, and wavelength passed to Trace.
-- the merit quantity used to compare optical performance.
+What this example teaches:
+- how `PupilCalc` atmospheric-refraction parameters are configured
+- how different wavelengths are traced with different atmospheric dispersion
+  settings
+- how a static corrector changes the chromatic spot diagram
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a 3D telescope/corrector layout
+- a color-coded spot diagram for three wavelengths
+
+Didactic note:
+- the `BestFocus` and RMS lines at the end are intentionally commented. They
+  are optional checks for users who want to extend the example into a merit
+  analysis.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
@@ -85,7 +97,7 @@ Rayos3 = Kos.raykeeper(Telescopio)
 Rayos = Kos.raykeeper(Telescopio)
 
 W = 0.60169
-sup = 1  # Difining M1 as enter pupil diameter
+sup = 1  # Define M1 as the entrance pupil diameter reference.
 AperVal = 2000
 AperType = "EPD"  # "STOP"
 Pup = Kos.PupilCalc(Telescopio, sup, W, AperType, AperVal)

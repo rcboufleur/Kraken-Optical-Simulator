@@ -1,15 +1,26 @@
-"""
-2 m telescope with adaptable atmospheric refraction corrector.
+"""Example: adaptable atmospheric refraction corrector for a 2 m telescope.
 
-Models an atmospheric refraction corrector whose geometry can be adjusted during the trace or analysis.
+This example models an atmospheric dispersion corrector whose prism rotation is
+selected for different zenith distances, then traces three wavelengths through
+the telescope/corrector system.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the ray source, direction cosines, and wavelength passed to Trace.
-- the merit quantity used to compare optical performance.
+What this example teaches:
+- how atmosphere-aware `PupilCalc` settings are reused across wavelengths
+- how corrector rotation and zenith distance are paired in a design study
+- how separate ray containers make wavelength comparison easier
+- how a custom plotting helper overlays the resulting spots
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a color-coded spot diagram for three wavelengths
+
+Didactic note:
+- four book-style cases are left in the file as consecutive assignments. The
+  last active pair is used by default; comment/uncomment the cases to compare
+  other corrector rotations and zenith distances.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 # !/usr/bin/env python3
@@ -166,7 +177,7 @@ Rays3 = Kos.raykeeper(Tel)
 
 
 W = 0.60169
-sup = 1  # Difining M1 as enter pupil diameter
+sup = 1  # Define M1 as the entrance pupil diameter reference.
 AperVal = 2000
 AperType = "EPD"  # "STOP"
 Pup = Kos.PupilCalc(Tel, sup, W, AperType, AperVal)

@@ -1,16 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-2 m telescope baseline model.
+"""Example: baseline 2 m telescope model.
 
-Builds the baseline 2 m telescope surface sequence and traces rays through the system.
+This example builds a two-mirror 2 m telescope, generates pupil-based ray
+patterns for several field points, traces them, and plots the resulting spot
+diagram.
 
-What to look at:
-- how the entrance pupil or ray bundle is calculated.
-- the ray source, direction cosines, and wavelength passed to Trace.
+What this example teaches:
+- how to define primary and secondary mirror surfaces
+- how to use `PupilCalc` with different sampling patterns
+- how to trace several field configurations through the same telescope
+- how to inspect the final spot diagram with Matplotlib
 
-Units are the KrakenOS example defaults: distances in millimeters and
-wavelengths in micrometers unless the code states otherwise.
+Expected output:
+- a 3D telescope layout with traced rays
+- a spot diagram at the image plane
+
+Didactic note:
+- the Colab display line is intentionally commented. Use it instead of
+  `display3d` when running in a notebook environment that needs that helper.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 import sys
@@ -108,6 +120,7 @@ for i in range(0, len(xc)):
 
 # ______________________________________#
 
+# Optional didactic display for notebook/Colab-style environments:
 # Kos.display3d_colab(Telescopio, Rayos, 2)
 Kos.display3d(Telescopio, Rayos, 2)
 X, Y, Z, L, M, N = Rayos.pick(-1)
