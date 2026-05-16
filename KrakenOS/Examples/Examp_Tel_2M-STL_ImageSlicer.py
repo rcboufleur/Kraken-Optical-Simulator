@@ -1,4 +1,4 @@
-﻿# !/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Examp-2M-STL_ImageSlicer.py
@@ -6,6 +6,7 @@ Examp-2M-STL_ImageSlicer.py
 
 
 import sys
+from importlib import resources
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
@@ -13,7 +14,9 @@ import KrakenOS as Kos
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
-import os
+
+EXAMPLE_RESOURCES = resources.files("KrakenOS") / "Examples"
+SAVED_RAYS_FILE = Path("savedRays.npy")
 
 A1 = 1
 
@@ -116,8 +119,7 @@ if A1 == 0:
     W = W * np.ones_like(Nr)
 
     Rays = np.vstack((Xr, Yr, Zr, Lr, Mr, Nr, W))
-    outfile = "savedRays.npy"
-    np.save(outfile, Rays)
+    np.save(SAVED_RAYS_FILE, Rays)
 
 
 ################################################################
@@ -130,13 +132,8 @@ else:
     P_Obj.Glass = "AIR"
     P_Obj.Diameter = 10
 
-    # currentDirectory = os.getcwd()
-    ruta = os.getcwd()
-
-    import os.path
-
-    ruta = ruta + "/Jherrera-ImageSlicerBW-00.stl"
-    existe = os.path.exists(ruta)
+    ruta = EXAMPLE_RESOURCES / "Jherrera-ImageSlicerBW-00.stl"
+    existe = ruta.exists()
 
     if existe:
         print("El archivo existe.")
@@ -144,12 +141,11 @@ else:
         print("El archivo no existe.")
 
 
-    direc = ruta
     P_ImageSlicer = Kos.surf()
     P_ImageSlicer.Diameter = 10.0
     P_ImageSlicer.Glass = "BK7"
     P_ImageSlicer.Name = "Image slicer"
-    P_ImageSlicer.Solid_3d_stl = direc
+    P_ImageSlicer.Solid_3d_stl = ruta
     P_ImageSlicer.Thickness = 100
     P_ImageSlicer.TiltX = 180.0
     P_ImageSlicer.DespX = -0.55
@@ -175,8 +171,8 @@ else:
     ImageSlicer = Kos.system(A, configuracion_1)
     Rayos = Kos.raykeeper(ImageSlicer)
 
-    outfile = "savedRays.npy"
-    R = np.load(outfile)
+    rays_file = SAVED_RAYS_FILE if SAVED_RAYS_FILE.exists() else EXAMPLE_RESOURCES / "savedRays.npy"
+    R = np.load(rays_file)
 
     print(np.shape(R))
     X, Y, Z, L, M, N, W = R[0, :], R[1, :], R[2, :], R[3, :], R[4, :], R[5, :], R[6, :]
