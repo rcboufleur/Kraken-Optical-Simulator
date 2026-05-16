@@ -56,6 +56,7 @@ def main():
         prisma_stl = kraken_resources / "Examples" / "Prisma.stl"
         image_slicer_stl = kraken_resources / "Examples" / "Jherrera-ImageSlicerBW-00.stl"
         saved_rays = kraken_resources / "Examples" / "savedRays.npy"
+        thar_lines = kraken_resources / "Examples" / "thar_uves.dat.txt"
         assert gold_csv.exists(), f"Missing resource: {gold_csv}"
         assert fresnel_profile.exists(), f"Missing resource: {fresnel_profile}"
         assert thorlabs_catalog.exists(), f"Missing resource: {thorlabs_catalog}"
@@ -64,6 +65,7 @@ def main():
         assert prisma_stl.exists(), f"Missing resource: {prisma_stl}"
         assert image_slicer_stl.exists(), f"Missing resource: {image_slicer_stl}"
         assert saved_rays.exists(), f"Missing resource: {saved_rays}"
+        assert thar_lines.exists(), f"Missing resource: {thar_lines}"
         lines.append("PASS importlib.resources finds Cat/Gold.csv")
         lines.append("PASS importlib.resources finds Examples/R1064_F1800.txt")
         lines.append("PASS importlib.resources finds LensCat/THORLABS.ZMF")
@@ -72,6 +74,7 @@ def main():
         lines.append("PASS importlib.resources finds Examples/Prisma.stl")
         lines.append("PASS importlib.resources finds Examples/Jherrera-ImageSlicerBW-00.stl")
         lines.append("PASS importlib.resources finds Examples/savedRays.npy")
+        lines.append("PASS importlib.resources finds Examples/thar_uves.dat.txt")
 
         lines.append("RESULT PASS")
         write_report(lines)

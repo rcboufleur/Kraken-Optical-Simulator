@@ -10,6 +10,11 @@ _cleanup_backup/
 # Local test output
 tests/test_report.txt
 
+# Generated example artifacts
+KrakenOS/Examples/krakenOS-pytracing.out
+KrakenOS/Examples/salida.stl
+KrakenOS/Examples/mi_objeto.pkl
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

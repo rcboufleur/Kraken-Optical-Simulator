@@ -1,9 +1,10 @@
-﻿# !/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Examp Tel 2M Wavefront Fitting"""
 
 import os
 import sys
+from importlib import resources
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -262,7 +263,7 @@ tsis = len(A) - 1
 
 # ______________________________________#
 
-a=np.loadtxt("thar_uves.dat.txt")
+a = np.loadtxt(resources.files("KrakenOS") / "Examples" / "thar_uves.dat.txt")
 n=a[:,0]
 lam=a[:,1]/10000.0
 
