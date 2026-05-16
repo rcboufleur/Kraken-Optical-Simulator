@@ -37,35 +37,50 @@ large, or not ideal as first-contact tutorials:
 | Fast tracing | `FastTrace` exists in the system class, but is not presented as a workflow. | Add a performance-oriented example only after confirming the intended public API. |
 | `SurfBlock` reusable assemblies | `Examp_SurfBlock_Basics.py` now shows catalog entries used as reusable blocks. | Larger relay examples can build on this pattern. |
 
-## Missing First-Contact Examples
+## Recently Added First-Contact Examples
 
-These are the best candidates for new examples because they would teach common
-tasks in a focused way:
+These focused examples were added to make important capabilities easier to learn
+without starting from the larger instrument-level scripts:
 
-1. `Examp_RMS_BestFocus.py` - added
+1. `Examp_RMS_BestFocus.py`
 
    Purpose: show how to trace a compact ray bundle, extract image-plane rays,
    calculate RMS, move to best focus, and report before/after RMS.
 
-2. `Examp_PSF_MTF_From_Zernike.py` - added
+2. `Examp_PSF_MTF_From_Zernike.py`
 
    Purpose: show how to use a simple Zernike coefficient vector with the PSF
    and MTF helpers, independent of a large telescope model.
 
-3. `Examp_Coating_Energy_Basics.py` - added
+3. `Examp_Coating_Energy_Basics.py`
 
    Purpose: show the coating table format, trace one or a few rays, and inspect
    the resulting reflected/transmitted energy terms.
 
-4. `Examp_Lens_Catalog_Basics.py` - added
+4. `Examp_Lens_Catalog_Basics.py`
 
    Purpose: load a packaged Zemax-style catalog file, list a few available lens
    entries, convert one entry to KrakenOS surfaces, and display the result.
 
-5. `Examp_Reverse_Trace.py` - added
+5. `Examp_Reverse_Trace.py`
 
    Purpose: demonstrate `RvTrace` in a tiny system so users understand when
    reverse tracing is useful.
+
+6. `Examp_SurfBlock_Basics.py`
+
+   Purpose: show how catalog-derived lenses can be wrapped as reusable
+   `SurfBlock` assemblies and aligned with explicit distances.
+
+7. `Examp_Metal_Mirror_Energy.py`
+
+   Purpose: compare default aluminum and loaded gold mirror energy terms so
+   users can inspect `RP`, `RS`, `TP`, `TS`, and `TT`.
+
+8. `docs/psf_mtf_notes.md`
+
+   Purpose: document the practical inputs and current sampling behavior of the
+   PSF/MTF helper functions.
 
 ## Documentation Improvements Before Adding Many Examples
 
@@ -79,7 +94,7 @@ tasks in a focused way:
 
 ## Suggested Next Batch
 
-The next practical batch should add:
+The next practical batch should investigate or design:
 
 1. Review whether `FastTrace` should have a public beginner example
 2. Add a glass catalog manager API or GUI in a future version
