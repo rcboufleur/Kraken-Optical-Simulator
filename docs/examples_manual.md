@@ -247,6 +247,8 @@ python KrakenOS/Examples/Examp_Ray.py
 
 ![Examp_Ray_2d.png](assets/examples/Examp_Ray_2d.png)
 
+*2D layout of a single ray traced through a cemented doublet. The green line shows the ray path, while the black profiles show the optical surfaces and the image plane.*
+
 ## Basic surface tracing
 
 | Example | Level | Summary | Required files |
@@ -323,11 +325,11 @@ shows what happens when a glass name appears in several loaded catalogs.
 python KrakenOS/Examples/Examp_Glass_Catalog_Order.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Glass_Catalog_Order_2d.png
-or docs/assets/examples/Examp_Glass_Catalog_Order_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Glass_Catalog_Order_2d.png](assets/examples/Examp_Glass_Catalog_Order_2d.png)
+
+*Catalog-priority chart for a duplicated glass name. The first matching catalog in the ordered list is the one KrakenOS will use by default.*
 
 ## Coating and energy
 
@@ -373,6 +375,8 @@ python KrakenOS/Examples/Examp_Coating_Energy_Basics.py
 **Example Images**
 
 ![Examp_Coating_Energy_Basics_2d.png](assets/examples/Examp_Coating_Energy_Basics_2d.png)
+
+*Coating lookup example showing reflected and transmitted energy terms for two incidence-angle samples. It illustrates how RP, RS, TP, and TS are interpreted.*
 
 ## Coating and non-sequential tracing
 
@@ -911,11 +915,15 @@ full refractive surface definitions.
 python KrakenOS/Examples/Examp_Perfect_lens.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Perfect_lens_2d.png
-or docs/assets/examples/Examp_Perfect_lens_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Perfect_lens_2d.png](assets/examples/Examp_Perfect_lens_2d.png)
+
+*2D layout of an ideal thin-lens system. The simplified surfaces make it easier to see thin-lens behavior before using real refractive curvatures and glass data.*
+
+![Examp_Perfect_lens_plot.png](assets/examples/Examp_Perfect_lens_plot.png)
+
+*Image-plane hit coordinates from the ideal-lens example. This plot separates the spot result from the optical layout.*
 
 ## Idealized telescope
 
@@ -948,11 +956,11 @@ ray geometry without the extra complexity of real glass surfaces.
 python KrakenOS/Examples/Examp_Perfect_lens_Telescope.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Perfect_lens_Telescope_2d.png
-or docs/assets/examples/Examp_Perfect_lens_Telescope_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Perfect_lens_Telescope_2d.png](assets/examples/Examp_Perfect_lens_Telescope_2d.png)
+
+*Ideal telescope layout generated from objective and eyepiece thin lenses. The traced field fans show the simplified telescope geometry.*
 
 ## Lens catalogs
 
@@ -1005,6 +1013,8 @@ python KrakenOS/Examples/Examp_Lens_Catalog_Basics.py
 
 ![Examp_Lens_Catalog_Basics_2d.png](assets/examples/Examp_Lens_Catalog_Basics_2d.png)
 
+*2D layout generated from a Zemax-style THORLABS catalog entry. The figure confirms that catalog surfaces can be converted into KrakenOS surfaces and traced like ordinary systems.*
+
 ### Examp_SurfBlock_Basics.py
 
 - **Level:** Intermediate
@@ -1043,11 +1053,11 @@ ray fan through the assembled relay.
 python KrakenOS/Examples/Examp_SurfBlock_Basics.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_SurfBlock_Basics_2d.png
-or docs/assets/examples/Examp_SurfBlock_Basics_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_SurfBlock_Basics_2d.png](assets/examples/Examp_SurfBlock_Basics_2d.png)
+
+*Relay assembled from two reusable catalog lens blocks. The figure shows how `SurfBlock` and `alignment` expand named components into ordinary surfaces for tracing.*
 
 ## Lens design and focus
 
@@ -1143,11 +1153,11 @@ Abbe-number-style strings.
 python KrakenOS/Examples/Examp_Dispersion_By_AbbeNumber.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Dispersion_By_AbbeNumber_2d.png
-or docs/assets/examples/Examp_Dispersion_By_AbbeNumber_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Dispersion_By_AbbeNumber_2d.png](assets/examples/Examp_Dispersion_By_AbbeNumber_2d.png)
+
+*Chromatic 2D ray trace through the doublet at three wavelengths. The separation of the colored bundles illustrates how material dispersion appears in a traced system.*
 
 ## Metal coatings
 
@@ -1189,11 +1199,11 @@ table. It is intentionally small so the output focuses on `CoatingMet`, `RP`,
 python KrakenOS/Examples/Examp_Metal_Mirror_Energy.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Metal_Mirror_Energy_2d.png
-or docs/assets/examples/Examp_Metal_Mirror_Energy_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Metal_Mirror_Energy_2d.png](assets/examples/Examp_Metal_Mirror_Energy_2d.png)
+
+*Energy comparison for aluminum and gold mirror data. The bars summarize average reflection and total transmission terms stored after tracing.*
 
 ## Mirror tracing
 
@@ -1266,11 +1276,11 @@ both in the system layout and in a final spot plot.
 python KrakenOS/Examples/Examp_Flat_Mirror_45Deg.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Flat_Mirror_45Deg_2d.png
-or docs/assets/examples/Examp_Flat_Mirror_45Deg_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Flat_Mirror_45Deg_2d.png](assets/examples/Examp_Flat_Mirror_45Deg_2d.png)
+
+*Folded optical path after a 45 degree mirror. The layout is useful for checking mirror orientation, reflection direction, and coordinate sign conventions.*
 
 ### Examp_ParaboleMirror_Shift.py
 
@@ -1717,6 +1727,8 @@ python KrakenOS/Examples/Examp_PSF_MTF_From_Zernike.py
 
 ![Examp_PSF_MTF_From_Zernike_2d.png](assets/examples/Examp_PSF_MTF_From_Zernike_2d.png)
 
+*Point-spread function and MTF profiles computed from a small set of Zernike coefficients. The image connects wavefront terms with image quality metrics.*
+
 ## Paraxial optics
 
 | Example | Level | Summary | Required files |
@@ -1804,11 +1816,11 @@ traces a multi-wavelength ray bundle through the refracting surfaces.
 python KrakenOS/Examples/Examp_Refraction_Prism.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Refraction_Prism_2d.png
-or docs/assets/examples/Examp_Refraction_Prism_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Refraction_Prism_2d.png](assets/examples/Examp_Refraction_Prism_2d.png)
+
+*Prism-only refraction trace at multiple wavelengths. The tilted flat faces bend the ray bundle and make the chromatic angular separation visible.*
 
 ### Examp_Refraction_Prism_OneRay.py
 
@@ -1900,9 +1912,15 @@ python KrakenOS/Examples/Examp_Doublet_Lens_Pupil.py
 
 ![Examp_Doublet_Lens_Pupil.png](assets/examples/Examp_Doublet_Lens_Pupil.png)
 
+*Pupil sampling result copied from the example output. It gives a quick visual check of the sampled pupil coordinates used for the ray bundle.*
+
 ![Examp_Doublet_Lens_Pupil_2d.png](assets/examples/Examp_Doublet_Lens_Pupil_2d.png)
 
+*2D ray fan generated from the pupil sampler. The figure shows how the bundle fills the entrance pupil and converges toward the image plane.*
+
 ![Examp_Doublet_Lens_Pupil_3d.png](assets/examples/Examp_Doublet_Lens_Pupil_3d.png)
+
+*Static 3D rendering of the same pupil bundle. This view is useful for checking that the traced rays and lens geometry are spatially coherent.*
 
 ### Examp_Tel_2M_Pupila.py
 
@@ -2023,11 +2041,11 @@ plane with `RvTrace`.
 python KrakenOS/Examples/Examp_Reverse_Trace.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_Reverse_Trace_2d.png
-or docs/assets/examples/Examp_Reverse_Trace_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_Reverse_Trace_2d.png](assets/examples/Examp_Reverse_Trace_2d.png)
+
+*Forward and reverse ray paths through the same doublet. This image helps verify that `RvTrace` walks the optical path back from image space toward object space.*
 
 ## STL geometry
 
@@ -2449,11 +2467,11 @@ and then traces the same bundle again after moving the image plane.
 python KrakenOS/Examples/Examp_RMS_BestFocus.py
 ```
 
-<!-- Optional image placeholder:
-Add docs/assets/examples/Examp_RMS_BestFocus_2d.png
-or docs/assets/examples/Examp_RMS_BestFocus_3d.png
-to show images here.
--->
+**Example Images**
+
+![Examp_RMS_BestFocus_2d.png](assets/examples/Examp_RMS_BestFocus_2d.png)
+
+*Best-focus diagnostic plot. The left panel shows RMS radius as the image plane is shifted, and the right panel compares nominal and best-focus spot coordinates.*
 
 ## System diagnostics
 
