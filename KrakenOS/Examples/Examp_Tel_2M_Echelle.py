@@ -1,6 +1,22 @@
+"""
+2 m telescope feeding an echelle-style dispersive layout.
+
+Combines a telescope model with dispersive elements and a spectral-line input file to trace an echelle-like configuration.
+
+What to look at:
+- the telescope surface sequence.
+- the grating order and orientation parameters.
+- the external spectral-line table used by the trace.
+
+Required local files:
+- thar_uves.dat.txt
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Tel 2M Wavefront Fitting"""
 
 import os
 import sys
@@ -13,12 +29,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 currentDirectory = os.getcwd()
 sys.path.insert(1, currentDirectory + '/library')
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -27,7 +41,6 @@ P_Obj.Glass = "AIR"
 P_Obj.Diameter = 1059. * 2.0
 P_Obj.Drawing=0
 
-# ______________________________________#
 
 Thickness = 3452.2
 M1 = Kos.surf()
@@ -38,7 +51,6 @@ M1.Glass = "MIRROR"
 M1.Diameter = 1.059E+003 * 2.0
 #M1.InDiameter = 250 * 2.0
 
-# ______________________________________#
 
 M2 = Kos.surf()
 M2.Rc = -3930.0
@@ -46,9 +58,6 @@ M2.Thickness = 4489.731761 -1.107e-9 # Thickness + 1037.525880
 M2.k = -4.3281
 M2.Glass = "MIRROR"
 M2.Diameter = 336.5 * 2.0
-
-
-# ______________________________________#
 
 
 N1 = Kos.surf()
@@ -245,9 +254,8 @@ L2b.Thickness = -5.40475
 P_Ima = Kos.surf()
 P_Ima.Diameter = 50
 P_Ima.Glass = "AIR"
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, M2, N1, Colim, N2, N3, G1,N4, N5, N6, N7, N8, G2, N9, N10, Asp1, Asp2, N11, Flat, N12, M3, N13, L1a, L1b, L2a, L2b, P_Ima]
 configuracion_1 = Kos.Setup()
@@ -255,13 +263,11 @@ Telescope = Kos.system(A, configuracion_1)
 
 Rays = Kos.raykeeper(Telescope)
 
-# ______________________________________#
 
 tam = 5
 rad = 2100 / 2
 tsis = len(A) - 1
 
-# ______________________________________#
 
 a = np.loadtxt(resources.files("KrakenOS") / "Examples" / "thar_uves.dat.txt")
 n=a[:,0]
@@ -278,7 +284,6 @@ for aa in a:
     Telescope.SetData()
     print("Order: ",aa)
 
-    # ______________________________________#
     for q in range(0,len(n)):
         W = lam[q]
         i=0
@@ -303,8 +308,6 @@ X=np.asarray(x)
 Y=np.asarray(y)
 Z=np.asarray(z)
 
-# ______________________________________#
-
 
 plt.plot(X, -Y, '|')
 plt.xlabel('X')
@@ -315,5 +318,3 @@ plt.show()
 
 
 Kos.display3d(Telescope, Rays, 0)
-
-

@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Perfect Lens"""
+"""
+Doublet optimization example.
+
+Uses a doublet model as an optimization target and evaluates the result with ray tracing and pupil tools.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import time
 import matplotlib.pyplot as plt
@@ -271,5 +283,3 @@ MyPlot(RAYS, SURF, figure= "Spot", mk = MK, col = COL)
 # Lens.Parax(0.5)
 # print("Final effective focal length: ", Lens.EFFL)
 # print("Final RMS radius in best focus: ", BestRMS(Lens, Wave))
-
-

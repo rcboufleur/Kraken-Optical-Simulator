@@ -1,15 +1,30 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Example: Doublet Lens with Focus Optimization
-This script demonstrates how to:
-  1. Build a doublet lens system using KrakenOS.
-  2. Trace rays for multiple wavelengths.
-  3. Optimize the image plane focus using a Newtonâ€“Raphson method.
-  4. Adjust the image plane position, re-trace the rays, and display an updated 2D plot.
+"""Example: doublet lens with a numerical best-focus search.
 
-Author: Joel Herrera V.
-Date: 10/03/2025
+This example traces a bundle of rays through a cemented doublet at three
+wavelengths, estimates the RMS spot radius, and updates the image-plane
+position toward best focus.
+
+What this example teaches:
+- how to build a multi-surface doublet
+- how to trace many rays at several wavelengths
+- how to extract ray data from `raykeeper`
+- how to use a simple Newton-style loop to improve focus
+
+Expected output:
+- printed focus-optimization iterations
+- an initial 2D ray plot
+- a final plot after the image-plane adjustment
+
+Didactic note:
+- one standard `display2d` call is intentionally left commented near the end.
+  Uncomment it if you want the regular desktop plot instead of the Colab-style
+  plotting helper.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 import sys
@@ -21,9 +36,7 @@ import numpy as np
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos  # Using KrakenOS for optical simulation
 
-# =============================================================================
 # Helper functions for calculating the RMS spot size and its derivative.
-# =============================================================================
 def R_RMS(L, M, N, X, Y, delta_Z):
     """
     Calculate the RMS radius (spot size) of rays on the image plane after a
@@ -49,7 +62,6 @@ def DER_R_RMS(L, M, N, X, Y, delta_Z):
     f2 = R_RMS(L, M, N, X, Y, delta_Z - h)
     return (f1 - f2) / (2.0 * h)
 
-# =============================================================================
 # Define the optical surfaces for the doublet lens system.
 # The system is composed of:
 #   - Object plane (flat, air)
@@ -57,7 +69,6 @@ def DER_R_RMS(L, M, N, X, Y, delta_Z):
 #   - Second lens surface (concave, F2)
 #   - Air gap before the image plane
 #   - Image plane (detector)
-# =============================================================================
 # Object Plane
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -87,13 +98,13 @@ L1c.Thickness = 9.737604742910693E+001
 L1c.Glass = "AIR"
 L1c.Diameter = 30
 
-# Image Plane
+# Image plane
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
 P_Ima.Thickness = 0.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 3.0
-P_Ima.Name = "Image Plane"
+P_Ima.Name = "Image plane"
 
 # Build the system
 # Note: The order of surfaces in list A determines the optical sequence.
@@ -101,18 +112,14 @@ A = [P_Obj, L1a, L1b, L1c, P_Ima]
 config_1 = Kos.Setup()
 Doublet = Kos.system(A, config_1)  # 'Doublet' is the system (formerly 'Doblete')
 
-# =============================================================================
 # Create ray containers for storing the traced rays.
 # We'll use a global container for all wavelengths.
-# =============================================================================
 raysWavelength1 = Kos.raykeeper(Doublet)  # For wavelength 0.4
 raysWavelength2 = Kos.raykeeper(Doublet)  # For wavelength 0.5
 raysWavelength3 = Kos.raykeeper(Doublet)  # For wavelength 0.6
 raysTotal = Kos.raykeeper(Doublet)        # Global container
 
-# =============================================================================
 # Generate rays across a circular aperture and trace them through the system.
-# =============================================================================
 grid_resolution = 10   # Grid resolution parameter (number of steps)
 aperture_radius = 10.0  # Maximum radius of the circular aperture (mm)
 
@@ -122,7 +129,7 @@ for j in range(-grid_resolution, grid_resolution + 1):
         x0 = (i / grid_resolution) * aperture_radius
         y0 = (j / grid_resolution) * aperture_radius
         if np.sqrt(x0**2 + y0**2) < aperture_radius:
-            # For simplicity, rays are launched parallel to the optical axis (0Â° tilt).
+            # For simplicity, rays are launched parallel to the optical axis (0 deg tilt).
             angle_deg = 0.0
             pSource = [x0, y0, 0.0]
             dCos = [0.0, np.sin(np.deg2rad(angle_deg)), np.cos(np.deg2rad(angle_deg))]
@@ -145,17 +152,13 @@ for j in range(-grid_resolution, grid_resolution + 1):
             raysWavelength3.push()
             raysTotal.push()
 
-# =============================================================================
 # Display the initial 2D plot of the ray paths.
-# =============================================================================
 Kos.display2d(Doublet, raysTotal, 0)
 
-# =============================================================================
-# Focus optimization using the Newtonâ€“Raphson method.
+# Focus optimization using the Newton-Raphson method.
 #
 # Extract the ray data from the last surface (image plane) to compute the RMS
 # spot size and its derivative.
-# =============================================================================
 X, Y, Z, L, M, N = raysTotal.pick(-1)
 
 damping = 0.5       # Damping factor to smooth the update
@@ -184,23 +187,19 @@ while iteration < max_iterations:
 
 print("Optimized delta_Z:", dz)
 
-# =============================================================================
 # Adjust the image plane position using the computed dz.
 #
 # Here we assume that the image plane is located at index 3 in the system's SDT.
 # (Ensure that this index correctly corresponds to your image plane.)
-# =============================================================================
 print("Original image plane thickness:", Doublet.SDT[3].Thickness)
 Doublet.SDT[3].Thickness = Doublet.SDT[3].Thickness + dz
 Doublet.SetData()  # Update the system data after modification
 Doublet.SetSolid()  # Update the 3D solid representation if necessary
 print("Adjusted image plane thickness:", Doublet.SDT[3].Thickness)
 
-# =============================================================================
 # Re-trace the rays after adjusting the image plane.
 #
 # Create a new ray container and repeat the ray tracing procedure.
-# =============================================================================
 newRaysTotal = Kos.raykeeper(Doublet)
 
 for j in range(-grid_resolution, grid_resolution + 1):
@@ -227,11 +226,9 @@ for j in range(-grid_resolution, grid_resolution + 1):
             Doublet.Trace(pSource, dCos, wavelength)
             newRaysTotal.push()
 
-# =============================================================================
-# Display the updated 2D plot after the focus adjustment.
-# =============================================================================
+# Optional didactic display:
+# Uncomment the next line to use the standard desktop 2D plot. The Colab-style
+# display call below is kept active because it is convenient in notebooks.
 # Kos.display2d(Doublet, newRaysTotal, 0)
 
 Kos.display2d_colab(Doublet, newRaysTotal, 0)
-
-

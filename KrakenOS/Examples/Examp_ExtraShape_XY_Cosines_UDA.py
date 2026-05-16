@@ -1,7 +1,17 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Extra Shape XY Cosines"""
+"""
+XY cosine surface with user-defined aperture.
 
+Combines an XY cosine surface perturbation with a user-defined aperture or surface description.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+- how custom surface or aperture data are attached to a surface.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import sys
 from pathlib import Path
@@ -11,7 +21,6 @@ import KrakenOS as Kos
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -19,7 +28,6 @@ P_Obj.Thickness = 40
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 
-# ______________________________________#
 
 L1a = Kos.surf()
 L1a.Rc = 55.134 * 0
@@ -46,7 +54,6 @@ py = [radio * np.sin(np.radians(0)),
 
 
 L1a.UDA = [px, py]
-# ______________________________________#
 
 L1c = Kos.surf()
 L1c.Thickness = 200
@@ -73,8 +80,6 @@ L1c.Res = 1
 L1c.UDA = [px, py]
 
 
-# ______________________________________#
-
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
 P_Ima.Thickness = 0.0
@@ -82,17 +87,14 @@ P_Ima.Glass = "AIR"
 P_Ima.Diameter = 200.0
 P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, L1a, L1c, P_Ima]
 Config_1 = Kos.Setup()
 
-# ______________________________________#
 
 Lens = Kos.system(A, Config_1)
 Rays = Kos.raykeeper(Lens)
 
-# ______________________________________#
 
 Wav = 0.45
 for i in range(-100, 100 + 1):
@@ -101,9 +103,6 @@ for i in range(-100, 100 + 1):
     Lens.Trace(pSource, dCos, Wav)
     Rays.push()
 
-# ______________________________________#
 
 Kos.display3d(Lens, Rays, 0)
 # Kos.display2d(Lens, Rays, 0)
-
-

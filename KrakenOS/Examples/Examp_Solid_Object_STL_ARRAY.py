@@ -1,6 +1,17 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Solid Objects STL ARRAY"""
+"""
+Array of STL solid objects.
+
+Places several STL-based solid objects in the optical path and traces the non-sequential ray behavior.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+- the STL geometry file and its orientation in the optical path.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 """
 Using stl or vtk solid elements in non-sequential mode is not accurate,
@@ -19,7 +30,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Thickness = 7000.0
@@ -27,7 +37,6 @@ P_Obj.Glass = "AIR"
 P_Obj.Diameter = 5000
 P_Obj.Drawing = 1
 
-# ______________________________________#
 
 n = 11
 Lx = 100.0
@@ -61,7 +70,6 @@ for A in range(-n, n + 1):
 # element0.save("salida.stl")
 # direc = r"salida.stl"
 
-# ______________________________________#
 
 objeto = Kos.surf()
 objeto.Diameter = 118.0 * 2.0
@@ -74,7 +82,6 @@ objeto.DespX = 0
 objeto.DespY = 0
 objeto.AxisMove = 0
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Rc = 0
@@ -82,19 +89,16 @@ P_Ima.Thickness = -1.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 200.0
 P_Ima.Drawing = 1
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, objeto, P_Ima]
 configur = Kos.Setup()
 
-# ______________________________________#
 
 MirrorArray = Kos.system(A, configur)
 Rays = Kos.raykeeper(MirrorArray)
 
-# ______________________________________#
 
 W = 0.633
 
@@ -111,14 +115,11 @@ for A in range(-n, n + 1):
         dCos = [0.0, np.sin(np.deg2rad(tet)), np.cos(np.deg2rad(tet))]
         MirrorArray.NsTrace(pSource_0, dCos, W)
         if np.shape(MirrorArray.NAME)[0] != 0:
-            if MirrorArray.NAME[-1] == "Plano imagen":
+            if MirrorArray.NAME[-1] == "Image plane":
                 plt.plot(MirrorArray.Hit_x[-1], MirrorArray.Hit_y[-1], '.', c="g")
                 Rays.push()
 
-# ______________________________________#
 
 plt.axis('square')
 plt.show()
 Kos.display3d(MirrorArray, Rays, 0)
-
-

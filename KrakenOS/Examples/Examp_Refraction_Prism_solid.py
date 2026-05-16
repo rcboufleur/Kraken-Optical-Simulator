@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Diffraction Grating Transmission"""
+"""
+Solid prism refraction.
+
+Uses non-sequential tracing through a solid prism model.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+- the grating parameters and diffraction order.
+- the STL geometry file and its orientation in the optical path.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -93,7 +105,6 @@ Config = Kos.Setup()
 Prism = Kos.system(A, Config)
 Rays = Kos.raykeeper(Prism)
 
-# _________________________________________#
 
 Prism.energy_probability = 0
 n_rays = 5
@@ -115,7 +126,3 @@ for i in range(-nr, nr + 1):
                 Rays.push()
 
 Kos.display2d(Prism, Rays, 0)
-
-
-
-

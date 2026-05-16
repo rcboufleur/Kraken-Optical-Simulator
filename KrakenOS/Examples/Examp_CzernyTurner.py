@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Parabole Mirror Shift"""
+"""
+Czerny-Turner spectrograph layout.
+
+Builds a compact Czerny-Turner-style layout and traces rays through mirrors and a dispersive element.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the grating parameters and diffraction order.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -127,5 +139,3 @@ P3D.plot()
 
 # Tm = np.rad2deg(Tm)
 # print(Tm)
-
-

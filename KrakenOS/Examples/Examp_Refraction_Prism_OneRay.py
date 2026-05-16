@@ -1,6 +1,17 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Diffraction Grating Transmission"""
+"""
+Single-ray prism refraction.
+
+Traces one ray through a prism so the refraction path can be inspected without a dense bundle.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the grating parameters and diffraction order.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -10,7 +21,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# _________________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -18,7 +28,6 @@ P_Obj.Thickness = 5
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 
-# _________________________________________#
 
 Prism_c1 = Kos.surf()
 Prism_c1.Rc = 0.0
@@ -28,7 +37,6 @@ Prism_c1.Diameter = 30.0
 Prism_c1.TiltX=20
 Prism_c1.AxisMove = 0
 
-# _________________________________________#
 
 Prism_c2 = Kos.surf()
 Prism_c2.Rc = 0.0
@@ -37,22 +45,19 @@ Prism_c2.Glass = "AIR"
 Prism_c2.Diameter = 30.0
 Prism_c2.TiltX = -20
 Prism_c2.AxisMove = 0
-# _________________________________________#
 
 
 P_Ima = Kos.surf()
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 P_Ima.Rc = 0.0
 P_Ima.Thickness = 0.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 100.0
 
-# _________________________________________#
 
 A = [P_Obj, Prism_c1, Prism_c2,  P_Ima]
 configuracion_1 = Kos.Setup()
 
-# _________________________________________#
 
 Doblete = Kos.system(A, configuracion_1)
 
@@ -76,8 +81,6 @@ for ii in range(0,40):
     W = 0.6
     Doblete.Trace(pSource_0, dCos, W)
     Rayos.push()
-
-    # _________________________________________#
 
 
     x0,y0,z0,l0,m0,n0 = Rayos.pick(1)
@@ -108,5 +111,3 @@ print(N)
 
 
 Kos.display2d(Doblete, Rayos, 0)
-
-

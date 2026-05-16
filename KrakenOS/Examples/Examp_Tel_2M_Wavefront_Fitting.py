@@ -1,6 +1,20 @@
-﻿# !/usr/bin/env python3
+"""
+2 m telescope wavefront fitting.
+
+Traces a 2 m telescope model and fits the resulting wavefront using aberration coefficients.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the aberration output produced after tracing.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Tel 2M Wavefront Fitting"""
 
 import os
 import sys
@@ -12,12 +26,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 currentDirectory = os.getcwd()
 sys.path.insert(1, currentDirectory + '/library')
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -26,7 +38,6 @@ P_Obj.Glass = "AIR"
 P_Obj.Diameter = 1059. * 2.0
 P_Obj.Drawing=0
 
-# ______________________________________#
 
 Thickness = 3452.2
 M1 = Kos.surf()
@@ -39,7 +50,6 @@ M1.InDiameter = 250 * 2.0
 M1.TiltY = 0.0
 M1.TiltX = 0.0
 M1.AxisMove = 0
-# ______________________________________#
 
 M2 = Kos.surf()
 M2.Rc = -3930.0
@@ -54,20 +64,17 @@ M2.DespY = 0.0
 M2.DespX = 0.0
 M2.AxisMove = 0
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Diameter = 300.0
 P_Ima.Glass = "AIR"
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, M2, P_Ima]
 configuracion_1 = Kos.Setup()
 Telescopio = Kos.system(A, configuracion_1)
 
-# ______________________________________#
 """Vamos a definir los parÃ¡metros de la pupila del sistema,
 definiremos esta pupila en la superficie 1, esta corresponde al
 espejo primario"""
@@ -148,7 +155,6 @@ for i in range(0, NC):
     print("z", i + 1, "  ", "{0:.8f}".format(float(Zcoef[i])), ":", Mat[i])
 
 
-# ______________________________________#
 print("(RMS) Fitting error: ", FITTINGERROR)
 print(RMS2Chief, "RMS(to chief) From fitted coefficents")
 print(RMS2Centroid, "RMS(to centroid) From fitted coefficents")
@@ -240,7 +246,3 @@ I= Kos.psf(COEF, Focal, Diameter, Wave,pixels=265, plot=1, sqr = 1)
 # # print(AB.SCW_AN)
 # # print(AB.SCW_NM)
 # # print(AB.SCW_TOTAL)
-
-
-
-

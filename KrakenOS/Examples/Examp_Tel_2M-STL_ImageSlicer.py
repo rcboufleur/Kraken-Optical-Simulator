@@ -1,8 +1,22 @@
+"""
+2 m telescope with an STL image slicer.
+
+Adds an STL image slicer to a 2 m telescope layout and uses non-sequential tracing through the combined model.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+- the STL geometry file and its orientation in the optical path.
+
+Required local files:
+- savedRays.npy
+- Jherrera-ImageSlicerBW-00.stl
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Examp-2M-STL_ImageSlicer.py
-"""
 
 
 import sys
@@ -21,13 +35,11 @@ SAVED_RAYS_FILE = Path("savedRays.npy")
 A1 = 1
 
 if A1 == 0:
-    # _________________________________________________________________#
     P_Obj = Kos.surf()
     P_Obj.Rc = 0
     P_Obj.Thickness = 1000 + 3.452200000000000E+003
     P_Obj.Glass = "AIR"
     P_Obj.Diameter = 1.059E+003 * 2.0
-    # _________________________________________________________________#
     Thickness = 3.452200000000000E+003
     M1 = Kos.surf()
     M1.Rc = -9.638000000004009E+003
@@ -36,7 +48,6 @@ if A1 == 0:
     M1.Glass = "MIRROR"
     M1.Diameter = 1.059E+003 * 2.0
     M1.InDiameter = 250 * 2.0
-    # _________________________________________________________________#
     M2 = Kos.surf()
     M2.Rc = -3.93E+003
     M2.Thickness = Thickness + 1.037525880125084E+003
@@ -44,23 +55,18 @@ if A1 == 0:
     M2.Glass = "MIRROR"
     M2.Diameter = 3.365E+002 * 2.0
     M2.AxisMove = 0
-    # _________________________________________________________________#
     P_Image_A = Kos.surf()
     P_Image_A.Diameter = 10.0
     P_Image_A.Glass = "AIR"
     P_Image_A.Thickness = 10
     P_Image_A.Name = "Image plane Tel"
     P_Image_A.DespZ = -100.0
-    # _________________________________________________________________#
     A = [P_Obj, M1, M2, P_Image_A]
 
-    # _________________________________________________________________#
     configuracion_1 = Kos.Setup()
     Telescopio = Kos.system(A, configuracion_1)
     Rayos = Kos.raykeeper(Telescopio)
 
-
-    # _________________________________________________________________#
 
     # Gaussian
     def f(x):
@@ -162,9 +168,8 @@ else:
     P_Ima = Kos.surf()
     P_Ima.Diameter = 10.0
     P_Ima.Glass = "AIR"
-    P_Ima.Name = "Plano imagen"
+    P_Ima.Name = "Image plane"
 
-    # _________________________________________________________________#
 
     A = [P_Obj, P_ImageSlicer, PerfLen, P_Ima]
     configuracion_1 = Kos.Setup()
@@ -210,7 +215,7 @@ else:
         AA = ImageSlicer.SURFACE
         AA = np.asarray(AA)
         AW = np.argwhere(AA == 1)
-        if ImageSlicer.NAME[-1] == "Plano imagen" and len(AW) < 10 and ImageSlicer.TT < 0.9:
+        if ImageSlicer.NAME[-1] == "Image plane" and len(AW) < 10 and ImageSlicer.TT < 0.9:
 
             # and ImageSlicer.TT<0.9 and ImageSlicer.TT>0.4
 
@@ -247,5 +252,3 @@ else:
 
     #             Rays.push()
     Kos.display3d(ImageSlicer, Rayos, 0)
-
-

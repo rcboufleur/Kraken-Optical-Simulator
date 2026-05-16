@@ -1,6 +1,17 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Parabole Mirror Shift"""
+"""
+Shifted parabolic mirror.
+
+Traces a bundle on an off-axis or shifted parabolic mirror and evaluates the resulting spot.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 import pickle
@@ -11,14 +22,12 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Thickness = 1000.0
 P_Obj.Diameter = 300
 P_Obj.Drawing = 0
 
-# ______________________________________#
 
 M1 = Kos.surf()
 M1.Rc = -2 * P_Obj.Thickness
@@ -32,20 +41,17 @@ M1.ShiftY = 200
 aa = 100
 bb = 100
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 1600.0
 P_Ima.Drawing = 0
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# ______________________________________#
 
 Espejo = Kos.system(A, configuracion_1)
 
@@ -62,7 +68,6 @@ Espejo = Kos.system(A, configuracion_1)
 
 Rayos = Kos.raykeeper(Espejo)
 
-# ______________________________________#
 
 tam = 15
 rad = 150.0
@@ -80,7 +85,6 @@ for i in range(-tam, tam + 1):
             Espejo.Trace(pSource_0, dCos, W)
             Rayos.push()
 
-# ______________________________________#
 
 Kos.display2d(Espejo, Rayos, 0)
 
@@ -101,8 +105,6 @@ x,y,z,l,m,n = Rayos.pick(-1, coordinates="local")
 print(R_RMS_delta(z, l, m, n, x, y))
 X, Y, Z, L, M, N = Rayos.pick(-1)
 
-# ______________________________________#
-
 
 import matplotlib.pyplot as plt
 plt.plot(X, Y, 'x')
@@ -111,5 +113,3 @@ plt.ylabel('y')
 plt.title('Spot Diagram')
 plt.axis('square')
 plt.show()
-
-

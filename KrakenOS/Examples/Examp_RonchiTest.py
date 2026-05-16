@@ -1,4 +1,18 @@
-﻿import matplotlib.pyplot as plt
+"""
+Ronchi test layout.
+
+Sets up a Ronchi-style test geometry and traces rays through the modeled test arrangement.
+
+What to look at:
+- the grating or screen placement.
+- the ray bundle sampling.
+- the 3D visualization of the test geometry.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 import scipy
@@ -57,7 +71,7 @@ P_Ima.Thickness = -.0001
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 6000.0
 P_Ima.Drawing = 1
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
 A = [P_Obj, Ronchi, Mirror, Ronchi2, P_Ima]
 
@@ -116,5 +130,3 @@ plt.show()
 
 #             Rays.push()
 Kos.display3d(Telescope, Rays, 1)
-
-

@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Diffraction Grating Transmission"""
+"""
+Basic prism refraction.
+
+Builds a simple prism model and traces a ray bundle through the refracting surfaces.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the grating parameters and diffraction order.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -48,8 +59,6 @@ Config = Kos.Setup()
 Prism = Kos.system(A, Config)
 Rays = Kos.raykeeper(Prism)
 
-# _________________________________________#
-
 
 n_rays = 10
 semidiam = 5.0
@@ -70,7 +79,3 @@ for i in range(-nr, nr + 1):
                 Rays.push()
 
 Kos.display2d(Prism, Rays, 0)
-
-
-
-

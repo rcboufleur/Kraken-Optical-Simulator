@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Parabole Mirror Shift"""
+"""
+Shifted parabolic mirror with user-defined aperture.
+
+Traces rays on a shifted parabolic mirror using a user-defined aperture or surface constraint.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+- how custom surface or aperture data are attached to a surface.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -10,14 +22,12 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Thickness = 1000.0
 P_Obj.Diameter = 300
 P_Obj.Drawing = 0
 
-# ______________________________________#
 
 M1 = Kos.surf()
 M1.Rc = -2 * P_Obj.Thickness
@@ -69,25 +79,20 @@ py.extend(py1)
 
 M1.UDA = [px, py]
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 1600.0
 P_Ima.Drawing = 0
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# ______________________________________#
 
 Espejo = Kos.system(A, configuracion_1, build = 1)
 Rayos = Kos.raykeeper(Espejo)
-
-# ______________________________________#
 
 
 diametro = 300
@@ -112,7 +117,6 @@ for i in range(0,len(X)):
         Espejo.Trace(pSource_0, dCos, W)
         Rayos.push()
 
-# ______________________________________#
 
 Kos.display3d(Espejo, Rayos, 0)
 
@@ -131,5 +135,3 @@ def R_RMS_delta(Z1, L, M, N, X0, Y0):
 x,y,z,l,m,n = Rayos.pick(-1, coordinates="local")
 
 print(R_RMS_delta(z, l, m, n, x, y))
-
-

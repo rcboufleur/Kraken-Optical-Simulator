@@ -1,7 +1,30 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Doublet Lens Pupil Seidel"""
+"""Example: doublet pupil calculation with Seidel terms.
 
+This example combines pupil setup, Seidel aberration calculations, and ray
+tracing through a doublet lens.
+
+What this example teaches:
+- how to configure `PupilCalc` for Seidel analysis
+- how to read spherical, coma, astigmatism, field curvature, and chromatic
+  aberration outputs
+- how changing Fraunhofer wavelengths affects chromatic aberration terms
+- how to trace the pupil-generated rays after the aberration calculation
+
+Expected output:
+- printed Seidel and chromatic-aberration terms
+- a 2D layout of the pupil-generated ray bundle
+
+Didactic note:
+- the commented print blocks are intentionally left in the file. They are
+  optional inspection snippets for users who want to explore individual Seidel
+  table entries and sums.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
+"""
 
 import sys
 from pathlib import Path
@@ -10,7 +33,6 @@ sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 import numpy as np
 
-# _________________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -19,7 +41,6 @@ P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 P_Obj.Name = "P Obj"
 
-# _________________________________________#
 
 L1a = Kos.surf()
 L1a.Rc = 9.284706570002484E+001
@@ -28,7 +49,6 @@ L1a.Glass = "N-BK7"
 L1a.Diameter = 30.0
 L1a.Axicon = 0
 
-# _________________________________________#
 
 L1b = Kos.surf()
 L1b.Rc = -3.071608670000159E+001
@@ -36,7 +56,6 @@ L1b.Thickness = 3.0
 L1b.Glass = "F2"
 L1b.Diameter = 30
 
-# _________________________________________#
 
 L1c = Kos.surf()
 L1c.Rc = -7.819730726078505E+001
@@ -44,7 +63,6 @@ L1c.Thickness = 9.737604742910693E+001 - 40
 L1c.Glass = "AIR"
 L1c.Diameter = 30
 
-# _________________________________________#
 
 pupila = Kos.surf()
 pupila.Rc = 0
@@ -53,7 +71,6 @@ pupila.Glass = "AIR"
 pupila.Diameter = 15.0
 pupila.Name = "Ap Stop"
 
-# _________________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
@@ -61,16 +78,13 @@ P_Ima.Thickness = 0.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 20.0
 
-# _________________________________________#
 
 A = [P_Obj, L1a, L1b, L1c, pupila, P_Ima]
 config_1 = Kos.Setup()
 
-# _________________________________________#
 
 Doblete = Kos.system(A, config_1)
 
-# _________________________________________#
 
 W = 0.6
 Surf = 4
@@ -83,7 +97,6 @@ Pup.Samp = 25
 Pup.Ptype = "fan"
 Pup.FieldY = 3.25
 
-# _________________________________________#
 
 AB = Kos.Seidel(Pup)
 
@@ -125,6 +138,9 @@ print(AB.CL)
 print(AB.CT)
 
 
+# Optional didactic inspection:
+# Uncomment these blocks to inspect individual Seidel table rows and sums.
+# They are disabled by default to keep the printed output compact.
 # print( AB[0][0])
 # print(np.sum(AB[1][0]), np.sum(AB[1][1]), np.sum(AB[1][2]), np.sum(AB[1][3]), np.sum(AB[1][4]))
 
@@ -146,7 +162,6 @@ print(AB.CT)
 x, y, z, L, M, N = Pup.Pattern2Field()
 Rayos = Kos.raykeeper(Doblete)
 
-# _________________________________________#
 
 for i in range(0, len(x)):
     pSource_0 = [x[i], y[i], z[i]]
@@ -154,8 +169,5 @@ for i in range(0, len(x)):
     Doblete.Trace(pSource_0, dCos, W)
     Rayos.push()
 
-# _________________________________________#
 
 Kos.display2d(Doblete, Rayos, 0)
-
-

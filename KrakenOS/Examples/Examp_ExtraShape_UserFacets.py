@@ -1,17 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Example: Faceted Optical Surface Using KrakenOS
+Faceted user-defined surface.
 
-This script defines an optical system using KrakenOS, in which one of the surfaces
-is composed of planar facets. Each facet has its own normal vector, introducing
-small tilts over the surface. The surface is constructed over a square area and
-tested using ray tracing.
+Builds a faceted surface from user data and traces rays across the resulting local surface normals.
 
-Units: All spatial dimensions are in millimeters (mm).
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+- how custom surface or aperture data are attached to a surface.
 
-Author: Joel H. V.
-Date:12/04/25
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
 """
 
 import sys
@@ -44,7 +43,6 @@ L1a.Glass = "BK7"
 L1a.Diameter = 30.0
 L1a.UDA = [px, py]
 
-# -----------------------------------------------------------------------------
 # Function to generate facet centers and normals for a faceted surface
 
 def generate_facets(n, m, deviation=0.1):
@@ -68,7 +66,7 @@ def generate_facets(n, m, deviation=0.1):
 
     ang_x = np.random.uniform(-deviation, deviation, size=(n, n))
     ang_y = np.random.uniform(-deviation, deviation, size=(n, n))
-    
+
 
     NX = np.sin(ang_x)                       # x-component of normal
     NY = np.sin(ang_y)                       # y-component of normal
@@ -76,7 +74,6 @@ def generate_facets(n, m, deviation=0.1):
 
     return X0, Y0, NX, NY, NZ
 
-# -----------------------------------------------------------------------------
 # Define a callable class to represent the faceted surface
 
 class FacetedSurface:
@@ -126,7 +123,6 @@ class FacetedSurface:
         z = -numerator / nz
         return z
 
-# -----------------------------------------------------------------------------
 # Create an instance of the faceted surface and assign it to a KrakenOS surface
 
 n = 10                  # Number of facets per side
@@ -143,7 +139,6 @@ L1c.UDA = [px, py]                   # Use the same UDA as L1a
 L1c.DerPres =0.000  # cero by default
 L1c.Res = 1 # One by default
 
-# -----------------------------------------------------------------------------
 # Define the image plane
 
 P_Ima = Kos.surf()
@@ -153,7 +148,6 @@ P_Ima.Glass = "AIR"
 P_Ima.Diameter = 300.0
 P_Ima.Name = "Image plane"
 
-# -----------------------------------------------------------------------------
 # Assemble optical system and perform ray tracing
 
 surfaces = [P_Obj, L1a, L1c, P_Ima]
@@ -173,10 +167,7 @@ for i in range(n):
         Lens.Trace(pSource, dCos, Wav)
         Rays.push()
 
-# ----------------------------------------------------------------------------
 # Visualization
 
 Kos.display3d(Lens, Rays, 0)
 Kos.display2d(Lens, Rays, 0)
-
-

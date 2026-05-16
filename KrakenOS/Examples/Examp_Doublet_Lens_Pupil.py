@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Example: Doublet Lens with Pupil Calculation
-This script demonstrates how to simulate a doublet lens system with pupil calculation using KrakenOS.
-The system includes:
-  - Object Plane (source)
-  - First lens surface (convex, BK7)
-  - Second lens surface (concave, F2)
-  - Air gap (with modified thickness)
-  - Pupil surface (defining the pupil of the system)
-  - Image Plane (detector)
+"""Example: doublet lens with pupil calculation.
 
-The script performs a pupil calculation using the PupilCalc tool and then generates a ray pattern based on the pupil.
-It traces the rays for two field orientations (FieldY = 2.0 and FieldY = -2.0) and finally displays a 2D visualization.
+This example uses `PupilCalc` to compute pupil information and generate field
+rays before tracing them through a doublet lens.
 
-Author: Joel Herrera V.
-Date: 10/03/2025
+What this example teaches:
+- how to add an aperture stop surface to a system
+- how to configure `PupilCalc`
+- how to inspect input and output pupil properties
+- how to trace two symmetric field angles
+
+Expected output:
+- printed pupil properties
+- a 2D layout with the traced pupil-generated rays
+
+Didactic note:
+- the 3D display line near the end is intentionally commented. Uncomment it
+  when you want to compare the 2D and 3D visualizations.
+
+Units:
+- distances are in millimeters
+- wavelengths are in micrometers
 """
 
 import sys
@@ -25,7 +31,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos  # Import KrakenOS for optical simulation
 
-# =============================================================================
 # Define the optical surfaces for the doublet lens system with pupil.
 #
 # The system is composed of:
@@ -34,8 +39,7 @@ import KrakenOS as Kos  # Import KrakenOS for optical simulation
 #   - Second Lens Surface: Concave surface made of F2
 #   - Air Gap: Modified air gap between lens and pupil/image plane
 #   - Pupil: Pupil surface with specific displacement and nominal positions
-#   - Image Plane: Detector where the final image is formed
-# =============================================================================
+#   - Image plane: Detector where the final image is formed
 
 # Object Plane (Source)
 P_Obj = Kos.surf()
@@ -78,7 +82,7 @@ pupil.Name = "Pupil"
 pupil.DespY = 0.0              # Y displacement (if any)
 pupil.Nm_Pos = (-10, 10)        # Name position in the 2D diagram
 
-# Image Plane (Detector)
+# Image plane (Detector)
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
 P_Ima.Thickness = 0.0
@@ -87,17 +91,14 @@ P_Ima.Diameter = 20.0
 P_Ima.Name = "P_Ima"
 P_Ima.Nm_Pos = (-10, 10)        # Name position in the 2D diagram
 
-# =============================================================================
 # Assemble the optical surfaces into a system.
 #
 # The order of surfaces in list A defines the optical sequence.
-# =============================================================================
 A = [P_Obj, L1a, L1b, L1c, pupil, P_Ima]
 config_1 = Kos.Setup()
 Doublet = Kos.system(A, config_1)
 RayKeeper = Kos.raykeeper(Doublet)  # Container to store traced rays
 
-# =============================================================================
 # Pupil Calculation
 #
 # Use the PupilCalc tool to compute pupil parameters.
@@ -107,7 +108,6 @@ RayKeeper = Kos.raykeeper(Doublet)  # Container to store traced rays
 #  - W: Wavelength (0.4)
 #  - AperType: Type of aperture ("STOP")
 #  - AperVal: Aperture value (3)
-# =============================================================================
 W = 0.4        # Wavelength
 sup = 4        # Surface index for pupil (0-based indexing: pupil is the 5th surface)
 AperVal = 3    # Aperture value
@@ -135,12 +135,10 @@ print(Pup.FocusAiryRadius)
 [L, M, N] = Pup.DirPupSal
 print("Pupil output direction cosines:", L, M, N)
 
-# =============================================================================
 # Generate the ray pattern based on the pupil calculation.
 #
 # The pupil configuration is used to generate a set of rays on the image plane.
 # Two field patterns are generated: one for FieldY = 2.0 and one for FieldY = -2.0.
-# =============================================================================
 
 # First field pattern: FieldY = 2.0
 Pup.Samp = 7           # Number of samples
@@ -165,13 +163,8 @@ for i in range(len(x)):
     Doublet.Trace(pSource_0, dCos, W)
     RayKeeper.push()
 
-# =============================================================================
-# Display the final ray tracing result.
-#
-# You can choose between 3D and 2D visualization. Here, a 2D plot is generated.
-# =============================================================================
-# Uncomment the following line for 3D visualization:
+# Optional didactic display:
+# The 3D line is commented by default so the example opens a lighter 2D plot.
+# Uncomment it when you want to compare the same traced rays in 3D.
 # Kos.display3d(Doublet, RayKeeper, 2)
 Kos.display2d(Doublet, RayKeeper, 0, 1)
-
-

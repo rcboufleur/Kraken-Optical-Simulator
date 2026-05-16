@@ -1,6 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Doublet Lens NonSec"""
+"""
+Non-sequential doublet trace.
+
+Uses the same doublet geometry as a small non-sequential tracing example.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -10,7 +20,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# _________________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -18,7 +27,6 @@ P_Obj.Thickness = 1
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 
-# _________________________________________#
 
 P_Obj2 = Kos.surf()
 P_Obj2.Rc = 0.0
@@ -26,7 +34,6 @@ P_Obj2.Thickness = 10
 P_Obj2.Glass = "AIR"
 P_Obj2.Diameter = 100.0
 
-# _________________________________________#
 
 L1a = Kos.surf()
 L1a.Rc = 9.284706570002484E+001
@@ -35,15 +42,12 @@ L1a.Glass = "BK7"
 L1a.Diameter = 30.0
 
 
-# _________________________________________#
-
 L1b = Kos.surf()
 L1b.Rc = -3.071608670000159E+001
 L1b.Thickness = 3.0
 L1b.Glass = "F2"
 L1b.Diameter = 30
 
-# _________________________________________#
 
 L1c = Kos.surf()
 L1c.Rc = -7.819730726078505E+001
@@ -51,7 +55,6 @@ L1c.Thickness = 9.737604742910693E+001
 L1c.Glass = "AIR"
 L1c.Diameter = 30
 
-# _________________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
@@ -61,17 +64,13 @@ P_Ima.Diameter = 30.0
 P_Ima.DespZ = 10
 P_Ima.TiltX = 6.
 
-# _________________________________________#
 
 A = [P_Obj, P_Obj2, L1a, L1b, L1c, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# _________________________________________#
 
 Doblete = Kos.system(A, configuracion_1)
 Rayos = Kos.raykeeper(Doblete)
-
-# _________________________________________#
 
 
 Doblete.energy_probability=1 # 0 for transmission only
@@ -94,8 +93,5 @@ for nsc in range(0, 30):
             Doblete.NsTrace(pSource_0, dCos, W)
             Rayos.push()
 
-# _________________________________________#
 
 Kos.display3d(Doblete, Rayos, 2)
-
-

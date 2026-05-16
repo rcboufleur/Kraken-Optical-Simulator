@@ -1,6 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Axicon and Cylinder"""
+"""
+Axicon combined with cylindrical power.
+
+Combines an axicon term with a cylindrical contribution to show how nonstandard surface parameters interact.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -10,11 +20,9 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 configuracion_1 = Kos.Setup()
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -22,7 +30,6 @@ P_Obj.Thickness = 10
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 
-# ______________________________________#
 
 L1a = Kos.surf()
 L1a.Rc = 0
@@ -30,7 +37,6 @@ L1a.Thickness = 26.0
 L1a.Glass = "BK7"
 L1a.Diameter = 30.0
 
-# ______________________________________#
 
 L1c = Kos.surf()
 L1c.Rc = 0.
@@ -42,25 +48,21 @@ L1c.Cylinder_Rxy_Ratio = 0
 L1c.Glass = "AIR"
 L1c.Diameter = 30
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
 P_Ima.Thickness = 0.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 100.0
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, L1a, L1c, P_Ima]
 
-# ______________________________________#
 
 Doblete = Kos.system(A, configuracion_1)
 Rayos = Kos.raykeeper(Doblete)
 
-# ______________________________________#
 
 tam = 5
 rad = 10.0
@@ -84,8 +86,5 @@ for i in range(-tam, tam + 1):
             Doblete.Trace(pSource_0, dCos, W)
             Rayos.push()
 
-# ______________________________________#
 
 Kos.display3d(Doblete, Rayos, 0)
-
-

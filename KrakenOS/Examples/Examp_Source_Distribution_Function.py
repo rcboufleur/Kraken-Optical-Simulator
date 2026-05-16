@@ -1,4 +1,18 @@
-﻿import matplotlib.pyplot as plt
+"""
+Custom source distribution function.
+
+Defines a nontrivial source distribution and traces the generated rays through a simple optical system.
+
+What to look at:
+- the source sampling function.
+- the conversion from sampled coordinates to rays.
+- the resulting 3D ray distribution.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 import scipy
@@ -32,7 +46,7 @@ P_Ima.Thickness = -1.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 6000.0
 P_Ima.Drawing = 1
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
 A = [P_Obj, objeto, P_Ima]
 
@@ -147,5 +161,3 @@ plt.show()
 
 #             Rays.push()
 # Kos.display3d(Telescope, Rays, 0)
-
-

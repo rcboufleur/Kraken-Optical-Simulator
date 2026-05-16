@@ -1,6 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Doublet Lens Tilt nonSec"""
+"""
+Tilted non-sequential doublet with coating data.
+
+Combines tilt, non-sequential tracing, and coating behavior in a compact doublet example.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -10,7 +20,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# _________________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -18,7 +27,6 @@ P_Obj.Thickness = 10
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 
-# _________________________________________#
 
 L1a = Kos.surf()
 L1a.Rc = 9.28E+001
@@ -29,7 +37,6 @@ L1a.AxisMove = 1
 L1a.TiltX = 13.0
 L1a.DespZ = 5.0
 
-# _________________________________________#
 
 # reflectivity
 R = [[0.5, 0.5, 0.5],
@@ -52,7 +59,6 @@ L1b.Diameter = 30
 THETA = [0, 45]
 L1b.Coating =[R, A, W, THETA]
 
-# _________________________________________#
 
 L1c = Kos.surf()
 L1c.Rc = (-7.819730726078505E+001)
@@ -64,27 +70,22 @@ L1c.Diameter = 30
 L1c.Coating =[R, A, W, THETA]
 
 
-# _________________________________________#
-
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
 P_Ima.Thickness = 0.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 1000.0
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# _________________________________________#
 
 A = [P_Obj, L1a, L1b, L1c, P_Obj, L1a, L1b, L1c, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# _________________________________________#
 
 Doblete = Kos.system(A, configuracion_1)
 Rayos = Kos.raykeeper(Doblete)
 Doblete.energy_probability=1
 
-# _________________________________________#
 
 tam = 30
 rad = 18.0
@@ -108,8 +109,5 @@ for j in range(-tam, tam + 1):
         Doblete.NsTrace(pSource_0, dCos, W)
         Rayos.push()
 
-# _________________________________________#
 
 Kos.display3d(Doblete, Rayos, 2)
-
-

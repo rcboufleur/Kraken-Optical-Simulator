@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Parabole Mirror Shift"""
+"""
+Spherical surface example.
+
+Builds a compact spherical-surface model and traces rays through the geometry.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 from importlib import resources
@@ -12,14 +23,12 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Thickness = 1000.0
 P_Obj.Diameter = 300
 P_Obj.Drawing = 0
 
-# ______________________________________#
 
 M1 = Kos.surf()
 M1.Rc = -2 * P_Obj.Thickness
@@ -30,15 +39,12 @@ M1.Diameter = 2000
 M1.CoatingMet = 0
 
 
-# ______________________________________#
-
 P_Ima = Kos.surf()
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 1600.0
 P_Ima.Drawing = 0
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, P_Ima]
 configuracion_1 = Kos.Setup()
@@ -47,12 +53,10 @@ MATERIAL_PATH = resources.files("KrakenOS") / "Cat" / "Gold.csv"
 
 configuracion_1.LoadMetal(MATERIAL_PATH, "Gold", 1)
 
-# ______________________________________#
 
 Espejo = Kos.system(A, configuracion_1)
 Rayos = Kos.raykeeper(Espejo)
 
-# ______________________________________#
 
 W = 0.5876
 Surf = 1
@@ -96,7 +100,3 @@ print(Rayos.RP[0], Rayos.RP[1], Rayos.RP[2])
 
 
 # x,y,z,l,m,n = Rayos.pick(-1, coordinates="local")
-
-
-
-

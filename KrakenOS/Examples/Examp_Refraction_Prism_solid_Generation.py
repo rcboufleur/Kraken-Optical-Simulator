@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Diffraction Grating Transmission"""
+"""
+Generated solid prism refraction.
+
+Generates or loads the solid-prism geometry used by a non-sequential refraction example.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+- the grating parameters and diffraction order.
+- the STL geometry file and its orientation in the optical path.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -47,8 +59,6 @@ faces = np.hstack(
 Solid = pv.PolyData(vertices, faces)
 
 
-# _________________________________________#
-
 P_Obj = Kos.surf(Thickness = 30, Diameter = 10.0)
 
 Prism_SolObj = Kos.surf()
@@ -87,7 +97,3 @@ for i in range(-nr, nr + 1):
                 Rays.push()
 
 Kos.display2d(Prism, Rays, 0)
-
-
-
-

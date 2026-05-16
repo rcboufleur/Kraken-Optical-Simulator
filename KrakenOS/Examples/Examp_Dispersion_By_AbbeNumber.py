@@ -1,7 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Doublet Lens"""
+"""
+Dispersion from Abbe number data.
 
+Shows how refractive-index dispersion can be described from Abbe-number-style material information.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 
@@ -11,7 +20,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 
 # From Examp_Doublet_Lens.py
@@ -68,15 +76,12 @@ format
 ex) '___BLANK 1 0 1.52216 5.88E+1 0 0 0 0 0 0'
 L1c = surf(Rc=-7.819730726078505E+001, Thickness=9.737604742910693E+001, Glass='___BLANK 1 0 1.52216 5.88E+1 0 0 0 0 0 0'  , Diameter=30.0)
 '''
-P_Ima = Kos.surf(Rc=0.0, Thickness=0.0, Glass='AIR', Diameter=50.0, Name='Plano imagen')
-# ______________________________________#
+P_Ima = Kos.surf(Rc=0.0, Thickness=0.0, Glass='AIR', Diameter=50.0, Name='Image plane')
 
-# ______________________________________#
 
 A = [P_Obj, L1a, L1b, L1c, P_Ima]
 config_1 = Kos.Setup()
 
-# ______________________________________#
 
 Doblete = Kos.system(A, config_1)
 Rayos1 = Kos.raykeeper(Doblete)
@@ -84,7 +89,6 @@ Rayos2 = Kos.raykeeper(Doblete)
 Rayos3 = Kos.raykeeper(Doblete)
 RayosT = Kos.raykeeper(Doblete)
 
-# ______________________________________#
 
 tam = 10
 rad = 10.0
@@ -111,10 +115,5 @@ for j in range(-tam, tam + 1):
             Rayos3.push()
             RayosT.push()
 
-# ______________________________________#
 
 Kos.display2d(Doblete, RayosT, 0)
-
-
-
-

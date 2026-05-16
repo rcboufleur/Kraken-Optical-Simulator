@@ -1,6 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Doublet Lens Cylinder"""
+"""
+Doublet lens with a cylindrical surface term.
+
+Adds a cylindrical contribution to one surface of a doublet and traces the resulting astigmatic behavior.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import sys
 from pathlib import Path
@@ -9,7 +19,6 @@ import numpy as np
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# _________________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0
@@ -17,7 +26,6 @@ P_Obj.Thickness = 10
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 30.0
 
-# _________________________________________#
 
 L1a = Kos.surf()
 L1a.Rc = 9.284706570002484E+001
@@ -25,7 +33,6 @@ L1a.Thickness = 6.0
 L1a.Glass = "BK7"
 L1a.Diameter = 30.0
 
-# _________________________________________#
 
 L1b = Kos.surf()
 L1b.Rc = -3.071608670000159E+001
@@ -35,7 +42,6 @@ L1b.Diameter = 30
 L1b.TiltZ = 30
 L1b.AxisMove = 0
 
-# _________________________________________#
 
 L1c = Kos.surf()
 L1c.Rc = -7.819730726078505E+001
@@ -46,7 +52,6 @@ L1c.Cylinder_Rxy_Ratio = 0
 L1c.TiltZ = 90
 L1c.AxisMove = 0
 
-# _________________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Rc = 0.0
@@ -54,17 +59,14 @@ P_Ima.Thickness = 0.0
 P_Ima.Glass = "AIR"
 P_Ima.Diameter = 10.0
 
-# _________________________________________#
 
 A = [P_Obj, L1a, L1b, L1c, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# _________________________________________#
 
 Doblete = Kos.system(A, configuracion_1)
 Rayos = Kos.raykeeper(Doblete)
 
-# _________________________________________#
 
 tam = 5
 rad = 10.0
@@ -88,9 +90,6 @@ for i in range(-tam, tam + 1):
             Doblete.Trace(pSource_0, dCos, W)
             Rayos.push()
 
-# _________________________________________#
 
 Kos.display2d(Doblete, Rayos, 0)
 Kos.display2d(Doblete, Rayos, 1)
-
-

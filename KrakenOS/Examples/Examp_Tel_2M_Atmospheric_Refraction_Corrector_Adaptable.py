@@ -1,6 +1,19 @@
-﻿# !/usr/bin/env python3
+"""
+2 m telescope with adaptable atmospheric refraction corrector.
+
+Models an atmospheric refraction corrector whose geometry can be adjusted during the trace or analysis.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp-Tel_2M_Atmospheric_Refraction_Corrector"""
 
 
 import sys
@@ -56,7 +69,6 @@ def BestRMS(system,raykeeper):
     system, deltaZ = BestFocus(x, y, z, l, m, n, system, mod = 0)
     rms = R_RMS_delta(deltaZ,l,m,n,x,y)
     return rms
-# _________________________________________________________________#
 
 # 4 examples for book pg.121
 T = 0 # Prism rotation
@@ -147,7 +159,6 @@ A = [P_Obj, M1, M2, M1Vertex, C1, C2, C3, C4, C5, C6, RZ, P_Ima]
 Config_1 = Kos.Setup()
 Tel = Kos.system(A, Config_1)
 
-# _________________________________________________________________#
 
 Rays1 = Kos.raykeeper(Tel)
 Rays2 = Kos.raykeeper(Tel)
@@ -189,5 +200,3 @@ MK = [".", ".", "."]
 COL = [[0.8,0.0,0.0], [0.0,0.8,0.0], [0.0,0.0,0.8]]
 SURF = [-1, -1, -1]
 MyPlot(RAYS, SURF, figure= "Spot", mk = MK, col = COL)
-
-

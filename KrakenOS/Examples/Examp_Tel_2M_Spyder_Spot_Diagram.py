@@ -1,6 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Tel 2M Spyder Spot Diagram"""
+"""
+2 m telescope spider spot diagram.
+
+Traces rays through a 2 m telescope model that includes spider or support-structure effects.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,7 +22,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -21,7 +30,6 @@ P_Obj.Glass = "AIR"
 P_Obj.Diameter = 1.059E+003 * 2.0
 P_Obj.Drawing = 0
 
-# ______________________________________#
 
 Spider = Kos.surf()
 Spider.Rc = 999999999999.0
@@ -41,7 +49,6 @@ Spider.Mask_Shape = AAA
 Spider.Mask_Type = 2
 Spider.TiltZ = 0
 
-# ______________________________________#
 
 Thickness = 3.452229924716749E+003
 M1 = Kos.surf()
@@ -52,7 +59,6 @@ M1.Glass = "MIRROR"
 M1.Diameter = 1.059E+003 * 2.0
 M1.InDiameter = 250 * 2.0
 
-# ______________________________________#
 
 M2 = Kos.surf()
 M2.Rc = -3.93E+003
@@ -62,24 +68,20 @@ M2.k = -4.328100000000000E+000
 M2.Glass = "MIRROR"
 M2.Diameter = 3.365E+002 * 2.0
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Diameter = 100.0
 P_Ima.Glass = "AIR"
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, Spider, M1, M2, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# ______________________________________#
 
 Telescopio = Kos.system(A, configuracion_1)
 Rayos = Kos.raykeeper(Telescopio)
 
-# ______________________________________#
 
 tam = 7
 rad = 2200 / 2
@@ -97,12 +99,10 @@ for i in range(-tam, tam + 1):
             Telescopio.Trace(pSource_0, dCos, W)
             Rayos.push()
 
-# ______________________________________#
 
 Kos.display3d(Telescopio, Rayos, 2)
 X, Y, Z, L, M, N = Rayos.pick(-1)
 
-# ______________________________________#
 
 plt.plot(X, Y, 'x')
 plt.xlabel('x')
@@ -110,5 +110,3 @@ plt.ylabel('y')
 plt.title('Spot Diagram')
 plt.axis('square')
 plt.show()
-
-

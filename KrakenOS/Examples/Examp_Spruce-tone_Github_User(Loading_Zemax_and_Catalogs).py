@@ -1,7 +1,16 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Doublet Lens"""
+"""
+Loading Zemax files and user catalogs.
 
+Loads external Zemax-style and user catalog data before tracing a small optical system.
+
+What to look at:
+- the ray source, direction cosines, and wavelength passed to Trace.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 from importlib import resources
@@ -93,7 +102,3 @@ xlim = [0, 180]
 ylim = [-15, 15]
 
 # plt.show()
-
-
-
-

@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Tel 2M Spyder Spot Diagram"""
+"""
+Single STL solid object.
+
+Loads one STL solid object and traces rays through or around the modeled geometry.
+
+What to look at:
+- the difference between sequential Trace and non-sequential NsTrace.
+- the STL geometry file and its orientation in the optical path.
+
+Required local files:
+- Prisma.stl
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 # import os
 import numpy as np
@@ -12,7 +26,6 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Thickness = 2.000000000000000E+003
@@ -20,7 +33,6 @@ P_Obj.Glass = "AIR"
 P_Obj.Diameter = 6.796727741707513E+002 * 2.0
 P_Obj.Drawing = 0
 
-# ______________________________________#
 
 M1 = Kos.surf()
 M1.Rc = -6.0E+003
@@ -33,7 +45,6 @@ M1.DespY = 0.0
 M1.TiltX = 0.0000
 M1.AxisMove = 1
 
-# ______________________________________#
 
 M2 = Kos.surf()
 M2.Rc = -6.00E+003
@@ -42,7 +53,6 @@ M2.k = -3.4782E+001
 M2.Glass = "MIRROR"
 M2.Diameter = 3.0E+002 * 2.0
 
-# ______________________________________#
 
 Vertex = Kos.surf()
 Vertex.Thickness = 130.0
@@ -50,11 +60,9 @@ Vertex.Glass = "AIR"
 Vertex.Diameter = 600.0
 Vertex.Drawing = 0
 
-# ______________________________________#
 
 file = resources.files("KrakenOS") / "Examples" / "Prisma.stl"
 
-# ______________________________________#
 
 objeto = Kos.surf()
 objeto.Diameter = 118.0 * 2.0
@@ -68,7 +76,6 @@ objeto.DespX = 0
 objeto.DespY = 0
 objeto.AxisMove = 0
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Rc = 0
@@ -77,12 +84,10 @@ P_Ima.Glass = "AIR"
 P_Ima.Diameter = 500.0
 P_Ima.Drawing = 1
 
-# ______________________________________#
 
 A = [P_Obj, M1, M2, Vertex, objeto, P_Ima]
 configuracion_1 = Kos.Setup()
 
-# ______________________________________#
 
 Telescope = Kos.system(A, configuracion_1)
 Rays = Kos.raykeeper(Telescope)
@@ -91,7 +96,6 @@ Rays = Kos.raykeeper(Telescope)
 Telescope.energy_probability = 1
 Telescope.NsLimit = 10
 
-# ______________________________________#
 
 W = 0.633
 tam = 5
@@ -117,5 +121,3 @@ for gg in range(0, 10):
 
 Kos.display3d(Telescope, Rays, 0)
 print(Telescope.EFFL)
-
-

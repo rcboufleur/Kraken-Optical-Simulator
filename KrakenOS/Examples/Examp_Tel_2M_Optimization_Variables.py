@@ -1,6 +1,18 @@
-﻿# !/usr/bin/env python3
+"""
+2 m telescope optimization variables.
+
+Defines the optical variables used for optimization and aberration checks in the 2 m telescope model.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the aberration output produced after tracing.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Tel 2M Wavefront Fitting"""
 
 import os
 import sys
@@ -12,12 +24,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 currentDirectory = os.getcwd()
 sys.path.insert(1, currentDirectory + '/library')
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -25,7 +35,6 @@ P_Obj.Thickness = 1000 + 3.452200000000000E+003
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 1.059E+003 * 2.0
 
-# ______________________________________#
 
 Thickness = 3.452200000000000E+003
 M1 = Kos.surf()
@@ -39,7 +48,6 @@ M1.TiltY = 0.0
 M1.TiltX = 0.0
 M1.Var = ["k"]
 
-# ______________________________________#
 
 M1.AxisMove = 0
 M2 = Kos.surf()
@@ -55,14 +63,12 @@ M2.DespX = 0.0
 M2.AxisMove = 0
 M2.Var = ["k"]
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Diameter = 300.0
 P_Ima.Glass = "AIR"
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, M2, P_Ima]
 configuracion_1 = Kos.Setup()
@@ -148,8 +154,6 @@ class FunHandl:
         self.obj.SetData()
 
 
-# ______________________________________#
-
 Surf = 1
 W = 0.5016
 AperVal = 2000.
@@ -184,5 +188,3 @@ from scipy.optimize import fsolve
 
 root = fsolve(MFVI.Fun, MFVI.Vars)
 print(root)
-
-

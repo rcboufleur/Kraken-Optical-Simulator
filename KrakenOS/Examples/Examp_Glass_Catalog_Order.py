@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Example: deterministic and prioritized glass catalog loading order."""
+"""
+Glass catalog loading order.
+
+Checks how KrakenOS prioritizes and loads glass catalogs when several catalog paths are available.
+
+What to look at:
+- the catalog search order.
+- how repeated glass names are resolved.
+- the printed diagnostic output.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import os
 import sys
@@ -58,5 +70,3 @@ print(
     "similar to Zemax catalog priority. Future improvement: add a catalog manager "
     "or GUI so users can inspect duplicate glass names and choose catalog priority explicitly."
 )
-
-

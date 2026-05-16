@@ -1,6 +1,18 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Perfect Lens"""
+"""
+Telescope made from ideal thin lenses.
+
+Uses ideal thin-lens elements to build a simplified telescope and inspect pupil behavior.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import time
 import matplotlib.pyplot as plt
@@ -75,7 +87,3 @@ x,y,z,l,m,n = Rays.pick(-1, coordinates="global")
 print(l)
 print(m)
 print(n)
-
-
-
-

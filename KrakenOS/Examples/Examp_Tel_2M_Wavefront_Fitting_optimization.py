@@ -1,6 +1,20 @@
-﻿# !/usr/bin/env python3
+"""
+2 m telescope wavefront fitting with optimization.
+
+Combines Zernike or Seidel wavefront fitting with optimization variables in the 2 m telescope model.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the ray source, direction cosines, and wavelength passed to Trace.
+- the aberration output produced after tracing.
+- the merit quantity used to compare optical performance.
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
+
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Tel 2M Wavefront Fitting"""
 
 import os
 import sys
@@ -12,12 +26,10 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# ______________________________________#
 
 currentDirectory = os.getcwd()
 sys.path.insert(1, currentDirectory + '/library')
 
-# ______________________________________#
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0
@@ -25,7 +37,6 @@ P_Obj.Thickness = 1000 + 3.452200000000000E+003
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 1.059E+003 * 2.0
 
-# ______________________________________#
 
 Thickness = 3.452200000000000E+003
 M1 = Kos.surf()
@@ -38,7 +49,6 @@ M1.InDiameter = 250 * 2.0
 M1.TiltY = 0.0
 M1.TiltX = 0.0
 
-# ______________________________________#
 
 M1.AxisMove = 0
 M2 = Kos.surf()
@@ -53,20 +63,17 @@ M2.DespY = 0.0
 M2.DespX = 0.0
 M2.AxisMove = 0.0
 
-# ______________________________________#
 
 P_Ima = Kos.surf()
 P_Ima.Diameter = 300.0
 P_Ima.Glass = "AIR"
-P_Ima.Name = "Plano imagen"
+P_Ima.Name = "Image plane"
 
-# ______________________________________#
 
 A = [P_Obj, M1, M2, P_Ima]
 configuracion_1 = Kos.Setup()
 Telescopio = Kos.system(A, configuracion_1)
 
-# ______________________________________#
 
 Surf = 1
 W = 0.5016
@@ -90,7 +97,6 @@ Zcoef, Mat, RMS2Chief, RMS2Centroid, FITTINGERROR = Kos.Zernike_Fitting(X, Y, Z,
 
 for i in range(0, NC):
     print("z", i + 1, "  ", "{0:.6f}".format(float(Zcoef[i])), ":", Mat[i])
-# ______________________________________#
 
 # print("RMS: ", "{:.4f}".format(float(w_rms)), " Error del ajuste: ", fitt_error)
 # z_coeff[0] = 0
@@ -104,7 +110,6 @@ for i in range(0, NC):
 RR = Kos.raykeeper(Telescopio)
 x, y, z, L, M, N = Pupil.Pattern2Field()
 
-# ______________________________________#
 
 for i in range(0, len(x)):
     pSource_0 = [x[i], y[i], z[i]]
@@ -112,12 +117,10 @@ for i in range(0, len(x)):
     Telescopio.Trace(pSource_0, dCos, W)
     RR.push()
 
-# ______________________________________#
 
 Kos.display2d(Telescopio, RR, 1,0)
 X, Y, Z, L, M, N = RR.pick(-1)
 
-# ______________________________________#
 
 plt.plot(X, Y, 'x')
 plt.xlabel('numbers')
@@ -177,5 +180,3 @@ from scipy.optimize import fsolve
 
 root = fsolve(SeidelFun.Fun, [0, 0])
 print(root)
-
-

@@ -1,6 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Examp Parabole Mirror Shift"""
+"""
+STL prism with coating data.
+
+Loads a prism from STL geometry and applies coating-related non-sequential tracing settings.
+
+What to look at:
+- how the entrance pupil or ray bundle is calculated.
+- the difference between sequential Trace and non-sequential NsTrace.
+- the STL geometry file and its orientation in the optical path.
+
+Required local files:
+- prism.stl
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
+"""
 
 import numpy as np
 from importlib import resources
@@ -87,6 +102,3 @@ Kos.NsTraceLoop(x, y, z, L, M, N, W, Rays, clean = 1)
 
 Kos.display2d(SOLID, Rays, 0, arrow = 1)
 Kos.display3d(SOLID, Rays, 1)
-
-
-

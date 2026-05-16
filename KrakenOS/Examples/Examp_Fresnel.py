@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Simulation of a Fresnel lens using KrakenOS
+Fresnel lens from a sampled radial profile.
 
-This script loads the profile of a Fresnel lens from a text file,
-builds an optical system in KrakenOS, and traces rays through the system to
-visualize the lens behavior.
+Loads a radial surface description and traces rays through a Fresnel-type profile.
+
+What to look at:
+- the external profile file.
+- how ExtraData is attached to the surface.
+- the difference between the 2D and 3D views.
+
+Required local files:
+- R1064_F1800.txt
+
+Units are the KrakenOS example defaults: distances in millimeters and
+wavelengths in micrometers unless the code states otherwise.
 """
 
 import sys
@@ -19,9 +28,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
 import KrakenOS as Kos
-# -----------------------------------------------------------------------------
 # Object surface (input of the system)
-# -----------------------------------------------------------------------------
 
 P_Obj = Kos.surf()
 P_Obj.Rc = 0.0  # Radius of curvature (0 = flat)
@@ -29,9 +36,7 @@ P_Obj.Thickness = 150  # Thickness to the next surface
 P_Obj.Glass = "AIR"
 P_Obj.Diameter = 50.0  # Effective diameter
 
-# -----------------------------------------------------------------------------
 # Class to process the Fresnel lens profile
-# -----------------------------------------------------------------------------
 
 class FresnelPrepare:
     def __init__(self, file):
@@ -96,9 +101,7 @@ class FresnelPrepare:
         z = Mp * r + bp
         return z
 
-# -----------------------------------------------------------------------------
 # Define the Fresnel lens from the profile file
-# -----------------------------------------------------------------------------
 
 file = resources.files("KrakenOS") / "Examples" / "R1064_F1800.txt"  # Lens profile file
 fresnel = FresnelPrepare(file)
@@ -135,18 +138,14 @@ P_Ima.Glass = "AIR"
 P_Ima.Diameter = 8000.0
 P_Ima.Name = "Image plane"
 
-# -----------------------------------------------------------------------------
 # Build the complete optical system
-# -----------------------------------------------------------------------------
 
 A = [P_Obj, L1a, L1b, P_Ima]
 Config_1 = Kos.Setup()
 Lens = Kos.system(A, Config_1)
 Rays = Kos.raykeeper(Lens)
 
-# -----------------------------------------------------------------------------
 # Generate and trace rays
-# -----------------------------------------------------------------------------
 
 SemiDiameter = 2128.0 / 2.0
 num = 300
@@ -159,11 +158,7 @@ for i in I:
     Lens.Trace(pSource, dCos, Wav)
     Rays.push()
 
-# -----------------------------------------------------------------------------
 # Visualization of system and rays
-# -----------------------------------------------------------------------------
 
 Kos.display3d(Lens, Rays, 0)  # 3D view
 Kos.display2d(Lens, Rays, 0)  # 2D view
-
-
