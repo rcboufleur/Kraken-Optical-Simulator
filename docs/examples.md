@@ -1,10 +1,9 @@
 # KrakenOS Example Guide
 
 Use this guide to find a starting example depending on what you want to do.
-For a modern user-facing learning path, see the
-[KrakenOS User Manual](user_manual/README.md). For a generated topic-by-topic
-manual, see
-[KrakenOS Examples Manual](examples_manual.md). That manual includes generated
+For the main learning path, see the
+[KrakenOS Manual](manual/README.md). For the generated visual appendix, see
+[KrakenOS Generated Examples Appendix](examples_manual.md). That appendix includes generated
 2D and 3D images for selected examples. To refresh those images and rebuild the
 manual, run `python tools/generate_example_images.py --all` from the repository
 root.

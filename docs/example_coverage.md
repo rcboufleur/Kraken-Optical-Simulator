@@ -5,7 +5,7 @@ It is meant to guide future example work without changing the historical
 example filenames.
 
 The modern user-facing documentation starts at
-[`docs/user_manual/README.md`](user_manual/README.md). The generated visual
+[`docs/manual/README.md`](manual/README.md). The generated visual
 examples manual remains in [`docs/examples_manual.md`](examples_manual.md).
 
 ## Well Covered

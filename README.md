@@ -31,23 +31,15 @@ off-axis systems, wavefront analysis with Zernike polynomials, Seidel sums,
 entrance and exit pupil calculations, paraxial optics, and practical
 instrument-level examples.
 
-## Documentation map
+## Documentation
 
-- [Documentation index](docs/README.md): the recommended reading path and the
-  role of each documentation file.
-- [User manual](docs/user_manual/README.md): the primary modern guide for
-  installation, surfaces, tracing, visualization, pupils, analysis, and
-  advanced workflows.
-- [Capabilities overview](docs/capabilities.md): what KrakenOS can model and
-  where to find representative examples.
-- [Example guide](docs/examples.md): task-oriented entry points for users who
-  want to start from a script.
-- [Generated examples manual](docs/examples_manual.md): generated visual
-  appendix built from example docstrings, with reproducible 2D and 3D images.
-- [Example coverage roadmap](docs/example_coverage.md): what is well covered,
-  what is partly covered, and what should be improved next.
-- [PSF and MTF notes](docs/psf_mtf_notes.md): practical notes for the compact
-  PSF/MTF helper functions.
+Start with the [KrakenOS Manual](docs/manual/README.md). It integrates
+installation, first systems, surfaces, materials, ray tracing, visualization,
+pupils, analysis, advanced workflows, API orientation, images, and links to
+runnable examples.
+
+For a shorter map of the supporting documentation, see
+[docs/README.md](docs/README.md).
 
 ## Install KrakenOS
 
@@ -76,11 +68,8 @@ print(Kos.__file__)
 print(Kos.surf())
 ```
 
-For a broader map of the library, see
-[KrakenOS Capabilities](docs/capabilities.md). To find examples by task, see
-[KrakenOS Example Guide](docs/examples.md). A generated manual based on the
-example scripts is available at [KrakenOS Examples Manual](docs/examples_manual.md).
-To refresh the generated example images and manual:
+For the complete learning path, see the [KrakenOS Manual](docs/manual/README.md).
+To refresh the generated example images used by the documentation:
 
 ```bash
 python tools/generate_example_images.py --all
@@ -298,9 +287,9 @@ Kos.display2d(Doublet, Rays,0,1)
 
 
 
-## User Manual and Examples
+## Manual and Examples
 
-The current user manual starts at [docs/user_manual/README.md](docs/user_manual/README.md).
+The current user manual starts at [docs/manual/README.md](docs/manual/README.md).
 The complete documentation index is [docs/README.md](docs/README.md).
 
 Example scripts are available in `KrakenOS/Examples`:

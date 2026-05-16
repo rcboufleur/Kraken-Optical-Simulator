@@ -19,6 +19,7 @@ KrakenOS/Examples/mi_objeto.pkl
 __pycache__/
 *.py[cod]
 *$py.class
+docs/MU-2022-01_md/
 
 # C extensions
 *.so

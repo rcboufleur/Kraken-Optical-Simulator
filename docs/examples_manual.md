@@ -1,7 +1,7 @@
 # KrakenOS Generated Examples Manual
 
 This is the generated visual appendix for the main
-[KrakenOS User Manual](user_manual/README.md). It is generated from the
+[KrakenOS Manual](manual/README.md). It is generated from the
 example scripts in `KrakenOS/Examples`. Each section links back to the
 runnable Python file and summarizes the didactic notes written in the
 example docstrings.

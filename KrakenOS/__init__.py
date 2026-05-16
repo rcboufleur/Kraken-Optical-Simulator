@@ -23,7 +23,7 @@ Documentation:
 
 - README.md: installation and first examples.
 - docs/README.md: documentation index and recommended reading path.
-- docs/user_manual/README.md: modern user manual.
+- docs/manual/README.md: modern KrakenOS manual.
 - docs/capabilities.md: overview of the main capabilities in the repository.
 """
 

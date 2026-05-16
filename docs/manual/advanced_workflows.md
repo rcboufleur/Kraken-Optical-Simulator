@@ -1,5 +1,11 @@
 # Advanced Workflows
 
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+Previous: [Optical Analysis](optical_analysis.md) | Next: [API Quick Reference](api_quick_reference.md)
+
+---
+
 KrakenOS includes examples that move beyond simple sequential lens systems.
 These examples are powerful, but they are not ideal first-contact tutorials.
 Use them after learning surfaces, ray bundles, visualization, and ray data.
@@ -26,6 +32,8 @@ Recommended examples:
 - [`Examp_CzernyTurner.py`](../../KrakenOS/Examples/Examp_CzernyTurner.py)
 - [`Examp_Tel_2M_Echelle.py`](../../KrakenOS/Examples/Examp_Tel_2M_Echelle.py)
 
+![Prism refraction trace](../assets/examples/Examp_Refraction_Prism_2d.png)
+
 ## STL and Solid Geometry
 
 STL workflows assign optical behavior to 3D geometry. These examples often need
@@ -37,6 +45,10 @@ Recommended examples:
 - [`Examp_Prism_STL-AR_coating.py`](../../KrakenOS/Examples/Examp_Prism_STL-AR_coating.py)
 - [`Examp_Solid_Object_STL.py`](../../KrakenOS/Examples/Examp_Solid_Object_STL.py)
 - [`Examp_Solid_Object_STL_ARRAY.py`](../../KrakenOS/Examples/Examp_Solid_Object_STL_ARRAY.py)
+
+![STL solid array spot result](assets/legacy_solid_array_spot.jpg)
+
+![STL solid array 3D view](assets/legacy_solid_array_3d.jpg)
 
 ## Telescope and Instrument Models
 
@@ -51,6 +63,8 @@ Recommended examples:
 - [`Examp_Tel_2M_Spyder_Spot_Diagram.py`](../../KrakenOS/Examples/Examp_Tel_2M_Spyder_Spot_Diagram.py)
 - [`Examp_Tel_2M_Wavefront_Fitting.py`](../../KrakenOS/Examples/Examp_Tel_2M_Wavefront_Fitting.py)
 
+![Telescope validation layout](assets/legacy_telescopic_precision_layout.jpg)
+
 ## Optimization
 
 KrakenOS systems can be used inside external optimization loops. The safest
@@ -62,4 +76,3 @@ Recommended examples:
 - [`Examp_Doublet_Optimization.py`](../../KrakenOS/Examples/Examp_Doublet_Optimization.py)
 - [`Examp_Tel_2M_Optimization_Variables.py`](../../KrakenOS/Examples/Examp_Tel_2M_Optimization_Variables.py)
 - [`Examp_Tel_2M_Wavefront_Fitting_optimization.py`](../../KrakenOS/Examples/Examp_Tel_2M_Wavefront_Fitting_optimization.py)
-

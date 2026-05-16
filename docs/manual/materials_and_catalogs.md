@@ -1,5 +1,11 @@
 # Materials and Catalogs
 
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+Previous: [Surfaces](surfaces.md) | Next: [Ray Tracing and Ray Data](ray_tracing_and_ray_data.md)
+
+---
+
 KrakenOS can use named glasses from AGF catalogs, numeric refractive indices,
 metal data, coating data, and Zemax-style lens catalogs.
 
@@ -16,6 +22,8 @@ The default order is deterministic, with `SCHOTT.AGF` first by default. This is
 important because the same glass name may appear in more than one catalog. When
 a glass name is duplicated, the first matching catalog in the configured order
 is used.
+
+![Catalog priority chart](../assets/examples/Examp_Glass_Catalog_Order_2d.png)
 
 Recommended example:
 
@@ -49,6 +57,10 @@ fields include:
 - `TP`, `TS`: transmitted P and S terms
 - `TT`: total transmission term
 
+![Coating energy terms](../assets/examples/Examp_Coating_Energy_Basics_2d.png)
+
+![Metal mirror energy terms](../assets/examples/Examp_Metal_Mirror_Energy_2d.png)
+
 Recommended examples:
 
 - [`Examp_Coating_Energy_Basics.py`](../../KrakenOS/Examples/Examp_Coating_Energy_Basics.py)
@@ -59,6 +71,8 @@ Recommended examples:
 KrakenOS can parse packaged Zemax-style lens catalogs and convert catalog
 entries into `surf` lists.
 
+![Catalog lens converted to KrakenOS surfaces](../assets/examples/Examp_Lens_Catalog_Basics_2d.png)
+
 Recommended examples:
 
 - [`Examp_Lens_Catalog_Basics.py`](../../KrakenOS/Examples/Examp_Lens_Catalog_Basics.py)
@@ -66,4 +80,3 @@ Recommended examples:
 
 Future work should add a catalog manager so users can inspect available
 catalogs, duplicated glass names, and catalog priority without editing code.
-

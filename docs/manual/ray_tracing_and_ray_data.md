@@ -1,5 +1,11 @@
 # Ray Tracing and Ray Data
 
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+Previous: [Materials and Catalogs](materials_and_catalogs.md) | Next: [Visualization](visualization.md)
+
+---
+
 KrakenOS supports sequential, non-sequential, and reverse ray tracing.
 
 ## Sequential Tracing
@@ -68,6 +74,8 @@ Recommended examples:
 - [`Examp_Doublet_Lens_NonSec.py`](../../KrakenOS/Examples/Examp_Doublet_Lens_NonSec.py)
 - [`Examp_Prism_STL.py`](../../KrakenOS/Examples/Examp_Prism_STL.py)
 
+![Folded mirror ray trace](../assets/examples/Examp_Flat_Mirror_45Deg_2d.png)
+
 ## Reverse Tracing
 
 Reverse tracing starts from image space and propagates backward:
@@ -80,3 +88,4 @@ Recommended example:
 
 - [`Examp_Reverse_Trace.py`](../../KrakenOS/Examples/Examp_Reverse_Trace.py)
 
+![Forward and reverse tracing](../assets/examples/Examp_Reverse_Trace_2d.png)

@@ -8,7 +8,7 @@ The examples are intentionally written as scripts rather than as polished API
 recipes.  That makes them useful for learning by editing: change one radius,
 wavelength, aperture, tilt, or grating order and run the file again.
 
-For a modern learning path, see `../../docs/user_manual/README.md`. For a
+For the main manual, see `../../docs/manual/README.md`. For a
 generated manual with topic summaries and selected 2D/3D figures, see
 `../../docs/examples_manual.md`.
 

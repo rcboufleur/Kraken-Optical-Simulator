@@ -1,5 +1,11 @@
 # First Optical System
 
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+Previous: [Core Concepts](core_concepts.md) | Next: [Surfaces](surfaces.md)
+
+---
+
 This chapter builds the smallest useful KrakenOS workflow: create surfaces,
 assemble a system, trace one ray, and save it in a ray container.
 
@@ -76,6 +82,12 @@ Useful first checks are:
 - `doublet.GLASS`: materials encountered along the path
 - `doublet.SURFACE`: surface numbers touched by the ray
 
+![Single ray through a doublet](../assets/examples/Examp_Ray_2d.png)
+
+The first visual check should be simple: one ray, one small lens group, and one
+image plane. If this plot looks wrong, fix geometry before tracing large ray
+bundles.
+
 ## Save the Ray
 
 ```python
@@ -88,4 +100,3 @@ Use `raykeeper` whenever you trace more than one ray. Each call to
 `rays.push()` stores a copy of that trace.
 
 Recommended example: [`Examp_Ray.py`](../../KrakenOS/Examples/Examp_Ray.py).
-

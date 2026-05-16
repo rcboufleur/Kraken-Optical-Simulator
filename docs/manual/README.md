@@ -1,4 +1,8 @@
-# KrakenOS User Manual
+# KrakenOS Manual
+
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+---
 
 This is the primary learning manual for KrakenOS. It is written for users who
 want to build optical systems, trace rays, inspect results, and move gradually
@@ -28,5 +32,9 @@ The recommended learning path is:
 
 For runnable scripts, use the [Example Guide](../examples.md). For the visual
 appendix generated from example docstrings, use the
-[Generated Examples Manual](../examples_manual.md). For the full documentation
+[Generated Examples Appendix](../examples_manual.md). For the full documentation
 map, see [KrakenOS Documentation](../README.md).
+
+Selected historical figures have been migrated into this manual where they
+still explain current KrakenOS concepts. New generated figures are used where
+they better match the current examples and package behavior.

@@ -1,5 +1,11 @@
 # Core Concepts
 
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+Previous: [Installation](installation.md) | Next: [First Optical System](first_optical_system.md)
+
+---
+
 KrakenOS is built around explicit optical surfaces and explicit ray traces.
 Instead of hiding the system behind a large editor, the user builds a list of
 surface objects and passes that list to `Kos.system`.
@@ -55,4 +61,3 @@ unless a script states otherwise. A ray is defined by:
 The common direction for sequential examples is from object space toward image
 space along positive `z`, but KrakenOS also supports reverse tracing and
 non-sequential workflows.
-

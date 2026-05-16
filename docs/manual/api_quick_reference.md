@@ -1,5 +1,11 @@
 # API Quick Reference
 
+**Manual Navigation:** [Overview](README.md) | [Installation](installation.md) | [Core Concepts](core_concepts.md) | [First System](first_optical_system.md) | [Surfaces](surfaces.md) | [Materials](materials_and_catalogs.md) | [Ray Tracing](ray_tracing_and_ray_data.md) | [Visualization](visualization.md) | [Pupils](pupils_and_fields.md) | [Analysis](optical_analysis.md) | [Advanced](advanced_workflows.md) | [API](api_quick_reference.md)
+
+Previous: [Advanced Workflows](advanced_workflows.md)
+
+---
+
 This page is a compact orientation guide, not a complete API reference.
 
 ## `Kos.surf`
@@ -99,4 +105,3 @@ Common method:
 | Method | Purpose |
 | --- | --- |
 | `Pattern2Field()` | Return ray origins and direction cosines. |
-

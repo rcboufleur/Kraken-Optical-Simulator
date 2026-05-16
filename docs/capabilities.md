@@ -7,9 +7,9 @@ and practical system examples.
 
 This document is an overview of the main capabilities currently represented in
 the codebase and examples. For a modern task-oriented user manual, see the
-[KrakenOS User Manual](user_manual/README.md). For a task-oriented list of
+[KrakenOS Manual](manual/README.md). For a task-oriented list of
 scripts, see the [KrakenOS Example Guide](examples.md). For a generated visual
-manual, see the [KrakenOS Examples Manual](examples_manual.md). For future
+appendix, see the [KrakenOS Generated Examples Appendix](examples_manual.md). For future
 example priorities, see the [Example Coverage Roadmap](example_coverage.md).
 For a short note on PSF/MTF helper usage, see [PSF and MTF Notes](psf_mtf_notes.md).
 
