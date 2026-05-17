@@ -1,3 +1,21 @@
+"""Benchmark warm parallel sequential tracing with worker-local KrakenOS systems.
+
+This is an exploratory benchmark, not a correctness test. It measures:
+
+- sequential tracing with one already-built ``system(build=0)``;
+- parallel total time, including process startup and worker initialization;
+- parallel warm trace time, after workers have initialized their own systems.
+
+Run from the repository root:
+
+    python tools/benchmark_parallel_trace.py
+
+Optional:
+
+    python tools/benchmark_parallel_trace.py --rays 100 1000 5000 --workers 1 2 4 8
+"""
+
+import argparse
 import math
 import os
 import time
@@ -80,11 +98,6 @@ def make_warmup_batches(workers):
     ]
 
 
-def trace_batch(batch):
-    system = build_simple_system(build=0)
-    return trace_batch_with_system(system, batch)
-
-
 def trace_batch_with_system(system, batch):
     import KrakenOS as Kos
 
@@ -107,10 +120,6 @@ def chunked(items, chunk_size):
     return [items[index : index + chunk_size] for index in range(0, len(items), chunk_size)]
 
 
-def worker_counts_to_test():
-    return [min(2, os.cpu_count() or 2)]
-
-
 def trace_sequential(rays):
     system = build_simple_system(build=0)
     start = time.perf_counter()
@@ -119,7 +128,7 @@ def trace_sequential(rays):
     return sorted(results, key=lambda item: item["index"]), elapsed
 
 
-def trace_parallel(rays, workers=2, batch_size=25):
+def trace_parallel(rays, workers, batch_size):
     batches = chunked(rays, batch_size)
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -146,88 +155,83 @@ def result_last_lmn(result):
 
 
 def assert_results_match(sequential, parallel):
-    assert len(sequential) == len(parallel)
+    if len(sequential) != len(parallel):
+        raise AssertionError("result length mismatch")
     for seq, par in zip(sequential, parallel):
-        assert seq["index"] == par["index"]
-        assert seq["val"] == par["val"]
-        assert len(seq["XYZ"]) == len(par["XYZ"])
-        assert seq["SURFACE"] == par["SURFACE"]
-        assert np.allclose(np.asarray(seq["XYZ"], dtype=float)[-1], np.asarray(par["XYZ"], dtype=float)[-1], rtol=1e-10, atol=1e-10)
-        assert np.isclose(np.asarray(seq["TOP"], dtype=float), np.asarray(par["TOP"], dtype=float), rtol=1e-10, atol=1e-10)
+        if seq["index"] != par["index"] or seq["val"] != par["val"]:
+            raise AssertionError("result identity mismatch")
+        if seq["SURFACE"] != par["SURFACE"]:
+            raise AssertionError("surface sequence mismatch")
+        if not np.allclose(
+            np.asarray(seq["XYZ"], dtype=float)[-1],
+            np.asarray(par["XYZ"], dtype=float)[-1],
+            rtol=1e-10,
+            atol=1e-10,
+        ):
+            raise AssertionError("last XYZ mismatch")
+        if not np.isclose(
+            np.asarray(seq["TOP"], dtype=float),
+            np.asarray(par["TOP"], dtype=float),
+            rtol=1e-10,
+            atol=1e-10,
+        ):
+            raise AssertionError("TOP mismatch")
 
         seq_lmn = result_last_lmn(seq)
         par_lmn = result_last_lmn(par)
         if seq_lmn is None or par_lmn is None:
-            assert seq_lmn is None and par_lmn is None
-        else:
-            assert np.allclose(seq_lmn, par_lmn, rtol=1e-10, atol=1e-10)
+            if seq_lmn is not None or par_lmn is not None:
+                raise AssertionError("last LMN mismatch")
+        elif not np.allclose(seq_lmn, par_lmn, rtol=1e-10, atol=1e-10):
+            raise AssertionError("last LMN mismatch")
 
 
-def build_raykeeper_from_results(results):
-    import KrakenOS as Kos
-
-    system = build_simple_system(build=0)
-    rays = Kos.raykeeper(system)
-    rays.extend_results(sorted(results, key=lambda item: item["index"]))
-    return rays
+def default_worker_counts():
+    cpu_count = os.cpu_count() or 2
+    candidates = [1, 2, 4, 8, 16, cpu_count]
+    return sorted({workers for workers in candidates if 1 <= workers <= cpu_count})
 
 
-def build_classic_raykeeper(rays_to_trace):
-    import KrakenOS as Kos
-
-    system = build_simple_system(build=0)
-    rays = Kos.raykeeper(system)
-    for ray in rays_to_trace:
-        system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
-        rays.push()
-    return rays
-
-
-def assert_raykeepers_match(reference, candidate):
-    assert reference.nrays == candidate.nrays
-    np.testing.assert_equal(reference.vld, candidate.vld)
-    assert len(reference.XYZ) == len(candidate.XYZ)
-    assert len(reference.R_LMN) == len(candidate.R_LMN)
-    assert len(reference.CC) == len(candidate.CC)
-    for ref_xyz, cand_xyz in zip(reference.XYZ, candidate.XYZ):
-        assert np.allclose(ref_xyz.astype(float), cand_xyz.astype(float), rtol=1e-10, atol=1e-10)
-    for ref_lmn, cand_lmn in zip(reference.R_LMN, candidate.R_LMN):
-        assert np.allclose(ref_lmn.astype(float), cand_lmn.astype(float), rtol=1e-10, atol=1e-10)
-    for ref_hits, cand_hits in zip(reference.CC, candidate.CC):
-        assert np.allclose(ref_hits.astype(float), cand_hits.astype(float), rtol=1e-10, atol=1e-10)
-
-
-def test_parallel_sequential_trace_matches_serial_results():
-    ray_count = 100
-    rays = generate_rays(ray_count)
-
-    sequential, sequential_time = trace_sequential(rays)
-    classic_raykeeper = build_classic_raykeeper(rays)
-
+def run_benchmark(ray_counts, worker_counts):
+    print("KrakenOS parallel trace benchmark")
+    print(f"cpu_count={os.cpu_count()}")
     print(
-        "\nparallel trace prototype:"
-        f"\n  rays={ray_count}"
-        f"\n  cpu_count={os.cpu_count()}"
-        f"\n  sequential_warm={sequential_time:.6f}s"
-        "\n  workers  batch_size  parallel_total  parallel_warm_trace  total_speedup  warm_speedup"
+        "rays  workers  batch_size  sequential_warm  parallel_total  "
+        "parallel_warm_trace  total_speedup  warm_speedup"
     )
 
-    for workers in worker_counts_to_test():
-        batch_size = max(1, math.ceil(ray_count / workers))
-        parallel, parallel_total_time, parallel_trace_time = trace_parallel(
-            rays,
-            workers=workers,
-            batch_size=batch_size,
-        )
+    for ray_count in ray_counts:
+        rays = generate_rays(ray_count)
+        sequential, sequential_time = trace_sequential(rays)
 
-        assert_results_match(sequential, parallel)
-        reconstructed_raykeeper = build_raykeeper_from_results(parallel)
-        assert_raykeepers_match(classic_raykeeper, reconstructed_raykeeper)
+        for workers in worker_counts:
+            if workers > (os.cpu_count() or workers):
+                continue
+            batch_size = max(1, math.ceil(ray_count / workers))
+            parallel, parallel_total_time, parallel_trace_time = trace_parallel(
+                rays,
+                workers=workers,
+                batch_size=batch_size,
+            )
+            assert_results_match(sequential, parallel)
 
-        total_speedup = sequential_time / parallel_total_time if parallel_total_time else float("inf")
-        warm_speedup = sequential_time / parallel_trace_time if parallel_trace_time else float("inf")
-        print(
-            f"  {workers:7d}  {batch_size:10d}  "
-            f"{parallel_total_time:14.6f}s  {parallel_trace_time:19.6f}s  "
-            f"{total_speedup:13.3f}x  {warm_speedup:12.3f}x"
-        )
+            total_speedup = sequential_time / parallel_total_time if parallel_total_time else float("inf")
+            warm_speedup = sequential_time / parallel_trace_time if parallel_trace_time else float("inf")
+            print(
+                f"{ray_count:4d}  {workers:7d}  {batch_size:10d}  "
+                f"{sequential_time:15.6f}s  {parallel_total_time:14.6f}s  "
+                f"{parallel_trace_time:19.6f}s  {total_speedup:13.3f}x  "
+                f"{warm_speedup:12.3f}x"
+            )
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--rays", nargs="+", type=int, default=[100, 1000])
+    parser.add_argument("--workers", nargs="+", type=int, default=default_worker_counts())
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    run_benchmark(args.rays, args.workers)

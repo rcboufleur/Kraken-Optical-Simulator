@@ -945,3 +945,59 @@ Connect parallel trace prototype to RayKeeper results
 - Preserve warm parallel timing diagnostics
 - Verify the full pytest suite
 ```
+
+### 2026-05-17 - Split Parallel Trace Benchmark From Pytest
+
+Goal:
+
+- Keep automated tests fast while preserving a reusable benchmark for parallel
+  sequential tracing experiments.
+
+Files changed:
+
+- `tests/test_parallel_trace.py`
+- `tools/benchmark_parallel_trace.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Reduced the pytest parallel trace coverage to a small deterministic case.
+- Kept the correctness contract in pytest:
+  sequential results, parallel worker results, and reconstructed raykeeper data
+  must match.
+- Added `tools/benchmark_parallel_trace.py` as a standalone benchmark for larger
+  worker/ray-count sweeps.
+- The benchmark reports both total multiprocessing time and warm trace time,
+  making Windows process startup overhead visible.
+
+Verification:
+
+```powershell
+python -m py_compile tests\test_parallel_trace.py tools\benchmark_parallel_trace.py
+python tools\benchmark_parallel_trace.py --rays 100 --workers 1 2
+python -m pytest tests\test_parallel_trace.py -s
+python -m pytest tests
+```
+
+Result:
+
+- The standalone benchmark passed its sequential/parallel numerical
+  validation.
+- The short benchmark showed that total multiprocessing time is dominated by
+  worker startup, while warm parallel tracing can already be faster than the
+  sequential path.
+- Full test suite collected 13 tests and all passed.
+
+Suggested commit:
+
+```text
+Split parallel trace benchmark from pytest
+```
+
+```text
+- Keep pytest parallel trace coverage short and deterministic
+- Add standalone warm parallel trace benchmark
+- Validate benchmark results against sequential tracing
+- Report total and warm multiprocessing timings separately
+- Update the maintenance log
+```
