@@ -10,7 +10,6 @@ import numpy as np
 import matplotlib.path as mpl_path
 # import matplotlib.pyplot as plt
 
-import pyvista as pv
 # from matplotlib.path import Path
 
 #############################################################################
@@ -71,7 +70,23 @@ class UDA():
     def __init__(self, x_poligono, y_poligono):
 
         # Crear un objeto de ruta a partir de las coordenadas del polígono
-        self.ruta_poligono = mpl_path.Path(np.column_stack((x_poligono, y_poligono)))
+        self.x_poligono = np.asarray(x_poligono)
+        self.y_poligono = np.asarray(y_poligono)
+        self._UDA_Surf = None
+        self.ruta_poligono = mpl_path.Path(np.column_stack((self.x_poligono, self.y_poligono)))
+
+    @property
+    def UDA_Surf(self):
+        if self._UDA_Surf is None:
+            self._UDA_Surf = self._build_mesh()
+        return self._UDA_Surf
+
+    @UDA_Surf.setter
+    def UDA_Surf(self, value):
+        self._UDA_Surf = value
+
+    def _build_mesh(self):
+        import pyvista as pv
 
         ppx = []
         ppy = []
@@ -84,8 +99,8 @@ class UDA():
 
 
         # Crear coordenadas x e y utilizando np.linspace
-        x = np.linspace(np.min(x_poligono), np.max(x_poligono), columnas)
-        y = np.linspace(np.min(y_poligono), np.max(y_poligono), filas)
+        x = np.linspace(np.min(self.x_poligono), np.max(self.x_poligono), columnas)
+        y = np.linspace(np.min(self.y_poligono), np.max(self.y_poligono), filas)
 
         # Crear el grid combinando las coordenadas x e y utilizando np.meshgrid
         xx, yy = np.meshgrid(x, y)
@@ -111,7 +126,7 @@ class UDA():
         # Visualización del polígono y los puntos
 
         num_puntos_interpolados = 100
-        x_poligono, y_poligono = interpolar_perimetro(x_poligono, y_poligono, num_puntos_interpolados)
+        x_poligono, y_poligono = interpolar_perimetro(self.x_poligono, self.y_poligono, num_puntos_interpolados)
 
         ppx = ppx + x_poligono
         ppy = ppy + y_poligono
@@ -169,9 +184,9 @@ class UDA():
         # Crea una nueva malla que contiene solo las celdas que deseas mantener
         malla_actualizada = malla.extract_cells(indices_celdas_a_mantener)
         try:
-            self.UDA_Surf = malla_actualizada.clean()
+            return malla_actualizada.clean()
         except:
-            self.UDA_Surf = malla_actualizada
+            return malla_actualizada
 
 
 
