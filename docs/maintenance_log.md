@@ -1001,3 +1001,55 @@ Split parallel trace benchmark from pytest
 - Report total and warm multiprocessing timings separately
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Add Parallel Sequential Trace Example
+
+Goal:
+
+- Provide a user-facing example for the parallel-ready sequential tracing
+  pattern validated by the tests and benchmark.
+
+Files changed:
+
+- `KrakenOS/Examples/Examp_Parallel_Trace.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added an example that builds a lightweight `system(build=0)` inside each
+  worker process.
+- Traces deterministic ray batches in parallel with Windows-compatible
+  multiprocessing `spawn`.
+- Returns only serializable numerical ray results from workers.
+- Reconstructs a parent-process `raykeeper` with `extend_results`.
+- Prints sequential warm time, parallel total time, parallel warm trace time,
+  and numerical validation status.
+
+Verification:
+
+```powershell
+python -m py_compile KrakenOS\Examples\Examp_Parallel_Trace.py
+python KrakenOS\Examples\Examp_Parallel_Trace.py
+```
+
+Result:
+
+- The example ran successfully on Windows.
+- For 1000 rays and 4 workers, the example reported a warm trace speedup above
+  2x while making the process startup overhead visible.
+- Parallel and sequential numerical results matched.
+- The reconstructed raykeeper contained all traced rays.
+
+Suggested commit:
+
+```text
+Add parallel sequential trace example
+```
+
+```text
+- Add example for worker-local build=0 sequential tracing
+- Return serializable ray results from multiprocessing workers
+- Reconstruct raykeeper in the parent process with extend_results
+- Print total and warm parallel timing diagnostics
+- Update the maintenance log
+```
