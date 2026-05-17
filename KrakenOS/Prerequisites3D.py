@@ -1,8 +1,8 @@
 
 import numpy as np
-import pyvista as pv
 from .UDA import *
 from .MeshBlock import MeshBlock
+from .GeometryBackend import is_polydata, make_disc, make_polydata, read_mesh
 
 
 def interpolate_coordinates(x, y, num_points=362):
@@ -221,7 +221,7 @@ class Prerequisites():
 
                 # print(self.SDT[j].Const[1], r_RES, RES)
 
-                disc = pv.Disc(center=[0.0, 0.0, 0.0], inner=INNER, outer=OUTER, normal=(0, 0, 1), r_res = r_RES, c_res = (RES * 2))
+                disc = make_disc(center=[0.0, 0.0, 0.0], inner=INNER, outer=OUTER, normal=(0, 0, 1), r_res=r_RES, c_res=(RES * 2))
                 L_te_h = self.Flat2SigmaSurface(disc, j)
 
 
@@ -253,9 +253,9 @@ class Prerequisites():
                 L_te_h = self.Flat2SigmaSurface(udashape, j)
 
         else:
-            aaa = isinstance(self.SDT[j].Solid_3d_stl, pv.core.pointset.PolyData)
+            aaa = is_polydata(self.SDT[j].Solid_3d_stl)
             if aaa == False:
-                L_te_h = pv.read(self.SDT[j].Solid_3d_stl)
+                L_te_h = read_mesh(self.SDT[j].Solid_3d_stl)
             else:
                 L_te_h = self.SDT[j].Solid_3d_stl
 
@@ -294,14 +294,14 @@ class Prerequisites():
         y2 = y2 + self.SDT[j].SubAperture[1]
 
         points2 = np.c_[(x2, y2, z2)]
-        L_te = pv.PolyData(points2, force_float=False)
+        L_te = make_polydata(points2, force_float=False)
 
         x2 = L_te.points[:, 0]
         y2 = L_te.points[:, 1]
         z2 = self.SuTo.SurfaceShape(x2, y2, j)
 
         points2 = np.c_[(x2, y2, z2)]
-        L_te = pv.PolyData(points2, force_float=False)
+        L_te = make_polydata(points2, force_float=False)
         L_te = self.GeometricRotatAndTran(L_te, j)
         return L_te.points
 
@@ -357,7 +357,7 @@ class Prerequisites():
             F.append([3, (3 + (i * 6)), (4 + (i * 6)), (5 + (i * 6))])
         P = np.asarray(P)
         F = np.asarray(F)
-        cant = pv.PolyData(P, F, force_float=False)
+        cant = make_polydata(P, F, force_float=False)
         Ax = cant.points[:, 0]
         Ay = cant.points[:, 1]
         Az = cant.points[:, 2]
@@ -467,7 +467,7 @@ class Prerequisites():
 
 
         points2 = np.c_[(x2, y2, z2)]
-        L_te = pv.PolyData(points2, force_float=False)
+        L_te = make_polydata(points2, force_float=False)
         L_te = self.GeometricRotatAndTran(L_te, j)
         return L_te.points
 
@@ -523,7 +523,7 @@ class Prerequisites():
             F.append([3, (3 + (i * 6)), (4 + (i * 6)), (5 + (i * 6))])
         P = np.asarray(P)
         F = np.asarray(F)
-        cant = pv.PolyData(P, F, force_float=False)
+        cant = make_polydata(P, F, force_float=False)
         Ax = cant.points[:, 0]
         Ay = cant.points[:, 1]
         Az = cant.points[:, 2]

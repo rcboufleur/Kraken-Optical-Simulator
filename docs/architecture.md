@@ -96,7 +96,8 @@ roles explicit helps decide what to refactor.
 | Area | Current PyVista role | Refactor direction |
 | --- | --- | --- |
 | `Display.py` | Visualization backend for 3D surfaces and rays | Keep PyVista justified here; adapt it to consume KrakenOS data |
-| `Prerequisites3D.py` | Geometry backend for meshes, masks, side faces, STL files, and ray-mesh intersections | Keep for now, gradually isolate behind clearer internal functions |
+| `GeometryBackend.py` | Small internal adapter around PyVista mesh creation and loading | Centralize PyVista calls before any future backend replacement |
+| `Prerequisites3D.py` | Geometry preparation for meshes, masks, side faces, STL files, and ray-mesh intersections | Use the backend adapter for mesh creation/loading and keep optical geometry behavior unchanged |
 | `InterNormalCalc.py` / `KrakenSys.py` | Indirectly use PyVista mesh `ray_trace()` for non-sequential geometry | Preserve behavior until KrakenOS has its own robust triangle mesh backend |
 | `RayKeeper.py` | Previously held unused PyVista containers | Removed; raykeeper now stores numerical ray data |
 | `UDA.py` | Previously built PyVista mesh during UDA construction | Mesh is now lazy; polygon hit testing works without mesh construction |
@@ -149,6 +150,7 @@ when full geometry is needed.
 | Missing masks | Unmasked surfaces use an empty `MeshBlock` instead of a dummy PyVista disk. |
 | UDA | Polygon hit testing is separated from lazy PyVista mesh construction. |
 | `build=0` | Lightweight setup skips dummy side mesh construction; full geometry rebuild remains automatic for `NsTrace()` and displays. |
+| Geometry backend | `GeometryBackend.py` centralizes PyVista calls for disc creation, `PolyData`, STL/mesh reading, and PolyData detection. |
 
 ## Candidate Future Steps
 
@@ -160,4 +162,3 @@ when full geometry is needed.
 | Separate 2D surface plotting from full PyVista meshes | Medium | Could make basic `display2d()` lighter. Needs careful visual comparison. |
 | Replace `pv.Disc()` for simple analytical surface meshes | Medium-high | Requires a tested internal mesh representation. |
 | Replace STL loading and `mesh.ray_trace()` | High | Requires robust triangle mesh intersection, normals, tolerances, and acceleration. |
-

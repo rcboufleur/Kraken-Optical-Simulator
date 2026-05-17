@@ -1,5 +1,4 @@
 import runpy
-import time
 from pathlib import Path
 
 
@@ -43,10 +42,8 @@ def main():
             path = EXAMPLES_DIR / example
             assert path.exists(), f"Missing example: {path}"
 
-            start = time.perf_counter()
             run_example(path)
-            elapsed = time.perf_counter() - start
-            lines.append(f"PASS {example} ({elapsed:.2f} s)")
+            lines.append(f"PASS {example}")
 
         lines.append("RESULT PASS")
         write_report(lines)
