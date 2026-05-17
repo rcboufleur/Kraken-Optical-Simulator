@@ -196,7 +196,9 @@ class Prerequisites():
 
 
         if self.SDT[j].Mask_Shape == "None":
-            self.SDT[j].RestoreVTK()
+            MASK = MeshBlock()
+        else:
+            MASK = self.SDT[j].Mask_Shape
 
 
         if (self.SDT[j].Solid_3d_stl == 'None'):
@@ -259,7 +261,6 @@ class Prerequisites():
 
             L_te_h.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
         L_te_h = self.GeometricRotatAndTran(L_te_h, j)
-        MASK = self.SDT[j].Mask_Shape
         OBJECT_MASK = MeshBlock()
         for mask in MASK:
             Mask_poly = self.Flat2SigmaSurface(mask, j)
