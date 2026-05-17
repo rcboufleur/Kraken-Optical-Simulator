@@ -892,3 +892,56 @@ Add RayKeeper result ingestion path
 - Verify push_result matches push for valid and invalid rays
 - Update the public API contract and maintenance log
 ```
+
+### 2026-05-17 - Connect Parallel Trace Prototype To RayKeeper Results
+
+Goal:
+
+- Prove the intended parallel workflow end to end:
+  worker-local tracing, extracted ray results, parent-process raykeeper
+  reconstruction.
+
+Files changed:
+
+- `tests/test_parallel_trace.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Updated the parallel trace prototype so each worker calls
+  `Kos.extract_ray_result(system)` after `Trace()`.
+- Kept workers independent: each process owns its own `system(build=0)`.
+- Added parent-process reconstruction through
+  `raykeeper.extend_results(results)`.
+- Compared the reconstructed raykeeper against a classic sequential
+  `system.Trace(...); rays.push()` raykeeper.
+- Preserved timing output for `parallel_total` and `parallel_warm_trace`.
+
+Verification:
+
+```powershell
+python -m py_compile tests\test_parallel_trace.py
+python -m pytest tests\test_parallel_trace.py -s
+python -m pytest tests
+```
+
+Result:
+
+- `tests/test_parallel_trace.py` passed.
+- Full test suite collected 13 tests and all passed.
+- Warm parallel timings still show useful speedup for moderate worker counts,
+  while total time remains dominated by Windows process startup/import overhead.
+
+Suggested commit:
+
+```text
+Connect parallel trace prototype to RayKeeper results
+```
+
+```text
+- Use extract_ray_result inside parallel trace workers
+- Rebuild raykeeper in the parent process with extend_results
+- Compare reconstructed raykeeper data with the classic push workflow
+- Preserve warm parallel timing diagnostics
+- Verify the full pytest suite
+```

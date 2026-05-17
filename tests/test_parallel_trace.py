@@ -80,37 +80,20 @@ def make_warmup_batches(workers):
     ]
 
 
-def extract_trace_result(system, ray_index):
-    xyz = np.asarray(system.XYZ, dtype=float)
-    ray_hits = np.asarray(system.ray_SurfHits, dtype=float)
-    last_lmn = None
-    if system.R_LMN:
-        last_lmn = np.asarray(system.R_LMN[-1], dtype=float).tolist()
-
-    return {
-        "index": ray_index,
-        "valid": bool(system.val),
-        "xyz": xyz.tolist(),
-        "ray_hits": ray_hits.tolist(),
-        "last_xyz": xyz[-1].tolist(),
-        "last_lmn": last_lmn,
-        "wavelength": float(system.WAV),
-        "top": float(system.TOP),
-        "n_hits": int(len(system.XYZ)),
-        "surfaces": np.asarray(system.SURFACE).tolist(),
-    }
-
-
 def trace_batch(batch):
     system = build_simple_system(build=0)
     return trace_batch_with_system(system, batch)
 
 
 def trace_batch_with_system(system, batch):
+    import KrakenOS as Kos
+
     results = []
     for ray in batch:
         system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
-        results.append(extract_trace_result(system, ray["index"]))
+        result = Kos.extract_ray_result(system)
+        result["index"] = ray["index"]
+        results.append(result)
     return results
 
 
@@ -155,19 +138,65 @@ def trace_parallel(rays, workers=2, batch_size=25):
     return sorted(results, key=lambda item: item["index"]), total_elapsed, trace_elapsed
 
 
+def result_last_lmn(result):
+    if not result["R_LMN"]:
+        return None
+    candidate = np.asarray(result["R_LMN"][-1], dtype=float)
+    if not candidate.size:
+        return None
+    return candidate
+
+
 def assert_results_match(sequential, parallel):
     assert len(sequential) == len(parallel)
     for seq, par in zip(sequential, parallel):
         assert seq["index"] == par["index"]
-        assert seq["valid"] == par["valid"]
-        assert seq["n_hits"] == par["n_hits"]
-        assert seq["surfaces"] == par["surfaces"]
-        assert np.allclose(seq["last_xyz"], par["last_xyz"], rtol=1e-10, atol=1e-10)
-        assert np.isclose(seq["top"], par["top"], rtol=1e-10, atol=1e-10)
-        if seq["last_lmn"] is None or par["last_lmn"] is None:
-            assert seq["last_lmn"] == par["last_lmn"]
+        assert seq["val"] == par["val"]
+        assert len(seq["XYZ"]) == len(par["XYZ"])
+        assert seq["SURFACE"] == par["SURFACE"]
+        assert np.allclose(np.asarray(seq["XYZ"], dtype=float)[-1], np.asarray(par["XYZ"], dtype=float)[-1], rtol=1e-10, atol=1e-10)
+        assert np.isclose(np.asarray(seq["TOP"], dtype=float), np.asarray(par["TOP"], dtype=float), rtol=1e-10, atol=1e-10)
+
+        seq_lmn = result_last_lmn(seq)
+        par_lmn = result_last_lmn(par)
+        if seq_lmn is None or par_lmn is None:
+            assert seq_lmn is None and par_lmn is None
         else:
-            assert np.allclose(seq["last_lmn"], par["last_lmn"], rtol=1e-10, atol=1e-10)
+            assert np.allclose(seq_lmn, par_lmn, rtol=1e-10, atol=1e-10)
+
+
+def build_raykeeper_from_results(results):
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    rays.extend_results(sorted(results, key=lambda item: item["index"]))
+    return rays
+
+
+def build_classic_raykeeper(rays_to_trace):
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    for ray in rays_to_trace:
+        system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
+        rays.push()
+    return rays
+
+
+def assert_raykeepers_match(reference, candidate):
+    assert reference.nrays == candidate.nrays
+    np.testing.assert_equal(reference.vld, candidate.vld)
+    assert len(reference.XYZ) == len(candidate.XYZ)
+    assert len(reference.R_LMN) == len(candidate.R_LMN)
+    assert len(reference.CC) == len(candidate.CC)
+    for ref_xyz, cand_xyz in zip(reference.XYZ, candidate.XYZ):
+        assert np.allclose(ref_xyz.astype(float), cand_xyz.astype(float), rtol=1e-10, atol=1e-10)
+    for ref_lmn, cand_lmn in zip(reference.R_LMN, candidate.R_LMN):
+        assert np.allclose(ref_lmn.astype(float), cand_lmn.astype(float), rtol=1e-10, atol=1e-10)
+    for ref_hits, cand_hits in zip(reference.CC, candidate.CC):
+        assert np.allclose(ref_hits.astype(float), cand_hits.astype(float), rtol=1e-10, atol=1e-10)
 
 
 def test_parallel_sequential_trace_matches_serial_results():
@@ -175,6 +204,7 @@ def test_parallel_sequential_trace_matches_serial_results():
     rays = generate_rays(ray_count)
 
     sequential, sequential_time = trace_sequential(rays)
+    classic_raykeeper = build_classic_raykeeper(rays)
 
     print(
         "\nparallel trace prototype:"
@@ -193,6 +223,8 @@ def test_parallel_sequential_trace_matches_serial_results():
         )
 
         assert_results_match(sequential, parallel)
+        reconstructed_raykeeper = build_raykeeper_from_results(parallel)
+        assert_raykeepers_match(classic_raykeeper, reconstructed_raykeeper)
 
         total_speedup = sequential_time / parallel_total_time if parallel_total_time else float("inf")
         warm_speedup = sequential_time / parallel_trace_time if parallel_trace_time else float("inf")
