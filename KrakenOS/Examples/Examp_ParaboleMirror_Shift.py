@@ -67,7 +67,9 @@ configuracion_1 = Kos.Setup()
 
 Espejo = Kos.system(A, configuracion_1)
 
-# Espejo = Kos.system_Lite(A, configuracion_1)
+# Lightweight construction can be requested when 3D solids are not needed
+# immediately. They are still built later if non-sequential tracing requires it.
+# Espejo = Kos.system(A, configuracion_1, build=0)
 
 
 # Optional didactic serialization experiment:

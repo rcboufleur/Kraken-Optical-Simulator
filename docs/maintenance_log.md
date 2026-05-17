@@ -778,3 +778,59 @@ Add public API contract test
 - Update the maintenance log with verification notes
 - Verify the full pytest suite
 ```
+
+### 2026-05-17 - Restore Display Aliases And Remove Obsolete Lite Reference
+
+Goal:
+
+- Resolve public API inconsistencies found while preparing future
+  package-level import cleanup.
+
+Files changed:
+
+- `KrakenOS/Display.py`
+- `KrakenOS/Examples/Examp_ParaboleMirror_Shift.py`
+- `tests/test_public_api.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added backward-compatible `Display2D = display2d` and
+  `Display3D = display3d` aliases.
+- Added `Display2D` and `Display3D` to the public API contract test.
+- Replaced the obsolete commented `Kos.system_Lite(...)` example with the
+  current lightweight construction form: `Kos.system(..., build=0)`.
+
+Verification:
+
+```powershell
+python -m py_compile KrakenOS\Display.py KrakenOS\Examples\Examp_ParaboleMirror_Shift.py tests\test_public_api.py
+python -m pytest tests
+```
+
+Additional check:
+
+```python
+import KrakenOS as Kos
+assert Kos.Display2D is Kos.display2d
+assert Kos.Display3D is Kos.display3d
+```
+
+Result:
+
+- `pytest` collected 5 tests and all passed.
+- Existing warning noise remains unchanged.
+
+Suggested commit:
+
+```text
+Restore legacy display aliases
+```
+
+```text
+- Add Display2D and Display3D aliases for backward compatibility
+- Include the legacy display aliases in the public API contract
+- Replace an obsolete system_Lite comment with system(..., build=0)
+- Update the maintenance log with verification notes
+- Verify the full pytest suite
+```

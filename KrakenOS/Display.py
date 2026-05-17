@@ -1798,6 +1798,10 @@ def display3d_interactive(SYSTEM, RAYS=None, options: Optional[Display3DOptions]
     return Display3DViewer(SYSTEM, RAYS, opt).show()
 
 
+# Backward-compatible aliases used by older documentation.
+Display2D = display2d
+Display3D = display3d
+
 # Optional aliases with capitalized names for users who prefer class-like naming.
 NewDisplay2D = display2d_interactive
 NewDisplay3D = display3d_interactive

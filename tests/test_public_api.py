@@ -3,6 +3,8 @@
 
 PUBLIC_API_NAMES = [
     "BestFocus",
+    "Display2D",
+    "Display3D",
     "NsTraceLoop",
     "Phase",
     "Phase2",
