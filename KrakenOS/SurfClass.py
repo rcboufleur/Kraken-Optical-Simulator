@@ -7,6 +7,7 @@ currentDirectory = os.getcwd()
 sys.path.insert(1, (currentDirectory + '/library'))
 from .MathShapesClass import *
 from .PhysicsClass import *
+from .MeshBlock import MeshBlock
 import pyvista as pv
 
 class surf():
@@ -242,7 +243,7 @@ class surf():
 
     def RestoreVTK(self):
         Objeto_3D = pv.Disc(center=[0.0, 0.0, 0.0], inner=0, outer=0.001, normal=(0, 0, 1), r_res=3, c_res=3)
-        Mask = pv.MultiBlock()
+        Mask = MeshBlock()
         Mask.append(Objeto_3D)
         self.Mask_Shape = Mask
 
@@ -432,6 +433,5 @@ class surf():
         self.Coating = self.Sv_Coating
         self.DerPres = self.Sv_DerPres
         self.Const = self.Sv_Const
-
 
 

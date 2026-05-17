@@ -33,6 +33,7 @@ from .UDA import *
 from .Physics import *
 from .Display import *
 from .PhysicsClass import *
+from .MeshBlock import *
 from .SurfClass import *
 from .PupilTool import *
 from .RayKeeper import *

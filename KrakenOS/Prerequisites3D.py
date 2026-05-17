@@ -2,6 +2,7 @@
 import numpy as np
 import pyvista as pv
 from .UDA import *
+from .MeshBlock import MeshBlock
 
 
 def interpolate_coordinates(x, y, num_points=362):
@@ -259,7 +260,7 @@ class Prerequisites():
             L_te_h.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
         L_te_h = self.GeometricRotatAndTran(L_te_h, j)
         MASK = self.SDT[j].Mask_Shape
-        OBJECT_MASK = pv.MultiBlock()
+        OBJECT_MASK = MeshBlock()
         for mask in MASK:
             Mask_poly = self.Flat2SigmaSurface(mask, j)
             Mask_poly = self.GeometricRotatAndTran(Mask_poly, j)
@@ -385,10 +386,10 @@ class Prerequisites():
         self.PreTypeTotal = []
         self.TypeTotal = []
         self.PreGlassOnSide = []
-        self.AAA = pv.MultiBlock()
-        self.BBB = pv.MultiBlock()
-        self.DDD = pv.MultiBlock()
-        self.EEE = pv.MultiBlock()
+        self.AAA = MeshBlock()
+        self.BBB = MeshBlock()
+        self.DDD = MeshBlock()
+        self.EEE = MeshBlock()
         self.counter = []
         self.side_number = []
         for j in range(0, self.n):
@@ -541,10 +542,10 @@ class Prerequisites():
         self.PreTypeTotal = []
         self.TypeTotal = []
         self.PreGlassOnSide = []
-        self.AAA = []
-        self.BBB = []
-        self.DDD = []
-        self.EEE = []
+        self.AAA = MeshBlock()
+        self.BBB = MeshBlock()
+        self.DDD = MeshBlock()
+        self.EEE = MeshBlock()
         self.counter = []
         self.side_number = []
         lens = 0
