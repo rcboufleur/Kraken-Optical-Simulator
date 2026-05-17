@@ -126,6 +126,22 @@ def wavelength_to_rgb(wavelength, gamma=1.0):
 
 ###############################################################################
 
+def _add_mesh_or_blocks(plotter, mesh, **kwargs):
+    if mesh is None or (isinstance(mesh, str) and mesh == "None"):
+        return
+
+    try:
+        plotter.add_mesh(mesh, **kwargs)
+        return
+    except (TypeError, NotImplementedError):
+        pass
+
+    for block in mesh:
+        _add_mesh_or_blocks(plotter, block, **kwargs)
+
+
+###############################################################################
+
 def display3d_old(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', BackgColTop = 'white', GridCol="black"):
 
     """display3d.
@@ -206,7 +222,7 @@ def display3d_old(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', Bac
                     p.add_mesh(edges, 'red')
                 points2 = np.c_[0.0, 0.0, 0.0]
                 c = pv.PolyData(points2)
-    p.add_mesh(SYSTEM.DDD, color=[0.5, 0.5, 0.5], opacity=OPA, show_edges=None)
+    _add_mesh_or_blocks(p, SYSTEM.DDD, color=[0.5, 0.5, 0.5], opacity=OPA, show_edges=None)
     NN = SYSTEM.AAA.n_blocks
     n = 0
     for g in SYSTEM.side_number:
@@ -682,7 +698,7 @@ def plot3d(SYSTEM, view, p, OPA):
                     p.add_mesh(edges, 'red')
                 points2 = np.c_[0.0, 0.0, 0.0]
                 c = pv.PolyData(points2)
-    p.add_mesh(SYSTEM.DDD, color=[0.5, 0.5, 0.5], opacity=OPA, show_edges=None)
+    _add_mesh_or_blocks(p, SYSTEM.DDD, color=[0.5, 0.5, 0.5], opacity=OPA, show_edges=None)
     NN = SYSTEM.AAA.n_blocks
     n = 0
 
@@ -1345,7 +1361,7 @@ def display3d_4OB(SYSTEM, RAYS, view, inline, BackgCol, BackgColTop, GridCol, p)
                     p.add_mesh(edges, 'red')
                 points2 = np.c_[0.0, 0.0, 0.0]
                 c = pv.PolyData(points2)
-    p.add_mesh(SYSTEM.DDD, color=[0.5, 0.5, 0.5], opacity=OPA, show_edges=None)
+    _add_mesh_or_blocks(p, SYSTEM.DDD, color=[0.5, 0.5, 0.5], opacity=OPA, show_edges=None)
     NN = SYSTEM.AAA.n_blocks
     n = 0
     for g in SYSTEM.side_number:
