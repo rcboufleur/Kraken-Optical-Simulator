@@ -1131,11 +1131,7 @@ def Plot2DSurf(SYSTEM, view, ax1):
 ###############################################################################
 def Plot2DRays(RAYS, view, arrow, ax1, nrays):
 
-    CCC = pv.MultiBlock()
-    for rays in RAYS.CC:
-        RAY_VTK_OBJ = pv.lines_from_points(rays)
-        # RAY_VTK_OBJ = pv.Spline(rays, 400)
-        CCC.append(RAY_VTK_OBJ)
+    CCC = [np.asarray(rays) for rays in RAYS.CC]
 
     if (len(RAYS.RayWave) != 0):
         RW = np.asarray(RAYS.RayWave)
@@ -1146,9 +1142,9 @@ def Plot2DRays(RAYS, view, arrow, ax1, nrays):
         for i in range(0, NR):
             RGB = wavelength_to_rgb((RW[i] * 1000.0))
             RRR = CCC[i]
-            Ax = RRR.points[:, 0]
-            Ay = RRR.points[:, 1]
-            Az = RRR.points[:, 2]
+            Ax = RRR[:, 0]
+            Ay = RRR[:, 1]
+            Az = RRR[:, 2]
             for f in range(1,len(Ax)):
                 if (view == 0):
                     line = ax1.plot([Az[f-1],Az[f]], [Ay[f-1],Ay[f]], color=RGB, linewidth=0.5)[0]
