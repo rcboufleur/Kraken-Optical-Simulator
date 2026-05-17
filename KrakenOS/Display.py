@@ -140,6 +140,10 @@ def _add_mesh_or_blocks(plotter, mesh, **kwargs):
         _add_mesh_or_blocks(plotter, block, **kwargs)
 
 
+def _ray_points_to_polyline(points):
+    return pv.lines_from_points(np.asarray(points))
+
+
 ###############################################################################
 
 def display3d_old(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', BackgColTop = 'white', GridCol="black"):
@@ -159,17 +163,15 @@ def display3d_old(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', Bac
     ST1="KrakenOS v0.1. Executing Script: " + sys.argv[0]
     OPA = 0.95
 
-    CCC = pv.MultiBlock()
+    CCC = []
     INST = isinstance(RAYS, list)
     if INST == True:
         for R in RAYS:
             for rays in R.CC:
-                RAY_VTK_OBJ = pv.lines_from_points(rays)
-                CCC.append(RAY_VTK_OBJ)
+                CCC.append(_ray_points_to_polyline(rays))
     else:
         for rays in RAYS.CC:
-            RAY_VTK_OBJ = pv.lines_from_points(rays)
-            CCC.append(RAY_VTK_OBJ)
+            CCC.append(_ray_points_to_polyline(rays))
 
 
     p = pv.Plotter(shape=(1, 1), title=ST1,notebook=inline)
@@ -609,12 +611,7 @@ def display3d(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', BackgCo
 ###############################################################################
 
 def rayplot3d(RAYS, view, p, OPA, nrays ):
-    CCC = pv.MultiBlock()
-    for rays in RAYS.CC:
-        RAY_VTK_OBJ = pv.lines_from_points(rays)
-        # RAY_VTK_OBJ = lines_from_points(rays)
-
-        CCC.append(RAY_VTK_OBJ)
+    CCC = [_ray_points_to_polyline(rays) for rays in RAYS.CC]
 
 
     if (len(RAYS.RayWave) != 0):
@@ -1293,17 +1290,15 @@ def display3d_4OB(SYSTEM, RAYS, view, inline, BackgCol, BackgColTop, GridCol, p)
 
     OPA = 0.95
 
-    CCC = pv.MultiBlock()
+    CCC = []
     INST = isinstance(RAYS, list)
     if INST == True:
         for R in RAYS:
             for rays in R.CC:
-                RAY_VTK_OBJ = pv.lines_from_points(rays)
-                CCC.append(RAY_VTK_OBJ)
+                CCC.append(_ray_points_to_polyline(rays))
     else:
         for rays in RAYS.CC:
-            RAY_VTK_OBJ = pv.lines_from_points(rays)
-            CCC.append(RAY_VTK_OBJ)
+            CCC.append(_ray_points_to_polyline(rays))
 
     Absorb_color = np.array([(10 / 256), (23 / 256), (24 / 256)])
     Mirror_color = np.array([(189 / 256), (189 / 256), (189 / 256)])
