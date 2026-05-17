@@ -222,7 +222,6 @@ class Prerequisites():
                 # print(self.SDT[j].Const[1], r_RES, RES)
 
                 disc = make_disc(center=[0.0, 0.0, 0.0], inner=INNER, outer=OUTER, normal=(0, 0, 1), r_res=r_RES, c_res=(RES * 2))
-                L_te_h = self.Flat2SigmaSurface(disc, j)
 
 
 
@@ -259,7 +258,7 @@ class Prerequisites():
             else:
                 L_te_h = self.SDT[j].Solid_3d_stl
 
-            L_te_h.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
+            L_te_h = L_te_h.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
         L_te_h = self.GeometricRotatAndTran(L_te_h, j)
         OBJECT_MASK = MeshBlock()
         for mask in MASK:
@@ -365,7 +364,7 @@ class Prerequisites():
         Ay = np.asarray(Ay)
         Az = np.asarray(Az)
 
-        cant.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
+        cant = cant.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
 
         return cant
 
@@ -395,11 +394,7 @@ class Prerequisites():
         self.side_number = []
         for j in range(0, self.n):
 
-            if self.SDT[j].Const[1] == 0:
-                (lens, masked) = self.Face3D(j)
-
-
-
+            (lens, masked) = self.Face3D(j)
 
 
             self.AAA.append(lens)
@@ -531,7 +526,7 @@ class Prerequisites():
         Ay = np.asarray(Ay)
         Az = np.asarray(Az)
 
-        cant.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
+        cant = cant.compute_normals(cell_normals=True, point_normals=True, split_vertices=True, flip_normals=False, consistent_normals=True, auto_orient_normals=False, non_manifold_traversal=True, feature_angle=30.0, inplace = False)
 
         return cant
 

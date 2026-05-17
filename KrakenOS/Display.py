@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 # plt.rcParams["font.family"] = "Times New Roman"
 import sys
 from matplotlib import rc
-from typing import Tuple
+from typing import Tuple, Optional, List
+from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
 
@@ -24,6 +25,115 @@ def set_krakenos_fonts():
     plt.rcParams["mathtext.fontset"] = "stix"
 
 set_krakenos_fonts()
+
+
+# =============================================================================
+# Shared display options and helpers
+# =============================================================================
+
+@dataclass
+class Display2DOptions:
+    """Options used by display2d() and display2d_interactive()."""
+
+    view: int = 0
+    arrow: float = 0
+    nrays: int = 0
+    figsize: Tuple[float, float] = (10, 4)
+    fs: int = 11
+    show_surfaces: bool = True
+    show_rays: bool = True
+    equal_axis: bool = True
+    grid: bool = False
+    title: str = "System Plot"
+    surface_line_width: float = 0.5
+    ray_line_width: float = 0.5
+
+
+@dataclass
+class Display3DOptions:
+    """Options used by display3d() and display3d_interactive()."""
+
+    view: int = 0
+    inline: bool = False
+    background: str = "white"
+    background_top: str = "white"
+    grid_color: str = "black"
+    nrays: int = 0
+    opacity: float = 0.99
+    ray_width: float = 1.0
+    show_surfaces: bool = True
+    show_rays: bool = True
+    show_edges: bool = True
+    show_masks: bool = True
+    show_sides: bool = True
+    show_grid: bool = True
+    show_axes: bool = True
+    text: str = "KrakenOS"
+    window_size: Tuple[int, int] = (1200, 800)
+
+
+def _as_list(value):
+    """Return value as a list, preserving existing list inputs."""
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    return [value]
+
+
+def _empty_polydata():
+    """Small empty mesh used as a safe merge seed for PyVista operations."""
+    return pv.PolyData(np.array([[0.0, 0.0, 0.0]]), force_float=False)
+
+
+def ensure_display_geometry(system):
+    """Build full display geometry on demand.
+
+    KrakenOS systems may be created with build=0 for lightweight sequential
+    tracing. Display functions require the full geometry blocks (AAA, BBB, DDD),
+    so this helper temporarily rebuilds with BUILD=1 and restores the previous
+    BUILD value afterwards.
+    """
+    for sys_ in _as_list(system):
+        try:
+            pr3d = getattr(sys_, "Pr3D", None)
+            if pr3d is not None and getattr(pr3d, "ExistSolid", 1) == 0:
+                previous_build = getattr(sys_, "BUILD", None)
+                try:
+                    sys_.BUILD = 1
+                    sys_.build()
+                finally:
+                    if previous_build is not None:
+                        sys_.BUILD = previous_build
+        except Exception:
+            # Display should not fail here for partially initialized objects.
+            # The actual plotting call will expose missing attributes if needed.
+            pass
+
+
+def _surface_display_color(surface):
+    """Return the default display color for a KrakenOS surface."""
+    absorb_color = np.array([(10 / 256), (23 / 256), (24 / 256)])
+    mirror_color = np.array([(189 / 256), (189 / 256), (189 / 256)])
+    glass_color = np.array([12 / 256, 238 / 256, 246 / 256])
+
+    if surface.Color != [0, 0, 0]:
+        return surface.Color
+    if surface.Glass == "MIRROR":
+        return mirror_color
+    if surface.Glass == "ABSORB":
+        return absorb_color
+    return glass_color
+
+
+def _safe_ray_count(ray_container, nrays=0):
+    """Return the number of rays to draw, clamped to available ray data."""
+    if not hasattr(ray_container, "RayWave") or len(ray_container.RayWave) == 0:
+        return 0
+    total = int(np.shape(np.asarray(ray_container.RayWave))[0])
+    if nrays == 0:
+        return total
+    return min(int(nrays), total)
 
 
 
@@ -565,27 +675,19 @@ def display3d(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', BackgCo
         view
     """
 
-    BLD = SYSTEM.BUILD
-    if SYSTEM.Pr3D.ExistSolid == 0:
-        SYSTEM.BUILD = 1
-        SYSTEM.build()
-        SYSTEM.BUILD = BLD
+    SYSTEM_list = _as_list(SYSTEM)
+    RAYS_list = _as_list(RAYS)
+
+    for system in SYSTEM_list:
+        ensure_display_geometry(system)
 
     ST1="KrakenOS v0.1. Executing Script: " + sys.argv[0]
     OPA = 0.99
     p = pv.Plotter(shape=(1, 1), title=ST1,notebook=inline)
 
-
-    INST = isinstance(SYSTEM, list)
-    if INST == False:
-        SYSTEM = [SYSTEM]
-
-    INST = isinstance(RAYS, list)
-    if INST == False:
-        RAYS = [RAYS]
-    for system in SYSTEM:
+    for system in SYSTEM_list:
         plot3d(system, view, p, OPA)
-    for rays in RAYS:
+    for rays in RAYS_list:
         rayplot3d(rays, view, p, OPA, nrays)
 
     p.add_axes(line_width=4)
@@ -611,15 +713,18 @@ def display3d(SYSTEM, RAYS, view=0, inline=False,     BackgCol= 'white', BackgCo
 ###############################################################################
 
 def rayplot3d(RAYS, view, p, OPA, nrays ):
-    CCC = [_ray_points_to_polyline(rays) for rays in RAYS.CC]
+    if RAYS is None or not hasattr(RAYS, "CC"):
+        return
 
+    CCC = [_ray_points_to_polyline(rays) for rays in RAYS.CC]
 
     if (len(RAYS.RayWave) != 0):
         RW = np.asarray(RAYS.RayWave)
+        total = min(np.shape(RW)[0], len(CCC))
         if nrays == 0:
-            NR = np.shape(RW)[0]
+            NR = total
         else:
-            NR = nrays
+            NR = min(int(nrays), total)
 
         for i in range(0, NR):
             RGB = wavelength_to_rgb((RW[i] * 1000.0))
@@ -979,31 +1084,22 @@ def display2d(SYSTEM, RAYS, view=0, arrow=0, nrays = 0, figsize: Tuple=(10, 4), 
     view :
         view
     """
-    BLD = SYSTEM.BUILD
-    if SYSTEM.Pr3D.ExistSolid == 0:
-        SYSTEM.BUILD = 1
-        SYSTEM.build()
-        SYSTEM.BUILD = BLD
+    SYSTEM_list = _as_list(SYSTEM)
+    RAYS_list = _as_list(RAYS)
+
+    for system in SYSTEM_list:
+        ensure_display_geometry(system)
 
     fs=fs # font size
     fig = plt.figure(figsize=figsize)
 
     ax1 = fig.add_subplot(111)
 
-    INST = isinstance(SYSTEM, list)
-    if INST == True:
+    for SYS in SYSTEM_list:
+        Plot2DSurf(SYS, view, ax1)
 
-        for SYS in SYSTEM:
-            Plot2DSurf(SYS, view, ax1)
-    else:
-        Plot2DSurf(SYSTEM, view, ax1)
-
-    INST = isinstance(RAYS, list)
-    if INST == True:
-        for R in RAYS:
-            Plot2DRays(R, view, arrow, ax1, nrays)
-    else:
-        Plot2DRays(RAYS, view, arrow, ax1, nrays)
+    for R in RAYS_list:
+        Plot2DRays(R, view, arrow, ax1, nrays)
 
     plt.title('System Plot')
     plt.xlabel('Z (mm)')
@@ -1109,12 +1205,12 @@ def Plot2DSurf(SYSTEM, view, ax1):
         if (view == 0):
             (ax, ay, az) = edge_3d(TT, 1, 0, 0, solid)
             ax1.plot(az, ay, sim, c='black', linewidth=0.5)
-            (ax, ay, az) = edge_3d(AAAA, (- 1), 0, 0, solid)
+            (ax, ay, az) = edge_3d(TT, (- 1), 0, 0, solid)
             ax1.plot(az, ay, sim, c='black', linewidth=0.5)
         if (view == 1):
             (ax, ay, az) = edge_3d(TT, 0, 1, 0, solid)
             ax1.plot(az, ax, sim, c='black', linewidth=0.5)
-            (ax, ay, az) = edge_3d(AAAA, 0, (- 1), 0, solid)
+            (ax, ay, az) = edge_3d(TT, 0, (- 1), 0, solid)
             ax1.plot(az, ax, sim, c='black', linewidth=0.5)
 
     mx = np.asarray(mx)
@@ -1128,17 +1224,23 @@ def Plot2DSurf(SYSTEM, view, ax1):
 ###############################################################################
 def Plot2DRays(RAYS, view, arrow, ax1, nrays):
 
+    if RAYS is None or not hasattr(RAYS, "CC"):
+        return
+
     CCC = [np.asarray(rays) for rays in RAYS.CC]
 
     if (len(RAYS.RayWave) != 0):
         RW = np.asarray(RAYS.RayWave)
+        total = min(np.shape(RW)[0], len(CCC))
         if nrays == 0:
-            NR = np.shape(RW)[0]
+            NR = total
         else:
-            NR = nrays
+            NR = min(int(nrays), total)
         for i in range(0, NR):
             RGB = wavelength_to_rgb((RW[i] * 1000.0))
             RRR = CCC[i]
+            if RRR.ndim != 2 or RRR.shape[1] < 3:
+                continue
             Ax = RRR[:, 0]
             Ay = RRR[:, 1]
             Az = RRR[:, 2]
@@ -1255,6 +1357,451 @@ def filter_face_2dplot(v1, v2, solid):
     return (v1, v2)
 
 #####################################
+
+
+# =============================================================================
+# Interactive display tools
+# =============================================================================
+
+class Display2DViewer:
+    """Interactive Matplotlib 2D viewer for KrakenOS systems.
+
+    This viewer keeps the classic Plot2DSurf/Plot2DRays drawing logic, but adds
+    in-window controls for the most common visualization options.
+    """
+
+    def __init__(self, SYSTEM, RAYS=None, options: Optional[Display2DOptions] = None):
+        self.systems = _as_list(SYSTEM)
+        self.rays_list = _as_list(RAYS)
+        self.options = options or Display2DOptions()
+
+        for system in self.systems:
+            ensure_display_geometry(system)
+
+        self.fig = None
+        self.ax = None
+        self._widgets = {}
+
+    def _redraw(self):
+        self.ax.clear()
+        opt = self.options
+
+        if opt.show_surfaces:
+            for system in self.systems:
+                Plot2DSurf(system, opt.view, self.ax)
+
+        if opt.show_rays:
+            for rays in self.rays_list:
+                Plot2DRays(rays, opt.view, opt.arrow, self.ax, opt.nrays)
+
+        self.ax.set_title(opt.title)
+        self.ax.set_xlabel("Z (mm)")
+        self.ax.set_ylabel("Y (mm)" if opt.view == 0 else "X (mm)")
+        if opt.equal_axis:
+            self.ax.axis("equal")
+        if opt.grid:
+            self.ax.grid(True, alpha=0.25)
+        self.fig.canvas.draw_idle()
+
+    def show(self):
+        from matplotlib.widgets import CheckButtons, RadioButtons, Slider, Button
+
+        self.fig = plt.figure(figsize=self.options.figsize)
+        self.ax = self.fig.add_axes([0.08, 0.12, 0.68, 0.80])
+
+        # Control panel
+        ax_checks = self.fig.add_axes([0.80, 0.62, 0.17, 0.22])
+        checks = CheckButtons(
+            ax_checks,
+            ["Surfaces", "Rays", "Equal", "Grid"],
+            [
+                self.options.show_surfaces,
+                self.options.show_rays,
+                self.options.equal_axis,
+                self.options.grid,
+            ],
+        )
+
+        def on_check(label):
+            if label == "Surfaces":
+                self.options.show_surfaces = not self.options.show_surfaces
+            elif label == "Rays":
+                self.options.show_rays = not self.options.show_rays
+            elif label == "Equal":
+                self.options.equal_axis = not self.options.equal_axis
+            elif label == "Grid":
+                self.options.grid = not self.options.grid
+            self._redraw()
+
+        checks.on_clicked(on_check)
+        self._widgets["checks"] = checks
+
+        ax_radio = self.fig.add_axes([0.80, 0.48, 0.17, 0.10])
+        radio = RadioButtons(ax_radio, ("Y-Z", "X-Z"), active=self.options.view)
+
+        def on_radio(label):
+            self.options.view = 0 if label == "Y-Z" else 1
+            self._redraw()
+
+        radio.on_clicked(on_radio)
+        self._widgets["radio"] = radio
+
+        max_rays = 0
+        for rays in self.rays_list:
+            if hasattr(rays, "RayWave"):
+                max_rays = max(max_rays, len(rays.RayWave))
+        max_rays = max(max_rays, 1)
+
+        ax_nrays = self.fig.add_axes([0.80, 0.37, 0.17, 0.03])
+        nrays_slider = Slider(ax_nrays, "nrays", 0, max_rays, valinit=self.options.nrays, valstep=1)
+
+        def on_nrays(value):
+            self.options.nrays = int(value)
+            self._redraw()
+
+        nrays_slider.on_changed(on_nrays)
+        self._widgets["nrays"] = nrays_slider
+
+        ax_arrow = self.fig.add_axes([0.80, 0.29, 0.17, 0.03])
+        arrow_slider = Slider(ax_arrow, "arrow", 0, 4, valinit=self.options.arrow, valstep=1)
+
+        def on_arrow(value):
+            self.options.arrow = int(value)
+            self._redraw()
+
+        arrow_slider.on_changed(on_arrow)
+        self._widgets["arrow"] = arrow_slider
+
+        ax_save = self.fig.add_axes([0.80, 0.18, 0.17, 0.06])
+        save_button = Button(ax_save, "Save PNG")
+
+        def on_save(_event):
+            self.fig.savefig("krakenos_display2d.png", dpi=200, bbox_inches="tight")
+
+        save_button.on_clicked(on_save)
+        self._widgets["save"] = save_button
+
+        self._redraw()
+        plt.show()
+        return self
+
+
+class Display3DViewer:
+    """Interactive PyVista 3D viewer for KrakenOS systems.
+
+    PyVista remains the rendering backend. The viewer adds a small in-window
+    control layer that lets users change common display options without editing
+    the function call.
+    """
+
+    def __init__(self, SYSTEM, RAYS=None, options: Optional[Display3DOptions] = None):
+        self.systems = _as_list(SYSTEM)
+        self.rays_list = _as_list(RAYS)
+        self.options = options or Display3DOptions()
+        for system in self.systems:
+            ensure_display_geometry(system)
+        self.plotter = None
+        self._actors = []
+
+    def _add_actor(self, actor):
+        if actor is not None:
+            self._actors.append(actor)
+        return actor
+
+    def _remove_scene_actors(self):
+        if self.plotter is None:
+            return
+        for actor in list(self._actors):
+            try:
+                self.plotter.remove_actor(actor, reset_camera=False, render=False)
+            except Exception:
+                pass
+        self._actors.clear()
+
+    def _add_mesh_or_blocks_actor(self, mesh, **kwargs):
+        if mesh is None or (isinstance(mesh, str) and mesh == "None"):
+            return
+        try:
+            self._add_actor(self.plotter.add_mesh(mesh, **kwargs))
+            return
+        except (TypeError, NotImplementedError):
+            pass
+        for block in mesh:
+            self._add_mesh_or_blocks_actor(block, **kwargs)
+
+    def _draw_system(self, system):
+        opt = self.options
+        if not opt.show_surfaces and not opt.show_masks and not opt.show_sides:
+            return
+
+        recorte = opt.view
+        NN = system.AAA.n_blocks
+        c = _empty_polydata()
+        cc = _empty_polydata()
+        if NN > 0 and system.SDT_0[0].Drawing == 1:
+            c = system.AAA[0]
+            cc = system.AAA[0]
+
+        if opt.show_surfaces:
+            for n in range(1, NN):
+                if system.SDT_0[n].Drawing != 1:
+                    continue
+                AAAA = system.AAA[n]
+                if system.SDT_0[n].Glass == "NULL":
+                    continue
+
+                color = _surface_display_color(system.SDT_0[n])
+                cc = cc.merge(AAAA)
+
+                if recorte == 1:
+                    clippedx = AAAA.clip((1, 0, 0), invert=False)
+                    clippedy = clippedx.clip((0, 1, 0), invert=False)
+                    c = c.merge(clippedy)
+                    clippedx = AAAA.clip(((-1), 0, 0), invert=False)
+                    clippedy = clippedx.clip((0, (-1), 0), invert=False)
+                    c = c.merge(clippedy)
+                    clippedx = AAAA.clip((1, 0, 0), invert=False)
+                    clippedy = clippedx.clip((0, (-1), 0), invert=False)
+                    c = c.merge(clippedy)
+                elif recorte == 2:
+                    c = c.merge(AAAA.clip((1, 0, 0), invert=False))
+                else:
+                    c = c.merge(AAAA)
+
+                self._add_actor(
+                    self.plotter.add_mesh(
+                        c,
+                        color,
+                        opacity=opt.opacity,
+                        specular=1,
+                        specular_power=15,
+                        smooth_shading=True,
+                        show_edges=False,
+                    )
+                )
+
+                if opt.show_edges and not (system.SDT_0[n].Solid_3d_stl != "None" and recorte == 0):
+                    try:
+                        edges = c.extract_feature_edges(
+                            feature_angle=10,
+                            boundary_edges=True,
+                            feature_edges=False,
+                            manifold_edges=False,
+                        )
+                        self._add_actor(self.plotter.add_mesh(edges, "red"))
+                    except Exception:
+                        pass
+
+                c = _empty_polydata()
+
+        if opt.show_masks:
+            self._add_mesh_or_blocks_actor(
+                system.DDD,
+                color=[0.5, 0.5, 0.5],
+                opacity=opt.opacity,
+                show_edges=None,
+            )
+
+        if opt.show_sides:
+            for n, g in enumerate(system.side_number):
+                if n >= system.BBB.n_blocks:
+                    break
+                if system.SDT_0[g].Drawing != 1:
+                    continue
+                color = _surface_display_color(system.SDT_0[g])
+                side = system.BBB[n]
+                if recorte == 1:
+                    self._add_actor(self.plotter.add_mesh(side.clip('x', invert=False), color, opacity=opt.opacity, smooth_shading=True, show_edges=None))
+                    self._add_actor(self.plotter.add_mesh(side.clip('-y', invert=False), color, opacity=opt.opacity, smooth_shading=True, show_edges=None))
+                elif recorte == 2:
+                    self._add_actor(self.plotter.add_mesh(side.clip((1, 0, 0), invert=False), color, opacity=opt.opacity, smooth_shading=True, show_edges=None))
+                else:
+                    self._add_actor(self.plotter.add_mesh(side, color, opacity=opt.opacity, smooth_shading=False, show_edges=None))
+
+    def _draw_rays(self, rays):
+        if not self.options.show_rays:
+            return
+        NR = _safe_ray_count(rays, self.options.nrays)
+        if NR == 0:
+            return
+        RW = np.asarray(rays.RayWave)
+        for i in range(NR):
+            if i >= len(rays.CC):
+                break
+            RGB = wavelength_to_rgb(RW[i] * 1000.0)
+            line = _ray_points_to_polyline(rays.CC[i])
+            self._add_actor(
+                self.plotter.add_mesh(
+                    line,
+                    color=RGB,
+                    opacity=self.options.opacity,
+                    smooth_shading=True,
+                    line_width=self.options.ray_width,
+                    show_edges=None,
+                )
+            )
+
+    def redraw(self):
+        self._remove_scene_actors()
+        for system in self.systems:
+            self._draw_system(system)
+        for rays in self.rays_list:
+            self._draw_rays(rays)
+        try:
+            self.plotter.render()
+        except Exception:
+            pass
+
+    def _set_flag(self, name, value):
+        setattr(self.options, name, bool(value))
+        self.redraw()
+
+    def _set_view(self, view):
+        self.options.view = int(view)
+        self.redraw()
+
+    def _set_opacity(self, value):
+        self.options.opacity = float(value)
+        self.redraw()
+
+    def _set_ray_width(self, value):
+        self.options.ray_width = float(value)
+        self.redraw()
+
+    def _set_nrays(self, value):
+        self.options.nrays = int(value)
+        self.redraw()
+
+    def show(self):
+        opt = self.options
+        self.plotter = pv.Plotter(
+            shape=(1, 1),
+            title="KrakenOS interactive display",
+            notebook=opt.inline,
+            window_size=opt.window_size,
+        )
+        self.redraw()
+
+        if opt.show_axes:
+            try:
+                self.plotter.add_axes(line_width=4)
+            except Exception:
+                pass
+
+        try:
+            cx, cy, cz = self.plotter.center
+            self.plotter.set_focus([cx, cy, cz])
+            self.plotter.camera_position = [-1.0, 0.5, 1.0]
+            self.plotter.set_viewup([0, 1.0, 0])
+        except Exception:
+            pass
+
+        try:
+            self.plotter.enable_anti_aliasing()
+        except Exception:
+            pass
+        try:
+            self.plotter.set_background(opt.background, top=opt.background_top)
+        except Exception:
+            pass
+        if opt.text:
+            try:
+                self.plotter.add_text(opt.text, position="upper_left", font_size=20, color="royalblue")
+            except Exception:
+                pass
+        if opt.show_grid:
+            try:
+                self.plotter.show_grid(font_size=6, color=opt.grid_color)
+            except Exception:
+                pass
+
+        # Keyboard shortcuts are robust across PyVista versions.
+        self.plotter.add_key_event("0", lambda: self._set_view(0))
+        self.plotter.add_key_event("1", lambda: self._set_view(1))
+        self.plotter.add_key_event("2", lambda: self._set_view(2))
+        self.plotter.add_key_event("r", lambda: self._set_flag("show_rays", not self.options.show_rays))
+        self.plotter.add_key_event("s", lambda: self._set_flag("show_surfaces", not self.options.show_surfaces))
+        self.plotter.add_key_event("e", lambda: self._set_flag("show_edges", not self.options.show_edges))
+        self.plotter.add_key_event("m", lambda: self._set_flag("show_masks", not self.options.show_masks))
+        self.plotter.add_key_event("l", lambda: self._set_flag("show_sides", not self.options.show_sides))
+        self.plotter.add_key_event("p", lambda: self.plotter.screenshot("krakenos_display3d.png"))
+
+        # Sliders are optional controls; if a backend lacks widgets, the display still works.
+        try:
+            max_rays = 1
+            for rays in self.rays_list:
+                if hasattr(rays, "RayWave"):
+                    max_rays = max(max_rays, len(rays.RayWave))
+            self.plotter.add_slider_widget(
+                lambda value: self._set_opacity(value),
+                [0.05, 1.0],
+                value=opt.opacity,
+                title="opacity",
+                pointa=(0.02, 0.10),
+                pointb=(0.30, 0.10),
+            )
+            self.plotter.add_slider_widget(
+                lambda value: self._set_ray_width(value),
+                [1.0, 8.0],
+                value=opt.ray_width,
+                title="ray width",
+                pointa=(0.02, 0.16),
+                pointb=(0.30, 0.16),
+            )
+            self.plotter.add_slider_widget(
+                lambda value: self._set_nrays(value),
+                [0, max_rays],
+                value=opt.nrays,
+                title="nrays",
+                pointa=(0.02, 0.22),
+                pointb=(0.30, 0.22),
+            )
+        except Exception:
+            pass
+
+        shortcut_text = (
+            "Keys: 0 full | 1 quarter | 2 half | r rays | s surfaces | "
+            "e edges | m masks | l sides | p screenshot"
+        )
+        try:
+            self.plotter.add_text(shortcut_text, position="lower_left", font_size=9, color="black")
+        except Exception:
+            pass
+
+        self.plotter.show(auto_close=False, interactive=True, interactive_update=False)
+        return self
+
+
+def display2d_interactive(SYSTEM, RAYS=None, options: Optional[Display2DOptions] = None, **kwargs):
+    """Open an interactive 2D display window.
+
+    Keyword arguments may be used to override fields in Display2DOptions.
+    Example: display2d_interactive(system, rays, nrays=20, view=1)
+    """
+    opt = options or Display2DOptions()
+    for key, value in kwargs.items():
+        if hasattr(opt, key):
+            setattr(opt, key, value)
+    return Display2DViewer(SYSTEM, RAYS, opt).show()
+
+
+def display3d_interactive(SYSTEM, RAYS=None, options: Optional[Display3DOptions] = None, **kwargs):
+    """Open an interactive 3D display window.
+
+    Keyword arguments may be used to override fields in Display3DOptions.
+    Example: display3d_interactive(system, rays, nrays=50, opacity=0.6)
+    """
+    opt = options or Display3DOptions()
+    for key, value in kwargs.items():
+        if hasattr(opt, key):
+            setattr(opt, key, value)
+    return Display3DViewer(SYSTEM, RAYS, opt).show()
+
+
+# Optional aliases with capitalized names for users who prefer class-like naming.
+NewDisplay2D = display2d_interactive
+NewDisplay3D = display3d_interactive
+
 
 class display3d_OB():
     def __init__(self):
