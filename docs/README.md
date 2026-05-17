@@ -31,7 +31,12 @@ manual instead of replacing it.
    Use this to decide which examples and documentation areas should be improved
    next.
 
-6. [PSF and MTF Notes](psf_mtf_notes.md)
+6. [Architecture Notes](architecture.md)
+
+   Use this as a maintenance guide for the current internal flow, build modes,
+   PyVista responsibilities, and conservative refactor direction.
+
+7. [PSF and MTF Notes](psf_mtf_notes.md)
 
    Use this for focused notes on the compact PSF/MTF helpers.
 
@@ -44,6 +49,7 @@ manual instead of replacing it.
 | `examples_manual.md` | Generated visual appendix from examples. |
 | `capabilities.md` | Capability map by subsystem. |
 | `example_coverage.md` | Maintenance and growth roadmap. |
+| `architecture.md` | Internal architecture and refactor notes. |
 | `psf_mtf_notes.md` | Focused technical note. |
 
 To regenerate the example figures and generated examples manual:
