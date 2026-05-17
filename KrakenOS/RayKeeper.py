@@ -1,6 +1,47 @@
 
 import numpy as np
 
+
+def extract_ray_result(System):
+    """Return the last traced ray data without returning the full system."""
+
+    return {
+        "nelements": System.n,
+        "val": System.val,
+        "Wave": System.Wave,
+        "ray_SurfHits": System.ray_SurfHits,
+        "SURFACE": System.SURFACE,
+        "NAME": System.NAME,
+        "GLASS": System.GLASS,
+        "S_XYZ": System.S_XYZ,
+        "T_XYZ": System.T_XYZ,
+        "XYZ": System.XYZ,
+        "OST_XYZ": System.OST_XYZ,
+        "OST_LMN": System.OST_LMN,
+        "S_LMN": System.S_LMN,
+        "LMN": System.LMN,
+        "R_LMN": System.R_LMN,
+        "N0": System.N0,
+        "N1": System.N1,
+        "WAV": System.WAV,
+        "G_LMN": System.G_LMN,
+        "ORDER": System.ORDER,
+        "GRATING": System.GRATING,
+        "DISTANCE": System.DISTANCE,
+        "OP": System.OP,
+        "TOP_S": System.TOP_S,
+        "TOP": System.TOP,
+        "ALPHA": System.ALPHA,
+        "BULK_TRANS": System.BULK_TRANS,
+        "RP": System.RP,
+        "RS": System.RS,
+        "TP": System.TP,
+        "TS": System.TS,
+        "TTBE": System.TTBE,
+        "TT": System.TT,
+    }
+
+
 class raykeeper():
     """raykeeper.
     """
@@ -26,120 +67,129 @@ class raykeeper():
     def push(self):
         """push.
         """
-        self.nelements = self.SYSTEM.n
-        if (self.SYSTEM.val == 0):
-            self.invalid_vld = np.append(self.vld, 0)
-            self.invalid_SURFACE.append(np.asarray(self.SYSTEM.SURFACE))
-            self.invalid_NAME.append(np.asarray(self.SYSTEM.NAME))
-            self.invalid_GLASS.append(np.asarray(self.SYSTEM.GLASS))
-            self.invalid_S_XYZ.append(np.asarray(self.SYSTEM.S_XYZ))
-            self.invalid_T_XYZ.append(np.asarray(self.SYSTEM.T_XYZ))
-            self.invalid_XYZ.append(np.asarray(self.SYSTEM.XYZ))
+        self.push_result(extract_ray_result(self.SYSTEM))
 
-            lst = self.SYSTEM.OST_XYZ
+    def push_result(self, result):
+        """Store one traced ray from an extracted result dictionary."""
+        self.nelements = result["nelements"]
+        if (result["val"] == 0):
+            self.invalid_vld = np.append(self.vld, 0)
+            self.invalid_SURFACE.append(np.asarray(result["SURFACE"]))
+            self.invalid_NAME.append(np.asarray(result["NAME"]))
+            self.invalid_GLASS.append(np.asarray(result["GLASS"]))
+            self.invalid_S_XYZ.append(np.asarray(result["S_XYZ"]))
+            self.invalid_T_XYZ.append(np.asarray(result["T_XYZ"]))
+            self.invalid_XYZ.append(np.asarray(result["XYZ"]))
+
+            lst = result["OST_XYZ"]
             ll = filter(None, lst)
             self.invalid_OST_XYZ.append(np.asarray(ll))
-            self.invalid_OST_LMN.append(np.asarray(self.SYSTEM.OST_LMN))
-            self.invalid_S_LMN.append(np.asarray(self.SYSTEM.S_LMN))
-            self.invalid_LMN.append(np.asarray(self.SYSTEM.LMN))
-            self.invalid_R_LMN.append(np.asarray(self.SYSTEM.R_LMN))
-            self.invalid_N0.append(np.asarray(self.SYSTEM.N0))
-            self.invalid_N1.append(np.asarray(self.SYSTEM.N1))
-            self.invalid_WAV.append(np.asarray(self.SYSTEM.WAV))
-            self.invalid_G_LMN.append(np.asarray(self.SYSTEM.G_LMN))
-            self.invalid_ORDER.append(np.asarray(self.SYSTEM.ORDER))
-            self.invalid_GRATING.append(np.asarray(self.SYSTEM.GRATING))
-            self.invalid_DISTANCE.append(np.asarray(self.SYSTEM.DISTANCE))
-            self.invalid_OP.append(np.asarray(self.SYSTEM.OP))
-            self.invalid_TOP_S.append(np.asarray(self.SYSTEM.TOP_S))
-            self.invalid_TOP.append(np.asarray(self.SYSTEM.TOP))
-            lst = self.SYSTEM.ALPHA
+            self.invalid_OST_LMN.append(np.asarray(result["OST_LMN"]))
+            self.invalid_S_LMN.append(np.asarray(result["S_LMN"]))
+            self.invalid_LMN.append(np.asarray(result["LMN"]))
+            self.invalid_R_LMN.append(np.asarray(result["R_LMN"]))
+            self.invalid_N0.append(np.asarray(result["N0"]))
+            self.invalid_N1.append(np.asarray(result["N1"]))
+            self.invalid_WAV.append(np.asarray(result["WAV"]))
+            self.invalid_G_LMN.append(np.asarray(result["G_LMN"]))
+            self.invalid_ORDER.append(np.asarray(result["ORDER"]))
+            self.invalid_GRATING.append(np.asarray(result["GRATING"]))
+            self.invalid_DISTANCE.append(np.asarray(result["DISTANCE"]))
+            self.invalid_OP.append(np.asarray(result["OP"]))
+            self.invalid_TOP_S.append(np.asarray(result["TOP_S"]))
+            self.invalid_TOP.append(np.asarray(result["TOP"]))
+            lst = result["ALPHA"]
             ll = filter(None, lst)
             self.invalid_ALPHA.append(np.asarray(ll))
-            self.invalid_BULK_TRANS.append(np.asarray(self.SYSTEM.BULK_TRANS))
-            self.invalid_RP.append(np.asarray(self.SYSTEM.RP))
-            self.invalid_RS.append(np.asarray(self.SYSTEM.RS))
-            self.invalid_TP.append(np.asarray(self.SYSTEM.TP))
-            self.invalid_TS.append(np.asarray(self.SYSTEM.TS))
-            self.invalid_TTBE.append(np.asarray(self.SYSTEM.TTBE))
-            self.invalid_TT.append(np.asarray(self.SYSTEM.TT))
+            self.invalid_BULK_TRANS.append(np.asarray(result["BULK_TRANS"]))
+            self.invalid_RP.append(np.asarray(result["RP"]))
+            self.invalid_RS.append(np.asarray(result["RS"]))
+            self.invalid_TP.append(np.asarray(result["TP"]))
+            self.invalid_TS.append(np.asarray(result["TS"]))
+            self.invalid_TTBE.append(np.asarray(result["TTBE"]))
+            self.invalid_TT.append(np.asarray(result["TT"]))
         else:
             self.vld = np.append(self.vld, 1)
             self.valid_vld = np.append(self.vld, 0)
-            self.valid_SURFACE.append(np.asarray(self.SYSTEM.SURFACE))
-            self.valid_NAME.append(np.asarray(self.SYSTEM.NAME))
-            self.valid_GLASS.append(np.asarray(self.SYSTEM.GLASS))
-            self.valid_S_XYZ.append(np.asarray(self.SYSTEM.S_XYZ))
-            self.valid_T_XYZ.append(np.asarray(self.SYSTEM.T_XYZ))
-            self.valid_XYZ.append(np.asarray(self.SYSTEM.XYZ))
-            self.valid_OST_XYZ.append(np.asarray(self.SYSTEM.OST_XYZ))
-            self.valid_OST_LMN.append(np.asarray(self.SYSTEM.OST_LMN))
-            self.valid_S_LMN.append(np.asarray(self.SYSTEM.S_LMN))
-            self.valid_LMN.append(np.asarray(self.SYSTEM.LMN))
-            self.valid_R_LMN.append(np.asarray(self.SYSTEM.R_LMN))
-            self.valid_N0.append(np.asarray(self.SYSTEM.N0))
-            self.valid_N1.append(np.asarray(self.SYSTEM.N1))
-            self.valid_WAV.append(np.asarray(self.SYSTEM.WAV))
-            self.valid_G_LMN.append(np.asarray(self.SYSTEM.G_LMN))
-            self.valid_ORDER.append(np.asarray(self.SYSTEM.ORDER))
-            self.valid_GRATING.append(np.asarray(self.SYSTEM.GRATING))
-            self.valid_DISTANCE.append(np.asarray(self.SYSTEM.DISTANCE))
-            self.valid_OP.append(np.asarray(self.SYSTEM.OP))
-            self.valid_TOP_S.append(np.asarray(self.SYSTEM.TOP_S))
-            self.valid_TOP.append(np.asarray(self.SYSTEM.TOP))
-            self.valid_ALPHA.append(np.asarray(self.SYSTEM.ALPHA))
-            self.valid_BULK_TRANS.append(np.asarray(self.SYSTEM.BULK_TRANS))
-            self.valid_RP.append(np.asarray(self.SYSTEM.RP))
-            self.valid_RS.append(np.asarray(self.SYSTEM.RS))
-            self.valid_TP.append(np.asarray(self.SYSTEM.TP))
-            self.valid_TS.append(np.asarray(self.SYSTEM.TS))
-            self.valid_TTBE.append(np.asarray(self.SYSTEM.TTBE))
-            self.valid_TT.append(np.asarray(self.SYSTEM.TT))
+            self.valid_SURFACE.append(np.asarray(result["SURFACE"]))
+            self.valid_NAME.append(np.asarray(result["NAME"]))
+            self.valid_GLASS.append(np.asarray(result["GLASS"]))
+            self.valid_S_XYZ.append(np.asarray(result["S_XYZ"]))
+            self.valid_T_XYZ.append(np.asarray(result["T_XYZ"]))
+            self.valid_XYZ.append(np.asarray(result["XYZ"]))
+            self.valid_OST_XYZ.append(np.asarray(result["OST_XYZ"]))
+            self.valid_OST_LMN.append(np.asarray(result["OST_LMN"]))
+            self.valid_S_LMN.append(np.asarray(result["S_LMN"]))
+            self.valid_LMN.append(np.asarray(result["LMN"]))
+            self.valid_R_LMN.append(np.asarray(result["R_LMN"]))
+            self.valid_N0.append(np.asarray(result["N0"]))
+            self.valid_N1.append(np.asarray(result["N1"]))
+            self.valid_WAV.append(np.asarray(result["WAV"]))
+            self.valid_G_LMN.append(np.asarray(result["G_LMN"]))
+            self.valid_ORDER.append(np.asarray(result["ORDER"]))
+            self.valid_GRATING.append(np.asarray(result["GRATING"]))
+            self.valid_DISTANCE.append(np.asarray(result["DISTANCE"]))
+            self.valid_OP.append(np.asarray(result["OP"]))
+            self.valid_TOP_S.append(np.asarray(result["TOP_S"]))
+            self.valid_TOP.append(np.asarray(result["TOP"]))
+            self.valid_ALPHA.append(np.asarray(result["ALPHA"]))
+            self.valid_BULK_TRANS.append(np.asarray(result["BULK_TRANS"]))
+            self.valid_RP.append(np.asarray(result["RP"]))
+            self.valid_RS.append(np.asarray(result["RS"]))
+            self.valid_TP.append(np.asarray(result["TP"]))
+            self.valid_TS.append(np.asarray(result["TS"]))
+            self.valid_TTBE.append(np.asarray(result["TTBE"]))
+            self.valid_TT.append(np.asarray(result["TT"]))
         self.nrays = (self.nrays + 1)
 
 
-        self.RayWave.append(self.SYSTEM.Wave)
-        self.CC.append(self.SYSTEM.ray_SurfHits)
+        self.RayWave.append(result["Wave"])
+        self.CC.append(result["ray_SurfHits"])
 
 
 
-        self.SURFACE.append(np.asarray(self.SYSTEM.SURFACE))
-        self.NAME.append(np.asarray(self.SYSTEM.NAME))
-        self.GLASS.append(np.asarray(self.SYSTEM.GLASS))
-        self.S_XYZ.append(np.asarray(self.SYSTEM.S_XYZ))
-        self.T_XYZ.append(np.asarray(self.SYSTEM.T_XYZ))
-        self.XYZ.append(np.asarray(self.SYSTEM.XYZ))
+        self.SURFACE.append(np.asarray(result["SURFACE"]))
+        self.NAME.append(np.asarray(result["NAME"]))
+        self.GLASS.append(np.asarray(result["GLASS"]))
+        self.S_XYZ.append(np.asarray(result["S_XYZ"]))
+        self.T_XYZ.append(np.asarray(result["T_XYZ"]))
+        self.XYZ.append(np.asarray(result["XYZ"]))
 
         # revisar
-        lst = self.SYSTEM.OST_XYZ
+        lst = result["OST_XYZ"]
         ll = filter(None, lst)
         self.OST_XYZ.append(np.asarray(ll))
 
         # self.OST_XYZ.append(np.asarray(self.SYSTEM.OST_XYZ))
-        self.OST_LMN.append(np.asarray(self.SYSTEM.OST_LMN))
-        self.S_LMN.append(np.asarray(self.SYSTEM.S_LMN))
-        self.LMN.append(np.asarray(self.SYSTEM.LMN))
-        self.R_LMN.append(np.asarray(self.SYSTEM.R_LMN))
-        self.N0.append(np.asarray(self.SYSTEM.N0))
-        self.N1.append(np.asarray(self.SYSTEM.N1))
-        self.WAV.append(np.asarray(self.SYSTEM.WAV))
-        self.G_LMN.append(np.asarray(self.SYSTEM.G_LMN))
-        self.ORDER.append(np.asarray(self.SYSTEM.ORDER))
-        self.GRATING.append(np.asarray(self.SYSTEM.GRATING))
-        self.DISTANCE.append(np.asarray(self.SYSTEM.DISTANCE))
-        self.OP.append(np.asarray(self.SYSTEM.OP))
-        self.TOP_S.append(np.asarray(self.SYSTEM.TOP_S))
-        self.TOP.append(np.asarray(self.SYSTEM.TOP))
-        lst = self.SYSTEM.ALPHA
+        self.OST_LMN.append(np.asarray(result["OST_LMN"]))
+        self.S_LMN.append(np.asarray(result["S_LMN"]))
+        self.LMN.append(np.asarray(result["LMN"]))
+        self.R_LMN.append(np.asarray(result["R_LMN"]))
+        self.N0.append(np.asarray(result["N0"]))
+        self.N1.append(np.asarray(result["N1"]))
+        self.WAV.append(np.asarray(result["WAV"]))
+        self.G_LMN.append(np.asarray(result["G_LMN"]))
+        self.ORDER.append(np.asarray(result["ORDER"]))
+        self.GRATING.append(np.asarray(result["GRATING"]))
+        self.DISTANCE.append(np.asarray(result["DISTANCE"]))
+        self.OP.append(np.asarray(result["OP"]))
+        self.TOP_S.append(np.asarray(result["TOP_S"]))
+        self.TOP.append(np.asarray(result["TOP"]))
+        lst = result["ALPHA"]
         ll = filter(None, lst)
         self.ALPHA.append(np.asarray(ll))
-        self.BULK_TRANS.append(np.asarray(self.SYSTEM.BULK_TRANS))
-        self.RP.append(np.asarray(self.SYSTEM.RP))
-        self.RS.append(np.asarray(self.SYSTEM.RS))
-        self.TP.append(np.asarray(self.SYSTEM.TP))
-        self.TS.append(np.asarray(self.SYSTEM.TS))
-        self.TTBE.append(np.asarray(self.SYSTEM.TTBE))
-        self.TT.append(np.asarray(self.SYSTEM.TT))
+        self.BULK_TRANS.append(np.asarray(result["BULK_TRANS"]))
+        self.RP.append(np.asarray(result["RP"]))
+        self.RS.append(np.asarray(result["RS"]))
+        self.TP.append(np.asarray(result["TP"]))
+        self.TS.append(np.asarray(result["TS"]))
+        self.TTBE.append(np.asarray(result["TTBE"]))
+        self.TT.append(np.asarray(result["TT"]))
+
+    def extend_results(self, results):
+        """Store multiple extracted ray results."""
+        for result in results:
+            self.push_result(result)
 
     def clean(self):
         """clean.

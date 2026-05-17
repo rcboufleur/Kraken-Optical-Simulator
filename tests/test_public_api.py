@@ -30,6 +30,7 @@ PUBLIC_API_NAMES = [
     "display3d_colab",
     "display3d_interactive",
     "display3d_old",
+    "extract_ray_result",
     "n_wave_dispersion",
     "plot_mtf",
     "psf",

@@ -834,3 +834,61 @@ Restore legacy display aliases
 - Update the maintenance log with verification notes
 - Verify the full pytest suite
 ```
+
+### 2026-05-17 - Add RayKeeper Result Ingestion Path
+
+Goal:
+
+- Prepare `raykeeper` for parallel tracing workflows where workers return
+  extracted ray results instead of full `system` or `raykeeper` objects.
+
+Files changed:
+
+- `KrakenOS/RayKeeper.py`
+- `tests/test_raykeeper_results.py`
+- `tests/test_public_api.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added `extract_ray_result(system)` to capture the current traced ray state
+  without returning the full mutable system.
+- Added `raykeeper.push_result(result)` to store one extracted result.
+- Added `raykeeper.extend_results(results)` to ingest multiple extracted
+  results.
+- Kept the classic `system.Trace(...); rays.push()` workflow working by making
+  `push()` call `push_result(extract_ray_result(self.SYSTEM))`.
+- Added tests proving `push_result(extract_ray_result(system))` matches
+  `push()` for valid and invalid rays.
+- Added `extract_ray_result` to the public API contract.
+
+Verification:
+
+```powershell
+python -m py_compile KrakenOS\RayKeeper.py tests\test_raykeeper_results.py tests\test_public_api.py
+python -m pytest tests\test_raykeeper_results.py tests\test_invalid_trace_results.py tests\test_public_api.py -q
+python -m pytest tests\test_trace_performance_components.py -s
+python -m pytest tests
+```
+
+Result:
+
+- Targeted raykeeper/result tests passed.
+- Full test suite collected 13 tests and all passed.
+- The performance component test showed `raykeeper.push()` still has measurable
+  overhead compared with minimal extraction; this is now explicit and can be
+  optimized later.
+
+Suggested commit:
+
+```text
+Add RayKeeper result ingestion path
+```
+
+```text
+- Add extract_ray_result for decoupling traced ray data from system objects
+- Add push_result and extend_results to raykeeper
+- Keep the classic push workflow as a compatibility wrapper
+- Verify push_result matches push for valid and invalid rays
+- Update the public API contract and maintenance log
+```
