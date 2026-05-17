@@ -1,0 +1,6 @@
+PASS create system with build=0
+INFO before NsTrace: ExistSolid=0, BBB=0, EEE=4
+PASS build=0 starts without side meshes
+INFO after NsTrace: ExistSolid=1, BBB=1, EEE=5
+PASS NsTrace rebuilds side meshes from build=0
+RESULT PASS
