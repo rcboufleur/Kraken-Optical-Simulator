@@ -69,6 +69,42 @@ def _scalar_surface_normal(surface, x, y, z):
     return solver.SurfDer(x, y, z)
 
 
+def numerical_derivative_bundle(surface, x, y, case=0):
+    """Return vectorized finite-difference sag derivatives when possible.
+
+    This is the fast fallback for surfaces that do not provide analytical
+    derivatives but whose sag function can evaluate NumPy arrays.  It mirrors
+    the fourth-order finite-difference stencil used by the scalar normal
+    fallback, while avoiding one Python call per ray.
+    """
+
+    h = surface.PresicionPrecal
+    h2 = 2.0 * h
+    try:
+        dzdx = (
+            -surface.sigma_z(x + h2, y, case)
+            + (8.0 * surface.sigma_z(x + h, y, case))
+            - (8.0 * surface.sigma_z(x - h, y, case))
+            + surface.sigma_z(x - h2, y, case)
+        ) / (12.0 * h)
+        dzdy = (
+            -surface.sigma_z(x, y + h2, case)
+            + (8.0 * surface.sigma_z(x, y + h, case))
+            - (8.0 * surface.sigma_z(x, y - h, case))
+            + surface.sigma_z(x, y - h2, case)
+        ) / (12.0 * h)
+    except Exception:
+        return None
+
+    dzdx = np.asarray(dzdx, dtype=float)
+    dzdy = np.asarray(dzdy, dtype=float)
+    if dzdx.shape != np.asarray(x).shape or dzdy.shape != np.asarray(y).shape:
+        return None
+    if not np.all(np.isfinite(dzdx)) or not np.all(np.isfinite(dzdy)):
+        return None
+    return dzdx, dzdy
+
+
 def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
     """Solve ray-surface intersections for a bundle using vectorized Newton.
 
@@ -102,12 +138,42 @@ def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
         if derivative is None:
             active_indices = np.flatnonzero(unresolved)
             analytical_indices = []
+            unsupported_indices = []
             dzdx_values = []
             dzdy_values = []
 
             for index in active_indices:
                 scalar_derivative = surface.sigma_derivative(float(x[index]), float(y[index]), case)
                 if scalar_derivative is None:
+                    unsupported_indices.append(index)
+                else:
+                    analytical_indices.append(index)
+                    dzdx_values.append(scalar_derivative[0])
+                    dzdy_values.append(scalar_derivative[1])
+
+            if unsupported_indices and not analytical_indices:
+                numerical_derivative = numerical_derivative_bundle(
+                    surface, x[unresolved], y[unresolved], case
+                )
+                if numerical_derivative is not None:
+                    step_indices = active_indices
+                    dzdx, dzdy = numerical_derivative
+                else:
+                    for index in unsupported_indices:
+                        z[index] = _scalar_solve_hit(
+                            surface,
+                            float(px1[index]),
+                            float(py1[index]),
+                            float(pz1[index]),
+                            float(l[index]),
+                            float(m[index]),
+                            float(n[index]),
+                        )[2]
+                        unresolved[index] = False
+                    continue
+
+            if unsupported_indices and analytical_indices:
+                for index in unsupported_indices:
                     z[index] = _scalar_solve_hit(
                         surface,
                         float(px1[index]),
@@ -118,18 +184,16 @@ def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
                         float(n[index]),
                     )[2]
                     unresolved[index] = False
-                else:
-                    analytical_indices.append(index)
-                    dzdx_values.append(scalar_derivative[0])
-                    dzdy_values.append(scalar_derivative[1])
 
-            if not analytical_indices:
-                continue
-
-            step_indices = np.asarray(analytical_indices, dtype=int)
-            sag = surface.sigma_z(x[step_indices], y[step_indices], case)
-            dzdx = np.asarray(dzdx_values, dtype=float)
-            dzdy = np.asarray(dzdy_values, dtype=float)
+                step_indices = np.asarray(analytical_indices, dtype=int)
+                sag = surface.sigma_z(x[step_indices], y[step_indices], case)
+                dzdx = np.asarray(dzdx_values, dtype=float)
+                dzdy = np.asarray(dzdy_values, dtype=float)
+            elif analytical_indices:
+                step_indices = np.asarray(analytical_indices, dtype=int)
+                sag = surface.sigma_z(x[step_indices], y[step_indices], case)
+                dzdx = np.asarray(dzdx_values, dtype=float)
+                dzdy = np.asarray(dzdy_values, dtype=float)
         else:
             step_indices = np.flatnonzero(unresolved)
             dzdx, dzdy = derivative
@@ -164,22 +228,33 @@ def local_normals_bundle(surface, x, y, z):
     if derivative is None:
         normals = np.empty((x.shape[0], 3), dtype=float)
         analytical_indices = []
+        unsupported_indices = []
         dzdx_values = []
         dzdy_values = []
 
         for index in range(x.shape[0]):
             scalar_derivative = surface.sigma_derivative(float(x[index]), float(y[index]), 0)
             if scalar_derivative is None:
-                normals[index] = _scalar_surface_normal(
-                    surface,
-                    float(x[index]),
-                    float(y[index]),
-                    float(z[index]),
-                )
+                unsupported_indices.append(index)
             else:
                 analytical_indices.append(index)
                 dzdx_values.append(scalar_derivative[0])
                 dzdy_values.append(scalar_derivative[1])
+
+        if unsupported_indices and not analytical_indices:
+            numerical_derivative = numerical_derivative_bundle(surface, x, y, 0)
+            if numerical_derivative is not None:
+                dzdx, dzdy = numerical_derivative
+                normals = np.column_stack([dzdx, dzdy, -np.ones_like(z)])
+                return normals / np.linalg.norm(normals, axis=1)[:, None]
+
+        for index in unsupported_indices:
+            normals[index] = _scalar_surface_normal(
+                surface,
+                float(x[index]),
+                float(y[index]),
+                float(z[index]),
+            )
 
         if analytical_indices:
             step_indices = np.asarray(analytical_indices, dtype=int)

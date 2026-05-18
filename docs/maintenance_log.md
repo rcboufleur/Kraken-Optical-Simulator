@@ -2559,3 +2559,69 @@ Reconstruct bundle energy bookkeeping
 - Compare reconstructed physical fields against scalar raykeeper records
 - Update the pupil bundle example and maintenance log
 ```
+
+### 2026-05-18 - Add Vectorized Numerical Bundle Derivatives
+
+Goal:
+
+- Recover bundle performance for surfaces that do not provide analytical
+  derivatives but whose sag function can evaluate NumPy arrays.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `tests/test_solvehit_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added `numerical_derivative_bundle()` using a fourth-order finite-difference
+  stencil over full coordinate arrays.
+- `solve_hit_bundle()` now uses this vectorized numerical derivative when all
+  active rays on a surface lack analytical derivatives and the sag function is
+  array-compatible.
+- `local_normals_bundle()` uses the same vectorized numerical derivative for
+  all-unsupported derivative packets.
+- Mixed packets, such as an axicon where only the apex ray is singular, keep
+  the previous safe policy:
+  - analytical derivative for supported rays;
+  - scalar fallback only for singular/unsupported rays.
+- Added tests for vectorized `ExtraData` without analytical derivative,
+  including angled rays.
+
+Verification:
+
+```powershell
+python -m py_compile KrakenOS\BundleTrace.py
+python -m pytest tests\test_solvehit_bundle.py tests\test_trace_bundle.py -q
+```
+
+Observed result:
+
+- `18 passed`.
+- Quick benchmark for 5000 `ExtraData` rays without analytical derivative:
+  - scalar `SolveHit`: about `0.104 s`;
+  - bundle `solve_hit_bundle`: about `0.0072 s`;
+  - speedup: about `14.5x`;
+  - max z error: about `8.3e-17`.
+
+Notes:
+
+- This does not replace analytical derivatives. Analytical derivatives remain
+  the preferred and fastest path.
+- This closes part of the performance gap for user surfaces, but full-system
+  benchmarks should be expanded before making this public API.
+
+Suggested commit:
+
+```text
+Add vectorized numerical bundle derivatives
+```
+
+```text
+- Add vectorized finite-difference derivative fallback for bundle tracing
+- Use it for array-compatible surfaces without analytical derivatives
+- Preserve scalar fallback for mixed singular packets such as axicon apex rays
+- Cover ExtraData without derivative and angled rays
+- Record benchmark results in the maintenance log
+```

@@ -1,5 +1,10 @@
 import numpy as np
-from KrakenOS.BundleTrace import aperture_active_mask, local_normals_bundle, solve_hit_bundle
+from KrakenOS.BundleTrace import (
+    aperture_active_mask,
+    local_normals_bundle,
+    numerical_derivative_bundle,
+    solve_hit_bundle,
+)
 
 
 def scalar_solve_hits(surface, px1, py1, pz1, l, m, n):
@@ -177,3 +182,46 @@ def test_solve_hit_bundle_falls_back_for_extra_data_without_derivative():
     assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n)
     x, y, z = solve_hit_bundle(surface, px1, py1, pz1, l, m, n)
     assert_bundle_normals_match_scalar(surface, x, y, z)
+
+
+def test_numerical_derivative_bundle_handles_vectorized_extra_data():
+    import KrakenOS as Kos
+
+    def user_surface(x, y, data):
+        return data[0] * x * y
+
+    surface = Kos.surf()
+    surface.Diameter = 30.0
+    surface.ExtraData = [user_surface, [0.25]]
+    surface.build_surface_function()
+
+    x = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
+    y = np.array([2.0, 1.0, 0.5, -1.0, -2.0])
+
+    derivative = numerical_derivative_bundle(surface, x, y)
+
+    assert derivative is not None
+    dzdx, dzdy = derivative
+    assert np.allclose(dzdx, 0.25 * y, rtol=1e-8, atol=1e-8)
+    assert np.allclose(dzdy, 0.25 * x, rtol=1e-8, atol=1e-8)
+
+
+def test_solve_hit_bundle_uses_vectorized_numerical_fallback_for_angled_extra_data():
+    import KrakenOS as Kos
+
+    def user_surface(x, y, data):
+        return data[0] * x * y
+
+    surface = Kos.surf()
+    surface.Diameter = 30.0
+    surface.ExtraData = [user_surface, [0.025]]
+    surface.build_surface_function()
+
+    px1 = np.array([-2.0, -1.0, 1.0, 2.0])
+    py1 = np.array([1.5, -0.5, 0.5, -1.5])
+    pz1 = np.zeros_like(px1)
+    l = np.array([0.01, -0.015, 0.02, -0.01])
+    m = np.array([-0.01, 0.02, -0.015, 0.01])
+    n = np.sqrt(1.0 - (l * l) - (m * m))
+
+    assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n)
