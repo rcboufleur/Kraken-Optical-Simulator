@@ -77,7 +77,7 @@ def build_doublet():
     return Kos.system(surfaces, Kos.Setup())
 
 
-def trace_bundle(system, wavelength=0.55):
+def trace_pupil_fan(system, wavelength=0.55):
     """Trace a compact pupil fan through the system and return a raykeeper."""
     rays = Kos.raykeeper(system)
 
@@ -114,7 +114,7 @@ def best_focus_shift(x, y, l, m, n):
 
 def main():
     doublet = build_doublet()
-    initial_rays = trace_bundle(doublet)
+    initial_rays = trace_pupil_fan(doublet)
 
     (
         initial_rms,
@@ -140,7 +140,7 @@ def main():
     doublet.SetData()
     doublet.SetSolid()
 
-    focused_rays = trace_bundle(doublet)
+    focused_rays = trace_pupil_fan(doublet)
     focused_rms, focused_cx, focused_cy, *_ = rms_at_image(focused_rays)
 
     print("Focused RMS radius (mm):", focused_rms)

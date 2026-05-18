@@ -17,7 +17,6 @@
 | `Examp_Doublet_Lens_Cylinder.py` | Intermediate | Cylindrical optics | Doublet lens with a cylindrical surface term. | - |
 | `Examp_Doublet_Lens_NonSec-AR_Coating.py` | Advanced | Non-sequential tracing | Non-sequential doublet trace with coating tables. | - |
 | `Examp_Doublet_Lens_NonSec.py` | Advanced | Non-sequential tracing | Non-sequential doublet trace. | - |
-| `Examp_Doublet_Lens_Pupil_Bundle.py` | Advanced | Performance experiments | PupilCalc-generated doublet rays traced as one experimental bundle. | - |
 | `Examp_Doublet_Lens_Pupil.py` | Intermediate | Pupil tracing | Doublet lens with pupil calculation. | - |
 | `Examp_Doublet_Lens_Pupil_Seidel.py` | Advanced | Aberration analysis | Doublet pupil calculation with Seidel terms. | - |
 | `Examp_Doublet_Lens_Tilt-Nulls.py` | Intermediate | Tilted components | Tilted doublet with NULL coordinate surfaces. | - |
@@ -26,7 +25,6 @@
 | `Examp_Doublet_Lens_Tilt_non_sec.py` | Advanced | Non-sequential tracing | Tilted non-sequential doublet. | - |
 | `Examp_Doublet_Lens_Zernike.py` | Advanced | Wavefront analysis | Doublet lens Zernike output. | - |
 | `Examp_Doublet_Optimization.py` | Advanced | Optimization | Doublet optimization with EFFL and RMS merit terms. | - |
-| `Examp_ExtraShape_Bundle_Numerical_Derivative.py` | Advanced | Performance experiments | User ExtraData surface traced as a bundle with vectorized numerical derivatives. | - |
 | `Examp_ExtraShape_Micro_Lens_Array.py` | Advanced | Custom surface shape | Micro-lens array extra shape. | - |
 | `Examp_ExtraShape_Radial_Sine.py` | Intermediate | Custom surface shape | Radial sine extra shape. | - |
 | `Examp_ExtraShape_UserFacets.py` | Advanced | Custom surface shape | Faceted user-defined surface. | - |
@@ -39,7 +37,6 @@
 | `Examp_Glass_Catalog_Order.py` | Beginner | Catalog configuration | Glass catalog loading order. | - |
 | `Examp_Lens_Catalog_Basics.py` | Beginner | Lens catalogs | Basic Zemax-style lens catalog loading. | THORLABS.ZMF |
 | `Examp_Metal_Mirror_Energy.py` | Beginner | Metal coatings | Metal mirror reflection and transmission terms. | Gold.csv |
-| `Examp_ParaboleMirror_Bundle_Comparison.py` | Advanced | Performance experiments | Shifted parabolic mirror traced as a ray bundle and compared with scalar Trace. | - |
 | `Examp_ParaboleMirror_Derivative_Comparison.py` | Intermediate | Mirror tracing | Shifted parabolic mirror spot comparison with analytical and numerical derivatives. | - |
 | `Examp_ParaboleMirror_Shift.py` | Intermediate | Mirror tracing | Shifted parabolic mirror. | - |
 | `Examp_ParaboleMirror_Shift_UDA.py` | Advanced | Mirror tracing | Shifted parabolic mirror with user-defined aperture. | - |
@@ -76,4 +73,3 @@
 | `Examp_Tel_2M_Spyder_Spot_RMS.py` | Advanced | Obscuration and RMS analysis | 2 m telescope spider RMS spot analysis. | - |
 | `Examp_Tel_2M_Wavefront_Fitting.py` | Advanced | Wavefront analysis | 2 m telescope wavefront fitting. | - |
 | `Examp_Tel_2M_Wavefront_Fitting_optimization.py` | Advanced | Wavefront optimization | 2 m telescope wavefront fitting with optimization. | - |
-| `Examp_Trace_Bundle_Experimental.py` | Advanced | Performance experiments | Experimental sequential ray-bundle comparison against scalar Trace. | - |
