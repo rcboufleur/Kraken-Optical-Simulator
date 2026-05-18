@@ -28,6 +28,7 @@
 | `Examp_ExtraShape_Micro_Lens_Array.py` | Advanced | Custom surface shape | Micro-lens array extra shape. | - |
 | `Examp_ExtraShape_Radial_Sine.py` | Intermediate | Custom surface shape | Radial sine extra shape. | - |
 | `Examp_ExtraShape_UserFacets.py` | Advanced | Custom surface shape | Faceted user-defined surface. | - |
+| `Examp_ExtraShape_With_Derivative.py` | Intermediate | Custom surface shape | User-defined ExtraData surface with optional analytical derivative. | - |
 | `Examp_ExtraShape_XY_Cosines.py` | Intermediate | Custom surface shape | XY cosine extra shape. | - |
 | `Examp_ExtraShape_XY_Cosines_UDA.py` | Advanced | Custom surface shape | XY cosine surface with user-defined aperture. | - |
 | `Examp_Flat_Mirror_45Deg.py` | Beginner | Mirror tracing | Flat fold mirror at 45 degrees. | - |

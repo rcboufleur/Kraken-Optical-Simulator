@@ -1201,3 +1201,60 @@ Add mixed analytical sag derivatives
 - Add derivative and trace regression tests
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Add ExtraData Derivative Example
+
+Goal:
+
+- Provide a user-facing example that shows how to add an optional analytical
+  derivative to a custom `ExtraData` surface.
+
+Files changed:
+
+- `KrakenOS/Examples/Examp_ExtraShape_With_Derivative.py`
+- `KrakenOS/Examples/EXAMPLES_INDEX.md`
+- `tests/test_examples_subset.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added a didactic example with a smooth 2D cosine sag function.
+- Shows the new optional form:
+  `ExtraData = [surface_function, coefficients, derivative_function]`.
+- Compares the analytical derivative path against the old numerical fallback:
+  `ExtraData = [surface_function, coefficients]`.
+- Prints timing and maximum final ray differences.
+- Added the example to the examples index.
+- Added the example to the representative examples test subset.
+
+Verification:
+
+```powershell
+python -m py_compile KrakenOS\Examples\Examp_ExtraShape_With_Derivative.py tests\test_examples_subset.py
+python KrakenOS\Examples\Examp_ExtraShape_With_Derivative.py
+python -m pytest tests\test_examples_subset.py -q
+python -m pytest tests
+```
+
+Result:
+
+- The example ran successfully.
+- Example output for 441 rays:
+  - analytical derivative time: `0.054011s`
+  - numerical fallback time: `0.059581s`
+  - max final XYZ difference: `1.375182e-09`
+  - max final LMN difference: `1.392064e-10`
+- Full test suite collected 19 tests and all passed.
+
+Suggested commit:
+
+```text
+Add ExtraData derivative example
+```
+
+```text
+- Add example for user-defined ExtraData analytical derivatives
+- Compare analytical and numerical fallback tracing paths
+- Add the example to the examples index and representative test subset
+- Update the maintenance log
+```
