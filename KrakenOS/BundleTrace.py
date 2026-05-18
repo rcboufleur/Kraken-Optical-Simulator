@@ -206,27 +206,29 @@ def trace_bundle(system, origins, directions, wavelength):
     ray_origins = np.asarray(origins, dtype=float).copy()
     ray_directions = np.asarray(directions, dtype=float).copy()
     active = np.ones(ray_origins.shape[0], dtype=bool)
+    propagation_sign = np.ones(ray_origins.shape[0], dtype=float)
     previous_n = system.N_Prec[0]
     final_hits = np.array(ray_origins, copy=True)
     final_directions = np.array(ray_directions, copy=True)
 
     for surface_index in range(1, system.n):
-        stops = ray_origins + (ray_directions * 999999999.9)
+        stops = ray_origins + (ray_directions * 999999999.9 * propagation_sign[:, None])
         hit_active, hits, normals, _local_hits, _local_directions = inter_normal_bundle(
             system, ray_origins, stops, surface_index
         )
         active = active & hit_active
 
         current_n = system.N_Prec[surface_index]
-        next_directions, _current_n, _sign, _angles = snell_refraction_bundle(
+        next_directions, current_after_physics, sign, _angles = snell_refraction_bundle(
             ray_directions, normals, previous_n, current_n
         )
+        propagation_sign = propagation_sign * sign
 
         ray_origins[active] = hits[active]
         ray_directions[active] = next_directions[active]
         final_hits[active] = hits[active]
         final_directions[active] = next_directions[active]
-        previous_n = current_n
+        previous_n = current_after_physics[0]
 
     return {
         "active": active,

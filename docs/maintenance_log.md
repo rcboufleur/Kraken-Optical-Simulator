@@ -1945,3 +1945,58 @@ Add experimental BundleTrace module
 - Keep BundleTrace out of the public KrakenOS API for now
 - Update the maintenance log
 ```
+
+### 2026-05-18 - Expand TraceBundle Coverage
+
+Goal:
+
+- Exercise the experimental `trace_bundle()` helper against more realistic
+  sequential cases before considering any public API or core integration.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `tests/test_trace_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added `trace_bundle()` comparisons against scalar `system.Trace()` for:
+  - a tilted/decentered refractive lens;
+  - an asphere plus Zernike surface using off-axis rays;
+  - rays that miss a small aperture and become inactive;
+  - a flat mirror followed by an image plane.
+- Updated the scalar comparison helper to handle invalid rays, whose scalar
+  `R_LMN` payload is intentionally empty.
+- Fixed the experimental mirror path in `BundleTrace.trace_bundle()`:
+  - preserved the scalar propagation `SIGN` behavior after reflection;
+  - used the post-physics absolute refractive index for the next surface,
+    matching `Physics.calculate()` and scalar `Trace()`.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_trace_bundle.py -q
+python -m pytest tests\test_bundle_transforms.py tests\test_solvehit_bundle.py tests\test_internormal_bundle.py tests\test_trace_bundle.py -q
+python -m py_compile KrakenOS\BundleTrace.py
+```
+
+Expected result:
+
+- The experimental `trace_bundle()` should match scalar `Trace()` for the
+  covered active rays.
+- Aperture misses should preserve ray order and return matching active masks.
+
+Suggested commit:
+
+```text
+Expand TraceBundle coverage
+```
+
+```text
+- Add TraceBundle tests for tilted, aspheric/Zernike, aperture, and mirror cases
+- Compare bundle results against scalar Trace for active rays
+- Preserve inactive aperture-miss rays in bundle output
+- Match scalar mirror propagation sign and post-physics refractive index handling
+- Update the maintenance log
+```
