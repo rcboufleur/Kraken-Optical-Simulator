@@ -1565,6 +1565,19 @@ Changes:
 - Generated deterministic non-central ray bundles to avoid the singular
   Zernike derivative at exactly the origin.
 
+Deferred follow-up:
+
+- Define a robust policy for analytical-derivative singularities such as:
+  - Zernike terms at the optical axis (`r = 0`);
+  - axicon apex points;
+  - conic limit points where the square-root derivative becomes singular;
+  - any future user-defined analytical derivative with isolated undefined
+    points.
+- Candidate policy for future review: compute analytical derivatives for the
+  regular subset of rays, and use the numerical derivative fallback only for
+  singular rays inside the same bundle. This would preserve vector performance
+  without rejecting an entire ray packet.
+
 Verification:
 
 ```powershell
@@ -1599,5 +1612,56 @@ Benchmark vectorized SolveHit prototype
 - Compare scalar loop intersections against vectorized Newton intersections
 - Measure parabolic and mixed conic/asphere/Zernike surfaces
 - Document active-mask handling for future bundle tracing
+- Update the maintenance log
+```
+
+### 2026-05-17 - Prototype Bundle Active Aperture Mask
+
+Goal:
+
+- Clarify how a future vectorized ray bundle should handle rays that miss an
+  aperture without deleting them from the packet.
+
+Files changed:
+
+- `tests/test_solvehit_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added a test-local `aperture_active_mask()` helper for the simple circular
+  aperture contract.
+- Added `solve_hit_bundle_with_aperture()` to demonstrate the future data
+  shape:
+  - keep hit coordinates for every input ray;
+  - return an `active` boolean array of the same length;
+  - mark rays outside the aperture inactive;
+  - preserve original ray order.
+- Added a test where rays at `x = +/-6 mm` miss a `10 mm` diameter aperture,
+  while rays on or inside the edge remain active.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_solvehit_bundle.py -q
+```
+
+Expected result:
+
+- Bundle SolveHit prototype tests should continue to pass.
+- The active-mask test should prove that aperture misses do not remove rays
+  from the packet.
+
+Suggested commit:
+
+```text
+Prototype bundle active aperture mask
+```
+
+```text
+- Add a test-local active-mask helper for bundle aperture handling
+- Preserve ray order while marking aperture misses inactive
+- Demonstrate bundle hit data with active flags
+- Document singular derivative follow-up policy
 - Update the maintenance log
 ```

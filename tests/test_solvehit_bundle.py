@@ -52,6 +52,36 @@ def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
     return x, y, z
 
 
+def aperture_active_mask(surface, x, y):
+    """Return active rays for the simple circular aperture contract.
+
+    This mirrors the scalar sequential aperture idea for the future bundle
+    tracer: rays outside the aperture are marked inactive, but remain in the
+    original array positions so downstream ray data can preserve ray order.
+    """
+
+    sub_aperture = surface.SubAperture
+    scale = sub_aperture[0]
+    center_y = sub_aperture[1]
+    center_x = sub_aperture[2]
+    radial_distance = np.sqrt(((x - center_x) ** 2.0) + ((y - center_y) ** 2.0))
+    diameter_at_point = 2.0 * radial_distance
+    outer_limit = surface.Diameter * scale
+    inner_limit = surface.InDiameter * scale
+    return (diameter_at_point <= outer_limit) & (diameter_at_point >= inner_limit)
+
+
+def solve_hit_bundle_with_aperture(surface, px1, py1, pz1, l, m, n):
+    hit_x, hit_y, hit_z = solve_hit_bundle(surface, px1, py1, pz1, l, m, n)
+    active = aperture_active_mask(surface, hit_x, hit_y)
+    return {
+        "active": active,
+        "x": hit_x,
+        "y": hit_y,
+        "z": hit_z,
+    }
+
+
 def scalar_solve_hits(surface, px1, py1, pz1, l, m, n):
     from KrakenOS.HitOnSurf import Hit_Solver
 
@@ -129,3 +159,27 @@ def test_solve_hit_bundle_matches_scalar_for_mixed_surface():
     n = np.sqrt(1.0 - (l * l) - (m * m))
 
     assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n)
+
+
+def test_bundle_aperture_mask_preserves_ray_order():
+    import KrakenOS as Kos
+
+    surface = Kos.surf()
+    surface.Diameter = 10.0
+    surface.InDiameter = 0.0
+    surface.build_surface_function()
+
+    px1 = np.array([-6.0, -5.0, -2.0, 0.0, 2.0, 5.0, 6.0])
+    py1 = np.zeros_like(px1)
+    pz1 = np.zeros_like(px1)
+    l = np.zeros_like(px1)
+    m = np.zeros_like(px1)
+    n = np.ones_like(px1)
+
+    result = solve_hit_bundle_with_aperture(surface, px1, py1, pz1, l, m, n)
+
+    assert result["active"].tolist() == [False, True, True, True, True, True, False]
+    assert np.allclose(result["x"], px1)
+    assert np.allclose(result["y"], py1)
+    assert np.allclose(result["z"], pz1)
+    assert len(result["active"]) == len(px1)
