@@ -2625,3 +2625,63 @@ Add vectorized numerical bundle derivatives
 - Cover ExtraData without derivative and angled rays
 - Record benchmark results in the maintenance log
 ```
+
+### 2026-05-18 - Add ExtraData Bundle Numerical Derivative Example
+
+Goal:
+
+- Provide a user-facing example showing how an `ExtraData` surface without an
+  analytical derivative can still benefit from the experimental bundle tracing
+  path through vectorized numerical derivatives.
+
+Files changed:
+
+- `KrakenOS/Examples/Examp_ExtraShape_Bundle_Numerical_Derivative.py`
+- `KrakenOS/Examples/EXAMPLES_INDEX.md`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added a didactic example using the classic:
+  - `ExtraData = [surface_function, coefficients]`
+- The example compares:
+  - scalar `system.Trace()` one ray at a time;
+  - experimental `trace_bundle(..., keep_history=True)`;
+  - `raykeeper.extend_bundle_result(...)`;
+  - final spot analysis through `raykeeper.pick(-1)`.
+- The example reports ray count, active rays, scalar time, bundle time,
+  speedup, active-mask equality, final-hit error, direction error, and RMS spot
+  values.
+- Registered the example in the examples index.
+
+Verification:
+
+```powershell
+python -m py_compile KrakenOS\Examples\Examp_ExtraShape_Bundle_Numerical_Derivative.py
+python KrakenOS\Examples\Examp_ExtraShape_Bundle_Numerical_Derivative.py
+```
+
+Observed result:
+
+- 1257 rays;
+- scalar Trace time: about `0.219 s`;
+- bundle Trace time: about `0.0047 s`;
+- speedup: about `47x`;
+- same active mask: `True`;
+- maximum final-hit error vs scalar: about `2.7e-15 mm`;
+- scalar and bundle RMS spot values match.
+
+Suggested commit:
+
+```text
+Add ExtraData bundle numerical derivative example
+```
+
+```text
+- Add user ExtraData bundle tracing example without analytical derivative
+- Demonstrate vectorized numerical derivative fallback in trace_bundle
+- Load bundle results into raykeeper and compare against scalar Trace
+- Report timing, accuracy, and RMS spot values
+- Register the example in the examples index
+- Update the maintenance log
+```

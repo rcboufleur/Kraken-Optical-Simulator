@@ -26,6 +26,7 @@
 | `Examp_Doublet_Lens_Tilt_non_sec.py` | Advanced | Non-sequential tracing | Tilted non-sequential doublet. | - |
 | `Examp_Doublet_Lens_Zernike.py` | Advanced | Wavefront analysis | Doublet lens Zernike output. | - |
 | `Examp_Doublet_Optimization.py` | Advanced | Optimization | Doublet optimization with EFFL and RMS merit terms. | - |
+| `Examp_ExtraShape_Bundle_Numerical_Derivative.py` | Advanced | Performance experiments | User ExtraData surface traced as a bundle with vectorized numerical derivatives. | - |
 | `Examp_ExtraShape_Micro_Lens_Array.py` | Advanced | Custom surface shape | Micro-lens array extra shape. | - |
 | `Examp_ExtraShape_Radial_Sine.py` | Intermediate | Custom surface shape | Radial sine extra shape. | - |
 | `Examp_ExtraShape_UserFacets.py` | Advanced | Custom surface shape | Faceted user-defined surface. | - |

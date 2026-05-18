@@ -236,6 +236,9 @@ def main():
     ax.axis("equal")
     ax.grid(True, alpha=0.25)
     plt.show()
+    
+    Kos.display2d(pupil_system, bundle_rays, 0, 1)
+
 
 
 if __name__ == "__main__":
