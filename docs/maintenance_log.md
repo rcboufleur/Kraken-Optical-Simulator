@@ -1825,3 +1825,56 @@ Prototype mini sequential TraceBundle
 - Keep the prototype outside the KrakenOS public API
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Benchmark Mini TraceBundle Prototype
+
+Goal:
+
+- Measure how much of the vectorized-intersection speedup remains when the
+  prototype includes transforms, normals, aperture masks, and Snell physics.
+
+Files changed:
+
+- `tools/benchmark_trace_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added an exploratory benchmark comparing:
+  - scalar `system.Trace()` in a Python loop;
+  - the test-local style mini `TraceBundle` algorithm.
+- The benchmark uses a simple sequential refractive lens and validates bundle
+  final hits and directions against scalar tracing before printing timings.
+- Kept the benchmark outside the KrakenOS package and public API.
+
+Verification:
+
+```powershell
+python tools\benchmark_trace_bundle.py --rays 100 1000 5000
+python -m py_compile tools\benchmark_trace_bundle.py
+```
+
+Measured result:
+
+```text
+KrakenOS TraceBundle prototype benchmark
+This measures a simple sequential refractive lens, not the full KrakenOS API.
+rays  scalar_trace_s  trace_bundle_s  speedup
+  100        0.015646        0.000664    23.56x
+ 1000        0.155877        0.001417   109.99x
+ 5000        0.782904        0.005158   151.77x
+```
+
+Suggested commit:
+
+```text
+Benchmark mini TraceBundle prototype
+```
+
+```text
+- Add an exploratory benchmark for the mini TraceBundle prototype
+- Compare scalar Trace loops against vectorized bundle tracing
+- Validate bundle hits and directions before reporting timings
+- Measure speedups for 100, 1000, and 5000 rays
+- Update the maintenance log
+```
