@@ -1538,3 +1538,66 @@ Prototype vectorized SolveHit in tests
 - Keep the prototype outside the KrakenOS public API
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Benchmark Vectorized SolveHit Prototype
+
+Goal:
+
+- Measure whether the bundle-style Newton intersection prototype is worth
+  developing further before moving any code into the KrakenOS core.
+
+Files changed:
+
+- `tools/benchmark_solvehit_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added an exploratory benchmark comparing:
+  - the existing scalar `Hit_Solver.SolveHit` in a Python loop;
+  - a vectorized `solve_hit_bundle` prototype.
+- Benchmarked parabolic/conic surfaces and mixed conic/asphere/Zernike
+  surfaces.
+- Kept the benchmark as a tool, not as a required pytest test.
+- Documented the future bundle-tracing rule for aperture and mask misses:
+  keep one boolean `active` mask per ray, mark missed rays inactive, and
+  preserve original ray order in the arrays.
+- Generated deterministic non-central ray bundles to avoid the singular
+  Zernike derivative at exactly the origin.
+
+Verification:
+
+```powershell
+python tools\benchmark_solvehit_bundle.py --rays 100 1000 5000
+python -m py_compile tools\benchmark_solvehit_bundle.py
+```
+
+Measured result:
+
+```text
+Parabolic/conic surface
+rays  scalar_loop_s  bundle_s  speedup
+  100       0.001466  0.000101    14.49x
+ 1000       0.014292  0.000153    93.41x
+ 5000       0.070881  0.000324   218.97x
+
+Mixed conic/asphere/Zernike surface
+rays  scalar_loop_s  bundle_s  speedup
+  100       0.009711  0.000340    28.61x
+ 1000       0.095875  0.000639   149.97x
+ 5000       0.477670  0.001825   261.71x
+```
+
+Suggested commit:
+
+```text
+Benchmark vectorized SolveHit prototype
+```
+
+```text
+- Add an exploratory SolveHit bundle benchmark tool
+- Compare scalar loop intersections against vectorized Newton intersections
+- Measure parabolic and mixed conic/asphere/Zernike surfaces
+- Document active-mask handling for future bundle tracing
+- Update the maintenance log
+```
