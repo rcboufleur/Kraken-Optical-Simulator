@@ -402,7 +402,10 @@ def bundle_to_raykeeper_results(system, bundle_result, wavelength=None):
         starts = global_hits[ray_index, :-1, :]
         stops = global_hits[ray_index, 1:, :]
         distance = np.linalg.norm(stops - starts, axis=1)
-        optical_path = distance * np.asarray(n1_values, dtype=float)
+        # The segment from surface k-1 to surface k travels through the medium
+        # before surface k.  This matches the scalar Trace bookkeeping, where
+        # OP uses N0 for each reached surface segment.
+        optical_path = distance * np.asarray(n0_values, dtype=float)
         top_s = np.cumsum(optical_path)
         total_path = top_s[-1] if len(top_s) else 0.0
 

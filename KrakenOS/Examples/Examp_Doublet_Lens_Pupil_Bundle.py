@@ -13,10 +13,19 @@ by ``PupilCalc.Pattern2Field()`` is traced in two ways:
 The pupil tool already returns ray origins and direction cosines as arrays:
 ``x, y, z, L, M, N``.  That makes it a natural source for bundle tracing.
 
+After the bundle trace, the result is loaded into ``raykeeper`` with
+``extend_bundle_result()``.  This keeps the example close to the usual KrakenOS
+analysis style: trace rays, store them in a raykeeper, then use ``pick()`` for
+spot measurements and plots.
+
 Didactic note:
 - ``trace_bundle()`` is still experimental and is not imported from
   ``KrakenOS.__init__``.  It is used here explicitly to test the future
   ray-bundle workflow without changing the public ``system.Trace()`` API.
+- The current bundle-to-raykeeper bridge preserves geometry, directions,
+  surface IDs, glass names, indices, distances, and optical path.  Polarization
+  and coating/energy bookkeeping are still neutral placeholders in this
+  experimental bridge.
 """
 
 import sys
@@ -211,6 +220,7 @@ def main():
     print(f"Scalar Trace time: {scalar['elapsed']:.6f} s")
     print(f"Bundle Trace time: {bundle['elapsed']:.6f} s")
     print(f"Speedup: {speedup:.3f}x")
+    print(f"Rays stored in raykeeper from bundle: {bundle_rays.nrays}")
     print(f"Same active mask: {np.array_equal(bundle['active'], scalar['active'])}")
     print(f"Max final hit error: {max_hit_error:.3e} mm")
     print(f"Max final direction error: {max_direction_error:.3e}")

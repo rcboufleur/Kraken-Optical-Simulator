@@ -2424,3 +2424,72 @@ Bridge bundle traces into raykeeper
 - Cover raykeeper bundle loading in trace bundle tests
 - Update the maintenance log
 ```
+
+### 2026-05-18 - Clarify Bundle RayKeeper Bookkeeping
+
+Goal:
+
+- Make the experimental bundle-to-raykeeper bridge explicit about which data are
+  preserved today, and keep the optical-path bookkeeping aligned with scalar
+  `Trace()`.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `KrakenOS/Examples/Examp_Doublet_Lens_Pupil_Bundle.py`
+- `tests/test_trace_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Corrected reconstructed optical path `OP` to use `N0`, the refractive index
+  of the medium actually traveled by each segment, matching scalar `Trace()`.
+- Extended the bundle raykeeper test to compare reconstructed `N0`, `N1`, `OP`,
+  and `TOP` against a scalar `extract_ray_result()` record.
+- Updated the pupil bundle example text to state the current conservation
+  contract:
+  - geometry and per-surface hit history are preserved;
+  - directions are preserved;
+  - surface IDs, names, glass names, `N0`, `N1`, distance, `OP`, and `TOP` are
+    reconstructed;
+  - polarization and coating/energy bookkeeping are currently neutral
+    placeholders.
+- The example now prints how many rays were loaded into `raykeeper` from the
+  bundle result.
+
+Next performance note:
+
+- The next speed-oriented task remains vectorized numerical fallback for
+  derivatives.  Current scalar fallback preserves compatibility but loses most
+  of the bundle speedup for surfaces without analytical derivatives.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_trace_bundle.py -q
+python -m py_compile KrakenOS\BundleTrace.py KrakenOS\RayKeeper.py KrakenOS\Examples\Examp_Doublet_Lens_Pupil_Bundle.py
+python KrakenOS\Examples\Examp_Doublet_Lens_Pupil_Bundle.py
+```
+
+Observed result:
+
+- `tests/test_trace_bundle.py`: `9 passed`.
+- Doublet pupil bundle example:
+  - 542 rays stored in `raykeeper` from bundle;
+  - speedup about `57x`;
+  - maximum final-hit error vs scalar about `1.2e-14 mm`;
+  - scalar and bundle RMS spot values match.
+
+Suggested commit:
+
+```text
+Clarify bundle raykeeper bookkeeping
+```
+
+```text
+- Match bundle raykeeper OP/TOP bookkeeping to scalar Trace
+- Test reconstructed N0, N1, OP, and TOP against scalar ray data
+- Document which raykeeper fields are preserved and which remain placeholders
+- Update the pupil bundle example output
+- Note vectorized numerical derivative fallback as the next performance task
+```

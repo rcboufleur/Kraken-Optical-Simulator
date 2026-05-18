@@ -414,6 +414,8 @@ def test_trace_bundle_matches_scalar_for_flat_mirror():
 
 def test_history_enabled_trace_bundle_can_fill_raykeeper():
     import KrakenOS as Kos
+    from KrakenOS.BundleTrace import bundle_to_raykeeper_results
+    from KrakenOS.RayKeeper import extract_ray_result
 
     scalar_system = build_simple_lens_system()
     bundle_system = build_simple_lens_system()
@@ -422,9 +424,10 @@ def test_history_enabled_trace_bundle_can_fill_raykeeper():
 
     scalar = scalar_trace_results(scalar_system, origins, directions, wavelength)
     bundle = trace_bundle(bundle_system, origins, directions, wavelength, keep_history=True)
+    bundle_records = bundle_to_raykeeper_results(bundle_system, bundle, wavelength)
 
     rays = Kos.raykeeper(bundle_system)
-    rays.extend_bundle_result(bundle, wavelength)
+    rays.extend_results(bundle_records)
 
     x, y, z, l, m, n = rays.pick(-1)
     active = scalar["active"]
@@ -443,3 +446,11 @@ def test_history_enabled_trace_bundle_can_fill_raykeeper():
         rtol=1e-8,
         atol=1e-8,
     )
+
+    scalar_check_system = build_simple_lens_system()
+    scalar_check_system.Trace(origins[0], directions[0], wavelength)
+    scalar_record = extract_ray_result(scalar_check_system)
+    assert np.allclose(bundle_records[0]["N0"], scalar_record["N0"])
+    assert np.allclose(bundle_records[0]["N1"], scalar_record["N1"])
+    assert np.allclose(bundle_records[0]["OP"], scalar_record["OP"], rtol=1e-8, atol=1e-8)
+    assert np.allclose(bundle_records[0]["TOP"], scalar_record["TOP"], rtol=1e-8, atol=1e-8)
