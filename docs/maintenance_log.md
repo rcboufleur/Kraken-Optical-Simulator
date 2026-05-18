@@ -1773,3 +1773,55 @@ Prototype sequential InterNormal bundle
 - Preserve inactive aperture-miss rays in the packet
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Prototype Mini Sequential TraceBundle
+
+Goal:
+
+- Demonstrate that a small sequential ray bundle can be traced through multiple
+  refractive surfaces and match the existing scalar `system.Trace()` workflow.
+
+Files changed:
+
+- `tests/test_trace_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added a test-local `trace_bundle()` prototype for a simple sequential lens.
+- The prototype combines:
+  - bundle coordinate transforms;
+  - bundle ray-surface intersection;
+  - bundle normal calculation;
+  - bundle aperture active masks;
+  - a test-local vectorized Snell/refraction calculation.
+- Compared final hit points and final outgoing directions against scalar
+  `system.Trace()` for the same rays.
+- Kept the prototype entirely in tests; no KrakenOS package files or public API
+  were changed.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_trace_bundle.py -q
+python -m pytest tests\test_bundle_transforms.py tests\test_solvehit_bundle.py tests\test_internormal_bundle.py tests\test_trace_bundle.py -q
+```
+
+Expected result:
+
+- The mini `TraceBundle` prototype should match scalar `Trace()` for a simple
+  sequential refractive lens within numerical tolerance.
+
+Suggested commit:
+
+```text
+Prototype mini sequential TraceBundle
+```
+
+```text
+- Add a test-local mini TraceBundle prototype for a simple lens
+- Combine bundle transforms, intersections, normals, aperture masks, and Snell physics
+- Compare bundle final hits and directions against scalar Trace
+- Keep the prototype outside the KrakenOS public API
+- Update the maintenance log
+```
