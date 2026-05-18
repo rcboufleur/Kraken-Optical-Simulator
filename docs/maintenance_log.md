@@ -1665,3 +1665,52 @@ Prototype bundle active aperture mask
 - Document singular derivative follow-up policy
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Validate Bundle Coordinate Transforms
+
+Goal:
+
+- Confirm that KrakenOS transform matrices can be applied to many ray points or
+  directions at once, matching the current scalar matrix convention.
+
+Files changed:
+
+- `tests/test_bundle_transforms.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added test-local bundle transform helpers for:
+  - points, using homogeneous `w = 1`;
+  - directions, using homogeneous `w = 0`.
+- Compared bundle transforms against the current scalar convention:
+  `TRANS_1A[j].dot([x, y, z, w])`.
+- Used a tilted and decentered surface so the test covers rotation and
+  translation.
+- Verified that directions are not translated.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_bundle_transforms.py -q
+```
+
+Expected result:
+
+- Bundle point transforms should match scalar matrix-dot transforms.
+- Bundle direction transforms should match scalar matrix-dot transforms and
+  keep homogeneous `w = 0`.
+
+Suggested commit:
+
+```text
+Validate bundle coordinate transforms
+```
+
+```text
+- Add tests for applying KrakenOS transforms to ray bundles
+- Compare bundle point and direction transforms against scalar matrix dot
+- Cover tilted and decentered surfaces
+- Preserve direction homogeneous coordinates with w=0
+- Update the maintenance log
+```
