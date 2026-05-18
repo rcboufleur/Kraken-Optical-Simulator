@@ -1714,3 +1714,62 @@ Validate bundle coordinate transforms
 - Preserve direction homogeneous coordinates with w=0
 - Update the maintenance log
 ```
+
+### 2026-05-17 - Prototype Sequential InterNormal Bundle
+
+Goal:
+
+- Combine bundle transforms, bundle intersection, bundle normals, and aperture
+  active masks into a test-local prototype of the sequential `InterNormal`
+  path.
+
+Files changed:
+
+- `tests/test_internormal_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added a test-local `inter_normal_bundle()` prototype for simple sequential
+  `TypeTotal == 0` surfaces.
+- The prototype:
+  - transforms start/stop ray points into local surface coordinates;
+  - computes local ray directions;
+  - solves intersections with the vectorized Newton helper;
+  - computes local analytical normals as a bundle;
+  - transforms hit points and normals back to global coordinates;
+  - returns an `active` aperture mask while preserving ray order.
+- Compared active bundle hit points, local hit points, normals, and local ray
+  directions against the existing scalar `INORM.InterNormal()` path.
+- Included one ray outside the aperture to verify inactive-ray behavior. The
+  bundle may still compute geometric coordinates for inactive rays, but active
+  comparisons are restricted to rays accepted by the aperture, matching the
+  future active-mask contract.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_internormal_bundle.py -q
+python -m pytest tests\test_bundle_transforms.py tests\test_solvehit_bundle.py tests\test_internormal_bundle.py -q
+```
+
+Expected result:
+
+- The bundle `InterNormal` prototype should match scalar `InterNormal` for
+  active rays on a tilted/decentered sequential surface.
+- The inactive aperture-miss ray should remain present in the packet with
+  `active = False`.
+
+Suggested commit:
+
+```text
+Prototype sequential InterNormal bundle
+```
+
+```text
+- Add a test-local InterNormal bundle prototype for simple sequential surfaces
+- Combine bundle transforms, SolveHit, normals, and active aperture masks
+- Compare active bundle results against scalar InterNormal
+- Preserve inactive aperture-miss rays in the packet
+- Update the maintenance log
+```
