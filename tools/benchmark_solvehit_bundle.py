@@ -31,39 +31,7 @@ import numpy as np
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
-
-def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
-    px1 = np.asarray(px1, dtype=float)
-    py1 = np.asarray(py1, dtype=float)
-    pz1 = np.asarray(pz1, dtype=float)
-    l = np.asarray(l, dtype=float)
-    m = np.asarray(m, dtype=float)
-    n = np.asarray(n, dtype=float)
-
-    ln = l / n
-    mn = m / n
-    z = np.array(pz1, dtype=float, copy=True)
-
-    for _ in range(30):
-        x = ((z - pz1) * ln) + px1
-        y = ((z - pz1) * mn) + py1
-        sag = surface.sigma_z(x, y, case)
-        derivative = surface.sigma_derivative(x, y, case)
-        if derivative is None:
-            raise RuntimeError("benchmark surfaces must provide analytical derivatives")
-        dzdx, dzdy = derivative
-        function_value = sag - z
-        function_derivative = (dzdx * ln) + (dzdy * mn) - 1.0
-        next_z = z - (function_value / function_derivative)
-
-        if np.all(np.abs(next_z - z) <= tolerance):
-            z = next_z
-            break
-        z = next_z
-
-    x = ((z - pz1) * ln) + px1
-    y = ((z - pz1) * mn) + py1
-    return x, y, z
+from KrakenOS.BundleTrace import solve_hit_bundle
 
 
 def scalar_solve_hits(surface, px1, py1, pz1, l, m, n):

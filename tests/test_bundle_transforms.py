@@ -1,34 +1,6 @@
 import numpy as np
 
-
-def transform_points_bundle(matrix, points):
-    """Apply a KrakenOS 4x4 transform matrix to many points at once."""
-
-    matrix = np.asarray(matrix, dtype=float)
-    homogeneous = np.column_stack(
-        [
-            points[:, 0],
-            points[:, 1],
-            points[:, 2],
-            np.ones(points.shape[0], dtype=float),
-        ]
-    )
-    return homogeneous @ matrix.T
-
-
-def transform_directions_bundle(matrix, directions):
-    """Apply only rotation/linear transform terms to many directions at once."""
-
-    matrix = np.asarray(matrix, dtype=float)
-    homogeneous = np.column_stack(
-        [
-            directions[:, 0],
-            directions[:, 1],
-            directions[:, 2],
-            np.zeros(directions.shape[0], dtype=float),
-        ]
-    )
-    return homogeneous @ matrix.T
+from KrakenOS.BundleTrace import transform_directions_bundle, transform_points_bundle
 
 
 def transform_points_scalar(matrix, points):
@@ -72,7 +44,6 @@ def build_tilted_decentered_system():
 def test_bundle_point_transform_matches_scalar_krakenos_matrix():
     system = build_tilted_decentered_system()
     matrix = system.Pr3D.TRANS_1A[1]
-
     points = np.array(
         [
             [-5.0, -2.0, 0.0],
@@ -93,7 +64,6 @@ def test_bundle_point_transform_matches_scalar_krakenos_matrix():
 def test_bundle_direction_transform_matches_scalar_krakenos_matrix():
     system = build_tilted_decentered_system()
     matrix = system.Pr3D.TRANS_1A[1]
-
     directions = np.array(
         [
             [0.0, 0.0, 1.0],

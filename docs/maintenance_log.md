@@ -1878,3 +1878,70 @@ Benchmark mini TraceBundle prototype
 - Measure speedups for 100, 1000, and 5000 rays
 - Update the maintenance log
 ```
+
+### 2026-05-18 - Add Experimental BundleTrace Module
+
+Goal:
+
+- Move the repeated bundle-tracing prototype logic out of tests/tools and into
+  one internal experimental module, without exposing it as public API.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `tests/test_bundle_transforms.py`
+- `tests/test_solvehit_bundle.py`
+- `tests/test_internormal_bundle.py`
+- `tests/test_trace_bundle.py`
+- `tools/benchmark_solvehit_bundle.py`
+- `tools/benchmark_trace_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added `KrakenOS/BundleTrace.py` as an internal experimental module.
+- Centralized the previously duplicated prototype helpers:
+  - `transform_points_bundle`;
+  - `transform_directions_bundle`;
+  - `solve_hit_bundle`;
+  - `local_normals_bundle`;
+  - `aperture_active_mask`;
+  - `inter_normal_bundle`;
+  - `snell_refraction_bundle`;
+  - `trace_bundle`.
+- Kept the module intentionally out of `KrakenOS.__init__`, so it is not a
+  public user-facing API yet.
+- Updated bundle-related tests and benchmarks to import from the internal
+  module instead of carrying local copies.
+- Kept `system.Trace()`, `KrakenSys.py`, `InterNormalCalc.py`, and optical
+  physics files unchanged.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_bundle_transforms.py tests\test_solvehit_bundle.py tests\test_internormal_bundle.py tests\test_trace_bundle.py -q
+python tools\benchmark_solvehit_bundle.py --rays 100 1000
+python tools\benchmark_trace_bundle.py --rays 100 1000
+python -m py_compile KrakenOS\BundleTrace.py tools\benchmark_solvehit_bundle.py tools\benchmark_trace_bundle.py
+```
+
+Expected result:
+
+- Bundle tests should continue to pass against the centralized experimental
+  module.
+- Benchmarks should still validate scalar/bundle agreement before reporting
+  timings.
+
+Suggested commit:
+
+```text
+Add experimental BundleTrace module
+```
+
+```text
+- Add internal experimental BundleTrace helpers
+- Centralize bundle transforms, intersections, normals, Snell physics, and trace prototype
+- Update bundle tests and benchmarks to use the shared module
+- Keep BundleTrace out of the public KrakenOS API for now
+- Update the maintenance log
+```
