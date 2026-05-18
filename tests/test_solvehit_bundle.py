@@ -1,5 +1,5 @@
 import numpy as np
-from KrakenOS.BundleTrace import aperture_active_mask, solve_hit_bundle
+from KrakenOS.BundleTrace import aperture_active_mask, local_normals_bundle, solve_hit_bundle
 
 
 def scalar_solve_hits(surface, px1, py1, pz1, l, m, n):
@@ -19,6 +19,24 @@ def assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n):
 
     for bundle_values, scalar_values in zip(bundle, scalar):
         assert np.allclose(bundle_values, scalar_values, rtol=1e-10, atol=1e-10)
+
+
+def scalar_surface_normals(surface, x, y, z):
+    from KrakenOS.HitOnSurf import Hit_Solver
+
+    solver = Hit_Solver([surface])
+    solver.vj = 0
+    return np.asarray(
+        [solver.SurfDer(float(px), float(py), float(pz)) for px, py, pz in zip(x, y, z)],
+        dtype=float,
+    )
+
+
+def assert_bundle_normals_match_scalar(surface, x, y, z, atol=1e-8):
+    bundle = local_normals_bundle(surface, x, y, z)
+    scalar = scalar_surface_normals(surface, x, y, z)
+
+    assert np.allclose(bundle, scalar, rtol=1e-6, atol=atol)
 
 
 def test_solve_hit_bundle_matches_scalar_for_simple_plane():
@@ -114,6 +132,8 @@ def test_solve_hit_bundle_falls_back_for_zernike_axis_derivative_limit():
     n = np.ones_like(px1)
 
     assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n)
+    x, y, z = solve_hit_bundle(surface, px1, py1, pz1, l, m, n)
+    assert_bundle_normals_match_scalar(surface, x, y, z)
 
 
 def test_solve_hit_bundle_falls_back_for_axicon_apex_derivative_limit():
@@ -132,6 +152,8 @@ def test_solve_hit_bundle_falls_back_for_axicon_apex_derivative_limit():
     n = np.ones_like(px1)
 
     assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n)
+    x, y, z = solve_hit_bundle(surface, px1, py1, pz1, l, m, n)
+    assert_bundle_normals_match_scalar(surface, x, y, z)
 
 
 def test_solve_hit_bundle_falls_back_for_extra_data_without_derivative():
@@ -153,3 +175,5 @@ def test_solve_hit_bundle_falls_back_for_extra_data_without_derivative():
     n = np.ones_like(px1)
 
     assert_bundle_matches_scalar(surface, px1, py1, pz1, l, m, n)
+    x, y, z = solve_hit_bundle(surface, px1, py1, pz1, l, m, n)
+    assert_bundle_normals_match_scalar(surface, x, y, z)

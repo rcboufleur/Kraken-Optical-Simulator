@@ -2108,3 +2108,63 @@ Add SolveHit bundle scalar fallback
 - Keep bundle normal fallback deferred
 - Update the maintenance log
 ```
+
+### 2026-05-18 - Add Bundle Normal Scalar Fallback
+
+Goal:
+
+- Let the experimental `local_normals_bundle()` compute normals for points
+  where analytical derivatives are singular or unsupported, while preserving
+  the vectorized path for ordinary analytical points.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `tests/test_solvehit_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added scalar normal fallback in `local_normals_bundle()` using the existing
+  `Hit_Solver.SurfDer()` implementation.
+- Kept analytical normals vectorized when `sigma_derivative()` succeeds for the
+  whole packet.
+- When vector derivative evaluation returns `None`, the bundle normal helper
+  now:
+  - checks each point individually;
+  - keeps analytically supported points on the analytical path;
+  - sends singular/unsupported points through scalar finite-difference normals;
+  - preserves output order.
+- Extended fallback tests to compare bundle normals against scalar
+  `Hit_Solver.SurfDer()` for:
+  - Zernike axis point;
+  - axicon apex point;
+  - `ExtraData` without derivative.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_solvehit_bundle.py -q
+python -m pytest tests\test_bundle_transforms.py tests\test_solvehit_bundle.py tests\test_internormal_bundle.py tests\test_trace_bundle.py -q
+python -m py_compile KrakenOS\BundleTrace.py
+```
+
+Expected result:
+
+- Bundle intersections and normals should match the established scalar solvers
+  for both analytical and fallback points.
+- The full bundle test block should continue to pass.
+
+Suggested commit:
+
+```text
+Add bundle normal scalar fallback
+```
+
+```text
+- Add scalar fallback for unsupported points in local_normals_bundle
+- Preserve vectorized analytical normals for supported points
+- Compare fallback normals against Hit_Solver.SurfDer
+- Cover Zernike axis, axicon apex, and ExtraData without derivative
+- Update the maintenance log
+```

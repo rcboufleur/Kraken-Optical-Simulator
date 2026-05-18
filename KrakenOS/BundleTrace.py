@@ -16,7 +16,7 @@ Still limited in this first experimental module:
 
 - STL and non-sequential tracing;
 - UDA/mask geometry beyond the simple circular aperture contract;
-- numerical derivative fallback for bundle normals;
+- fully vectorized numerical derivative fallback for bundle normals;
 - raykeeper integration.
 """
 
@@ -57,6 +57,16 @@ def _scalar_solve_hit(surface, px1, py1, pz1, l, m, n):
 
     solver = Hit_Solver([surface])
     return solver.SolveHit(px1, py1, pz1, l, m, n, 0)
+
+
+def _scalar_surface_normal(surface, x, y, z):
+    """Use the established scalar normal solver for one point as a fallback."""
+
+    from .HitOnSurf import Hit_Solver
+
+    solver = Hit_Solver([surface])
+    solver.vj = 0
+    return solver.SurfDer(x, y, z)
 
 
 def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
@@ -138,13 +148,50 @@ def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
 
 
 def local_normals_bundle(surface, x, y, z):
-    """Return local analytical normals for many surface hit points."""
+    """Return local normals for many surface hit points.
+
+    Analytical derivatives are used where available. Points whose derivative is
+    singular or unsupported use the established scalar finite-difference normal
+    path, preserving compatibility while keeping the common analytical subset
+    vectorized.
+    """
+
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    z = np.asarray(z, dtype=float)
 
     derivative = surface.sigma_derivative(x, y, 0)
     if derivative is None:
-        raise RuntimeError(
-            "Bundle tracing currently requires analytical derivatives for normals."
-        )
+        normals = np.empty((x.shape[0], 3), dtype=float)
+        analytical_indices = []
+        dzdx_values = []
+        dzdy_values = []
+
+        for index in range(x.shape[0]):
+            scalar_derivative = surface.sigma_derivative(float(x[index]), float(y[index]), 0)
+            if scalar_derivative is None:
+                normals[index] = _scalar_surface_normal(
+                    surface,
+                    float(x[index]),
+                    float(y[index]),
+                    float(z[index]),
+                )
+            else:
+                analytical_indices.append(index)
+                dzdx_values.append(scalar_derivative[0])
+                dzdy_values.append(scalar_derivative[1])
+
+        if analytical_indices:
+            step_indices = np.asarray(analytical_indices, dtype=int)
+            dzdx = np.asarray(dzdx_values, dtype=float)
+            dzdy = np.asarray(dzdy_values, dtype=float)
+            analytical_normals = np.column_stack([dzdx, dzdy, -np.ones_like(dzdx)])
+            normals[step_indices] = analytical_normals / np.linalg.norm(
+                analytical_normals,
+                axis=1,
+            )[:, None]
+        return normals
+
     dzdx, dzdy = derivative
     normals = np.column_stack([dzdx, dzdy, -np.ones_like(z)])
     return normals / np.linalg.norm(normals, axis=1)[:, None]
