@@ -12,11 +12,11 @@ Current scope:
 - circular aperture checks;
 - refractive/mirror Snell physics following the current scalar implementation.
 
-Out of scope for this first experimental module:
+Still limited in this first experimental module:
 
 - STL and non-sequential tracing;
 - UDA/mask geometry beyond the simple circular aperture contract;
-- numerical derivative fallback inside a bundle;
+- numerical derivative fallback for bundle normals;
 - raykeeper integration.
 """
 
@@ -50,8 +50,23 @@ def transform_directions_bundle(matrix, directions):
     return homogeneous @ matrix.T
 
 
+def _scalar_solve_hit(surface, px1, py1, pz1, l, m, n):
+    """Use the established scalar solver for one ray as a fallback."""
+
+    from .HitOnSurf import Hit_Solver
+
+    solver = Hit_Solver([surface])
+    return solver.SolveHit(px1, py1, pz1, l, m, n, 0)
+
+
 def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
-    """Solve ray-surface intersections for a bundle using vectorized Newton."""
+    """Solve ray-surface intersections for a bundle using vectorized Newton.
+
+    Rays whose active surface cannot provide an analytical derivative are
+    solved by the established scalar ``Hit_Solver.SolveHit`` path.  That keeps
+    the common analytical subset vectorized while preserving compatibility for
+    isolated singular rays such as a Zernike axis point or axicon apex.
+    """
 
     px1 = np.asarray(px1, dtype=float)
     py1 = np.asarray(py1, dtype=float)
@@ -63,25 +78,59 @@ def solve_hit_bundle(surface, px1, py1, pz1, l, m, n, case=0, tolerance=1e-9):
     ln = l / n
     mn = m / n
     z = np.array(pz1, dtype=float, copy=True)
+    unresolved = np.ones_like(z, dtype=bool)
 
     for _ in range(30):
+        if not np.any(unresolved):
+            break
+
         x = ((z - pz1) * ln) + px1
         y = ((z - pz1) * mn) + py1
-        sag = surface.sigma_z(x, y, case)
-        derivative = surface.sigma_derivative(x, y, case)
-        if derivative is None:
-            raise RuntimeError(
-                "Bundle tracing currently requires analytical derivatives for all rays."
-            )
-        dzdx, dzdy = derivative
-        function_value = sag - z
-        function_derivative = (dzdx * ln) + (dzdy * mn) - 1.0
-        next_z = z - (function_value / function_derivative)
 
-        if np.all(np.abs(next_z - z) <= tolerance):
-            z = next_z
-            break
-        z = next_z
+        sag = surface.sigma_z(x[unresolved], y[unresolved], case)
+        derivative = surface.sigma_derivative(x[unresolved], y[unresolved], case)
+        if derivative is None:
+            active_indices = np.flatnonzero(unresolved)
+            analytical_indices = []
+            dzdx_values = []
+            dzdy_values = []
+
+            for index in active_indices:
+                scalar_derivative = surface.sigma_derivative(float(x[index]), float(y[index]), case)
+                if scalar_derivative is None:
+                    z[index] = _scalar_solve_hit(
+                        surface,
+                        float(px1[index]),
+                        float(py1[index]),
+                        float(pz1[index]),
+                        float(l[index]),
+                        float(m[index]),
+                        float(n[index]),
+                    )[2]
+                    unresolved[index] = False
+                else:
+                    analytical_indices.append(index)
+                    dzdx_values.append(scalar_derivative[0])
+                    dzdy_values.append(scalar_derivative[1])
+
+            if not analytical_indices:
+                continue
+
+            step_indices = np.asarray(analytical_indices, dtype=int)
+            sag = surface.sigma_z(x[step_indices], y[step_indices], case)
+            dzdx = np.asarray(dzdx_values, dtype=float)
+            dzdy = np.asarray(dzdy_values, dtype=float)
+        else:
+            step_indices = np.flatnonzero(unresolved)
+            dzdx, dzdy = derivative
+
+        function_value = sag - z[step_indices]
+        function_derivative = (dzdx * ln[step_indices]) + (dzdy * mn[step_indices]) - 1.0
+        next_z = z[step_indices] - (function_value / function_derivative)
+
+        converged = np.abs(next_z - z[step_indices]) <= tolerance
+        z[step_indices] = next_z
+        unresolved[step_indices[converged]] = False
 
     x = ((z - pz1) * ln) + px1
     y = ((z - pz1) * mn) + py1

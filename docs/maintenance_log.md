@@ -2048,3 +2048,63 @@ Document BundleTrace derivative limits
 - Keep fallback behavior deferred for a focused follow-up
 - Update the maintenance log
 ```
+
+### 2026-05-18 - Add SolveHit Bundle Scalar Fallback
+
+Goal:
+
+- Let the experimental `solve_hit_bundle()` handle rays that cannot use the
+  analytical derivative path, without giving up the fast vectorized path for
+  ordinary analytical rays.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `tests/test_solvehit_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Added a scalar fallback inside `solve_hit_bundle()` using the existing
+  `Hit_Solver.SolveHit` implementation.
+- Kept the fast vectorized Newton path for surfaces/rays where
+  `sigma_derivative()` returns analytical derivatives.
+- When a vector derivative request returns `None`, `solve_hit_bundle()` now:
+  - checks each unresolved ray individually;
+  - keeps analytically supported rays in the vector Newton path;
+  - sends singular or unsupported rays through the scalar solver;
+  - preserves ray order in the returned arrays.
+- Converted previous derivative-limit tests into fallback equivalence tests for:
+  - Zernike terms with a central ray at `r = 0`;
+  - axicon apex ray;
+  - `ExtraData` without a user-provided derivative.
+- Kept numerical fallback for bundle normals deferred; `local_normals_bundle()`
+  still requires analytical derivatives.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_solvehit_bundle.py -q
+python -m pytest tests\test_bundle_transforms.py tests\test_solvehit_bundle.py tests\test_internormal_bundle.py tests\test_trace_bundle.py -q
+python -m py_compile KrakenOS\BundleTrace.py
+```
+
+Expected result:
+
+- Bundle intersection should match scalar `SolveHit()` for normal analytical
+  surfaces and for singular/unsupported rays handled by fallback.
+- Full bundle tests should continue to pass.
+
+Suggested commit:
+
+```text
+Add SolveHit bundle scalar fallback
+```
+
+```text
+- Add scalar fallback for unsupported rays in solve_hit_bundle
+- Preserve vectorized Newton for analytically supported rays
+- Cover Zernike axis, axicon apex, and ExtraData without derivative
+- Keep bundle normal fallback deferred
+- Update the maintenance log
+```
