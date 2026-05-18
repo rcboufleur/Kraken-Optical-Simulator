@@ -2493,3 +2493,69 @@ Clarify bundle raykeeper bookkeeping
 - Update the pupil bundle example output
 - Note vectorized numerical derivative fallback as the next performance task
 ```
+
+### 2026-05-18 - Reconstruct Bundle Energy Bookkeeping
+
+Goal:
+
+- Preserve the physical raykeeper fields that scalar `Trace()` stores for
+  ordinary sequential geometric tracing, instead of leaving energy fields as
+  neutral placeholders.
+
+Files changed:
+
+- `KrakenOS/BundleTrace.py`
+- `KrakenOS/Examples/Examp_Doublet_Lens_Pupil_Bundle.py`
+- `tests/test_trace_bundle.py`
+- `docs/maintenance_log.md`
+
+Changes:
+
+- Stored incidence angles in history-enabled `trace_bundle()` results.
+- Updated `bundle_to_raykeeper_results()` to reconstruct:
+  - `ALPHA`;
+  - `BULK_TRANS`;
+  - `RP`, `RS`, `TP`, `TS`;
+  - `TTBE`;
+  - `TT`.
+- The reconstruction reuses existing scalar physics helpers:
+  - `FresnelEnergy()`;
+  - `system.CoatingFun()`.
+- Extended the raykeeper bridge test to compare reconstructed energy and
+  absorption fields against scalar `extract_ray_result()` for a simple lens.
+- Updated the pupil bundle example wording to state that geometry, directions,
+  indices, optical path, absorption, Fresnel/coating terms, and total
+  transmission are preserved for the current sequential geometric path.
+
+Current limitation:
+
+- The bundle tracer still needs dedicated validation before being used for
+  advanced polarization workflows or more complex coating/energy scenarios.
+- The next performance task is still vectorized numerical derivative fallback,
+  so surfaces without analytical derivatives do not lose most of the bundle
+  speedup.
+
+Verification:
+
+```powershell
+python -m pytest tests\test_trace_bundle.py -q
+python -m py_compile KrakenOS\BundleTrace.py KrakenOS\RayKeeper.py KrakenOS\Examples\Examp_Doublet_Lens_Pupil_Bundle.py
+```
+
+Observed result:
+
+- `tests/test_trace_bundle.py`: `9 passed`.
+
+Suggested commit:
+
+```text
+Reconstruct bundle energy bookkeeping
+```
+
+```text
+- Store incidence angles in history-enabled bundle traces
+- Reconstruct ALPHA, Fresnel/coating terms, BULK_TRANS, TTBE, and TT
+- Reuse existing scalar FresnelEnergy and CoatingFun helpers
+- Compare reconstructed physical fields against scalar raykeeper records
+- Update the pupil bundle example and maintenance log
+```

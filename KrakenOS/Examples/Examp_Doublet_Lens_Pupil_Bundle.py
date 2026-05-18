@@ -23,9 +23,10 @@ Didactic note:
   ``KrakenOS.__init__``.  It is used here explicitly to test the future
   ray-bundle workflow without changing the public ``system.Trace()`` API.
 - The current bundle-to-raykeeper bridge preserves geometry, directions,
-  surface IDs, glass names, indices, distances, and optical path.  Polarization
-  and coating/energy bookkeeping are still neutral placeholders in this
-  experimental bridge.
+  surface IDs, glass names, indices, distances, optical path, absorption,
+  Fresnel/coating energy terms, and total transmission for this sequential
+  geometric path.  It is still experimental and should be validated before
+  relying on it for advanced polarization workflows.
 """
 
 import sys

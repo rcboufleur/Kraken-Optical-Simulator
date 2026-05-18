@@ -317,6 +317,7 @@ def trace_bundle(system, origins, directions, wavelength, keep_history=False):
         output_directions = np.zeros((ray_count, system.n - 1, 3), dtype=float)
         local_directions = np.zeros((ray_count, system.n - 1, 3), dtype=float)
         normals = np.zeros((ray_count, system.n - 1, 3), dtype=float)
+        incidence_angles = np.zeros((ray_count, system.n - 1), dtype=float)
         global_hits[:, 0, :] = ray_origins
 
     for surface_index in range(1, system.n):
@@ -327,7 +328,7 @@ def trace_bundle(system, origins, directions, wavelength, keep_history=False):
         active = active & hit_active
 
         current_n = system.N_Prec[surface_index]
-        next_directions, current_after_physics, sign, _angles = snell_refraction_bundle(
+        next_directions, current_after_physics, sign, angles = snell_refraction_bundle(
             ray_directions, normal_vectors, previous_n, current_n
         )
         propagation_sign = propagation_sign * sign
@@ -340,6 +341,7 @@ def trace_bundle(system, origins, directions, wavelength, keep_history=False):
             output_directions[:, history_index, :] = next_directions
             local_directions[:, history_index, :] = direction_local
             normals[:, history_index, :] = normal_vectors
+            incidence_angles[:, history_index] = angles
 
         ray_origins[active] = hits[active]
         ray_directions[active] = next_directions[active]
@@ -362,6 +364,7 @@ def trace_bundle(system, origins, directions, wavelength, keep_history=False):
                 "output_directions": output_directions,
                 "local_directions": local_directions,
                 "normals": normals,
+                "incidence_angles": incidence_angles,
             }
         )
     return result
@@ -389,13 +392,16 @@ def bundle_to_raykeeper_results(system, bundle_result, wavelength=None):
     output_directions = bundle_result["output_directions"]
     local_directions = bundle_result["local_directions"]
     normals = bundle_result["normals"]
+    incidence_angles = bundle_result["incidence_angles"]
     active = bundle_result["active"]
 
     surfaces = list(range(1, system.n))
     names = [system.SDT[index].Name for index in surfaces]
     glasses = [system.SDT[index].Glass for index in surfaces]
+    global_glasses = [system.GlobGlass[index] for index in surfaces]
     n0_values = [system.N_Prec[index - 1] for index in surfaces]
     n1_values = [system.N_Prec[index] for index in surfaces]
+    alpha_values = [system.AlphaPrecal[index] for index in surfaces]
 
     results = []
     for ray_index in range(global_hits.shape[0]):
@@ -408,6 +414,58 @@ def bundle_to_raykeeper_results(system, bundle_result, wavelength=None):
         optical_path = distance * np.asarray(n0_values, dtype=float)
         top_s = np.cumsum(optical_path)
         total_path = top_s[-1] if len(top_s) else 0.0
+        rp_values = []
+        rs_values = []
+        tp_values = []
+        ts_values = []
+        alpha_record = [0.0, 0.0]
+        bulk_trans = []
+        ttbe = []
+        total_energy = 1.0
+
+        from .Physics import FresnelEnergy
+
+        for element_index, surface_index in enumerate(surfaces):
+            alpha_record.append(alpha_values[element_index])
+            if active[ray_index]:
+                mtl = system.SDT[surface_index].CoatingMet
+                rp, rs, tp, ts = FresnelEnergy(
+                    global_glasses[element_index],
+                    n0_values[element_index],
+                    n1_values[element_index],
+                    incident_directions[ray_index, element_index],
+                    normals[ray_index, element_index],
+                    output_directions[ray_index, element_index],
+                    system.SETUP,
+                    wave,
+                    mtl,
+                )
+                rp2, rs2, tp2, ts2, valid_coating = system.CoatingFun(
+                    system.SDT[surface_index].Coating,
+                    incidence_angles[ray_index, element_index],
+                    wave,
+                )
+                if valid_coating == 1:
+                    rp, rs, tp, ts = rp2, rs2, tp2, ts2
+            else:
+                rp, rs, tp, ts = 0, 0, 0, 0
+
+            rp_values.append(rp)
+            rs_values.append(rs)
+            tp_values.append(tp)
+            ts_values.append(ts)
+
+            if global_glasses[element_index] == "MIRROR":
+                interface_energy = (rp + rs) / 2.0
+                bulk = interface_energy
+            else:
+                bulk = np.exp((-alpha_record[-2]) * distance[element_index])
+                interface_energy = (tp + ts) / 2.0
+
+            bulk_trans.append(bulk)
+            element_energy = interface_energy * bulk
+            ttbe.append(element_energy)
+            total_energy = total_energy * element_energy
 
         results.append(
             {
@@ -436,14 +494,14 @@ def bundle_to_raykeeper_results(system, bundle_result, wavelength=None):
                 "OP": list(optical_path),
                 "TOP_S": list(top_s),
                 "TOP": total_path,
-                "ALPHA": [0.0] * (system.n + 1),
-                "BULK_TRANS": [1.0] * (system.n - 1),
-                "RP": [0.0] * (system.n - 1),
-                "RS": [0.0] * (system.n - 1),
-                "TP": [1.0] * (system.n - 1),
-                "TS": [1.0] * (system.n - 1),
-                "TTBE": [1.0] * (system.n - 1),
-                "TT": 1.0,
+                "ALPHA": alpha_record,
+                "BULK_TRANS": bulk_trans,
+                "RP": rp_values,
+                "RS": rs_values,
+                "TP": tp_values,
+                "TS": ts_values,
+                "TTBE": ttbe,
+                "TT": total_energy,
             }
         )
     return results
