@@ -2,6 +2,8 @@
 
 from concurrent.futures import FIRST_COMPLETED, wait
 
+__all__ = ("resolve_max_in_flight", "run_bounded_ordered_batches")
+
 
 def resolve_max_in_flight(workers, max_in_flight=None):
     """Return a positive in-flight window size (default ``2 * workers``)."""
