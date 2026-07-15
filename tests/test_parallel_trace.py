@@ -91,7 +91,7 @@ def trace_batch_with_system(system, batch):
     results = []
     for ray in batch:
         system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
-        result = Kos.extract_ray_result(system)
+        result = Kos.extract_ray_result(system, copy=True)
         result["index"] = ray["index"]
         results.append(result)
     return results
@@ -119,7 +119,12 @@ def trace_sequential(rays):
     return sorted(results, key=lambda item: item["index"]), elapsed
 
 
-def trace_parallel(rays, workers=2, batch_size=25):
+def trace_parallel(rays, workers=2, batch_size=25, return_flat=False):
+    """Materialize worker batches. Prefer ``trace_parallel_into_raykeeper``.
+
+    ``return_flat=True`` builds a sorted list and drops the group list so both
+    are not retained together.
+    """
     batches = chunked(rays, batch_size)
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -132,8 +137,13 @@ def trace_parallel(rays, workers=2, batch_size=25):
         grouped_results = list(pool.map(trace_batch_with_worker_system, batches))
         trace_elapsed = time.perf_counter() - trace_start
     total_elapsed = time.perf_counter() - total_start
-    results = [result for group in grouped_results for result in group]
-    return sorted(results, key=lambda item: item["index"]), total_elapsed, trace_elapsed
+
+    if return_flat:
+        results = [result for group in grouped_results for result in group]
+        del grouped_results
+        return sorted(results, key=lambda item: item["index"]), total_elapsed, trace_elapsed
+
+    return (None, total_elapsed, trace_elapsed, grouped_results)
 
 
 def result_last_lmn(result):
@@ -163,12 +173,53 @@ def assert_results_match(sequential, parallel):
             assert np.allclose(seq_lmn, par_lmn, rtol=1e-10, atol=1e-10)
 
 
+def trace_parallel_into_raykeeper(rays, workers, batch_size):
+    """Trace rays in parallel, streaming results directly into a raykeeper.
+
+    Unlike ``trace_parallel``, this never materializes all result dicts at
+    once.  Each batch is consumed and discarded before the next arrives.
+    """
+    import KrakenOS as Kos
+
+    batches = chunked(rays, batch_size)
+
+    total_start = time.perf_counter()
+    with ProcessPoolExecutor(
+        max_workers=workers,
+        mp_context=get_context("spawn"),
+        initializer=init_worker_system,
+    ) as pool:
+        list(pool.map(trace_batch_with_worker_system, make_warmup_batches(workers)))
+
+        system = build_simple_system(build=0)
+        rk = Kos.raykeeper(system)
+
+        trace_start = time.perf_counter()
+        for batch in pool.map(trace_batch_with_worker_system, batches):
+            rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+        trace_elapsed = time.perf_counter() - trace_start
+
+    total_elapsed = time.perf_counter() - total_start
+    return rk, total_elapsed, trace_elapsed
+
+
 def build_raykeeper_from_results(results):
     import KrakenOS as Kos
 
     system = build_simple_system(build=0)
     rays = Kos.raykeeper(system)
     rays.extend_results(sorted(results, key=lambda item: item["index"]))
+    return rays
+
+
+def build_raykeeper_from_batches(grouped_results):
+    """Ingest batches as they arrive to avoid retaining one giant result list."""
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    for batch in grouped_results:
+        rays.extend_results(sorted(batch, key=lambda item: item["index"]))
     return rays
 
 
@@ -199,6 +250,7 @@ def assert_raykeepers_match(reference, candidate):
 
 def test_parallel_sequential_trace_matches_serial_results():
     ray_count = 100
+    batch_size = 25
     rays = generate_rays(ray_count)
 
     sequential, sequential_time = trace_sequential(rays)
@@ -213,16 +265,17 @@ def test_parallel_sequential_trace_matches_serial_results():
     )
 
     for workers in worker_counts_to_test():
-        batch_size = max(1, math.ceil(ray_count / workers))
+        # Flat path for dict-level equivalence (small N; does not retain groups).
         parallel, parallel_total_time, parallel_trace_time = trace_parallel(
-            rays,
-            workers=workers,
-            batch_size=batch_size,
+            rays, workers=workers, batch_size=batch_size, return_flat=True
         )
-
         assert_results_match(sequential, parallel)
-        reconstructed_raykeeper = build_raykeeper_from_results(parallel)
-        assert_raykeepers_match(classic_raykeeper, reconstructed_raykeeper)
+
+        # End-to-end production path: stream batches into raykeeper.
+        streamed_raykeeper, _, _ = trace_parallel_into_raykeeper(
+            rays, workers=workers, batch_size=batch_size
+        )
+        assert_raykeepers_match(classic_raykeeper, streamed_raykeeper)
 
         total_speedup = sequential_time / parallel_total_time if parallel_total_time else float("inf")
         warm_speedup = sequential_time / parallel_trace_time if parallel_trace_time else float("inf")
@@ -231,3 +284,68 @@ def test_parallel_sequential_trace_matches_serial_results():
             f"{parallel_total_time:14.6f}s  {parallel_trace_time:19.6f}s  "
             f"{total_speedup:13.3f}x  {warm_speedup:12.3f}x"
         )
+
+
+def test_extract_snapshot_copy_is_independent_after_pickle_roundtrip():
+    import pickle
+
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    system.Trace([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], 0.55)
+    snapshot = Kos.extract_ray_result(system, copy=True)
+    payload = pickle.dumps(snapshot)
+    restored = pickle.loads(payload)
+
+    system.Trace([1000.0, 0.0, 0.0], [0.0, 0.0, 1.0], 0.55)
+    rays = Kos.raykeeper(system)
+    rays.push_result(restored)
+
+    assert rays.vld.tolist() == [1.0]
+    assert not np.allclose(np.asarray(restored["XYZ"], dtype=float)[-1], [1000.0, 0.0, 0.0])
+    assert not np.allclose(np.asarray(rays.XYZ[0], dtype=float)[-1], [1000.0, 0.0, 0.0])
+
+
+def test_streaming_parallel_memory_scales_near_linearly():
+    """Peak memory for streaming parallel ingestion should grow ~linearly.
+
+    Uses ``trace_parallel_into_raykeeper`` which consumes batches
+    incrementally via ``executor.map`` — no global result-dict list is
+    ever materialized.
+    """
+    import tracemalloc
+
+    import KrakenOS as Kos
+
+    workers = min(2, os.cpu_count() or 2)
+    batch_size = 25
+
+    def _trace_and_measure(ray_count):
+        rays = generate_rays(ray_count)
+
+        tracemalloc.start()
+        # Take a snapshot *after* tracemalloc starts to isolate our allocations.
+        _ = tracemalloc.take_snapshot()
+
+        rk, _, _ = trace_parallel_into_raykeeper(rays, workers, batch_size)
+        # Force NumPy to actually allocate the lazy caches so they count.
+        _ = rk.vld
+        _ = rk.valid_vld
+        _ = rk.invalid_vld
+
+        peak = tracemalloc.get_traced_memory()[1]
+        tracemalloc.stop()
+        return rk, peak
+
+    # --- Correctness: streaming must match classic tracing ---
+    classic = build_classic_raykeeper(generate_rays(200))
+    streamed, _peak_200 = _trace_and_measure(200)
+    assert_raykeepers_match(classic, streamed)
+
+    # --- Memory scaling: 2× rays should stay well under 3× peak ---
+    _, peak_100 = _trace_and_measure(100)
+    _, peak_200 = _trace_and_measure(200)
+
+    ratio = peak_200 / peak_100 if peak_100 else float("inf")
+    # Allow overhead; 3× is a generous guard against quadratic growth.
+    assert ratio < 3.0, f"peak memory ratio {ratio:.2f}x — possible non-linear growth (peak_100={peak_100}, peak_200={peak_200})"
