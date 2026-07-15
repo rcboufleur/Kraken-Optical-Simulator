@@ -1,10 +1,11 @@
 import math
 import os
 import time
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from multiprocessing import get_context
 
 import numpy as np
+import pytest
 
 
 _WORKER_SYSTEM = None
@@ -173,15 +174,19 @@ def assert_results_match(sequential, parallel):
             assert np.allclose(seq_lmn, par_lmn, rtol=1e-10, atol=1e-10)
 
 
-def trace_parallel_into_raykeeper(rays, workers, batch_size):
-    """Trace rays in parallel, streaming results directly into a raykeeper.
+def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None):
+    """Trace rays in parallel with a bounded in-flight batch window.
 
-    Unlike ``trace_parallel``, this never materializes all result dicts at
-    once.  Each batch is consumed and discarded before the next arrives.
+    At most ``max_in_flight`` (default ``2 * workers``) batches are submitted
+    at once.  Completed batches are ingested in input order via a small
+    reorder buffer, so peak retained worker results stay bounded even when
+    later batches finish before earlier ones.
     """
     import KrakenOS as Kos
 
     batches = chunked(rays, batch_size)
+    if max_in_flight is None:
+        max_in_flight = max(1, workers * 2)
 
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -195,8 +200,30 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size):
         rk = Kos.raykeeper(system)
 
         trace_start = time.perf_counter()
-        for batch in pool.map(trace_batch_with_worker_system, batches):
-            rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+        next_submit = 0
+        next_ingest = 0
+        pending = {}
+        ready = {}
+
+        def _submit_more():
+            nonlocal next_submit
+            while next_submit < len(batches) and len(pending) < max_in_flight:
+                future = pool.submit(trace_batch_with_worker_system, batches[next_submit])
+                pending[future] = next_submit
+                next_submit += 1
+
+        _submit_more()
+        while pending or ready:
+            if pending:
+                done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
+                for future in done:
+                    batch_index = pending.pop(future)
+                    ready[batch_index] = future.result()
+            while next_ingest in ready:
+                batch = ready.pop(next_ingest)
+                rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+                next_ingest += 1
+            _submit_more()
         trace_elapsed = time.perf_counter() - trace_start
 
     total_elapsed = time.perf_counter() - total_start
@@ -306,6 +333,25 @@ def test_extract_snapshot_copy_is_independent_after_pickle_roundtrip():
     assert not np.allclose(np.asarray(rays.XYZ[0], dtype=float)[-1], [1000.0, 0.0, 0.0])
 
 
+def test_push_retains_stable_snapshot_after_next_trace():
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    system.Trace([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], 0.55)
+    rays.push()
+
+    xyz_a = np.asarray(rays.XYZ[0], dtype=float).copy()
+    cc_a = np.asarray(rays.CC[0], dtype=float).copy()
+
+    system.Trace([3.0, 1.0, 0.0], [0.0, 0.0, 1.0], 0.55)
+    rays.push()
+
+    assert np.allclose(np.asarray(rays.XYZ[0], dtype=float), xyz_a)
+    assert np.allclose(np.asarray(rays.CC[0], dtype=float), cc_a)
+    assert not np.allclose(np.asarray(rays.XYZ[1], dtype=float), xyz_a)
+
+
 def test_valid_and_invalid_views_are_read_only_sequences_with_live_updates():
     import KrakenOS as Kos
 
@@ -326,6 +372,11 @@ def test_valid_and_invalid_views_are_read_only_sequences_with_live_updates():
     assert invalid_xyz[-1] is rays.XYZ[1]
     assert invalid_xyz[:] == [rays.XYZ[1]]
 
+    with pytest.raises(TypeError):
+        valid_xyz[0] = rays.XYZ[1]
+    with pytest.raises(AttributeError):
+        valid_xyz.append(rays.XYZ[0])
+
     system.Trace([2.0, 0.0, 0.0], [0.0, 0.0, 1.0], 0.55)
     rays.push()
     assert len(valid_xyz) == 3
@@ -333,15 +384,12 @@ def test_valid_and_invalid_views_are_read_only_sequences_with_live_updates():
 
 
 def test_streaming_parallel_memory_scales_near_linearly():
-    """Peak memory for streaming parallel ingestion should grow ~linearly.
+    """Parent-process Python allocation scaling for bounded parallel ingestion.
 
-    Uses ``trace_parallel_into_raykeeper`` which consumes batches
-    incrementally via ``executor.map`` — no global result-dict list is
-    ever materialized.
+    This is a regression signal for quadratic growth in the parent process; it
+    does not measure worker-process or all native NumPy peak memory.
     """
     import tracemalloc
-
-    import KrakenOS as Kos
 
     workers = min(2, os.cpu_count() or 2)
     batch_size = 25

@@ -65,7 +65,8 @@ def _as_stored_array(value, filtered=False):
             value = [item for item in value if _is_filter_none_keep(item)]
         except TypeError:
             pass
-    return np.asarray(value)
+    # Always copy so a subsequent Trace() cannot mutate stored rays in place.
+    return np.asarray(value).copy()
 
 
 def extract_ray_result(System, copy=False):
@@ -222,12 +223,19 @@ class raykeeper():
         return z
 
     def push(self):
-        """push.
+        """Snapshot the system's last traced ray into this keeper.
+
+        Array-backed fields are copied at ingestion so a later Trace() that
+        mutates system buffers in place cannot alter already-stored rays.
         """
         self.push_result(extract_ray_result(self.SYSTEM, copy=False))
 
     def push_result(self, result):
-        """Store one traced ray from an extracted result dictionary."""
+        """Store one traced ray from an extracted result dictionary.
+
+        Ndarray fields are copied so retained rays stay independent of later
+        traces or shared system buffers.
+        """
         self.nelements = result["nelements"]
         is_valid = bool(result["val"] != 0)
 
@@ -250,9 +258,9 @@ class raykeeper():
         self.RayWave.append(result["Wave"])
         hits = result["ray_SurfHits"]
         if isinstance(hits, np.ndarray):
-            self.CC.append(hits)
+            self.CC.append(hits.copy())
         else:
-            self.CC.append(np.asarray(hits))
+            self.CC.append(np.asarray(hits).copy())
 
         for field in _ARRAY_FIELDS:
             getattr(self, field).append(stored[field])

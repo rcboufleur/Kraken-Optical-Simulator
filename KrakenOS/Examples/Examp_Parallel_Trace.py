@@ -23,7 +23,7 @@ import math
 import os
 import sys
 import time
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
 from multiprocessing import get_context
 from pathlib import Path
 
@@ -203,20 +203,18 @@ def check_results_match(sequential, parallel):
     return True
 
 
-def trace_parallel_into_raykeeper(rays, workers, batch_size):
-    """Trace rays in parallel, streaming results directly into a raykeeper.
+def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None):
+    """Trace rays in parallel with a bounded in-flight batch window.
 
-    Unlike ``trace_parallel``, this function never materializes all result
-    dicts at once.  Each batch is consumed and discarded before the next
-    batch is received from the executor.
-
-    Because ``ProcessPoolExecutor.map`` yields in input order and batches
-    are created in increasing ray-index order, incremental appends preserve
-    global ray order without a global sort.
+    At most ``max_in_flight`` (default ``2 * workers``) batches are submitted
+    at once.  Completed batches are ingested in input order via a small
+    reorder buffer so peak retained worker results stay bounded.
     """
     import KrakenOS as Kos
 
     batches = chunked(rays, batch_size)
+    if max_in_flight is None:
+        max_in_flight = max(1, workers * 2)
 
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -230,8 +228,30 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size):
         rk = Kos.raykeeper(system)
 
         trace_start = time.perf_counter()
-        for batch in pool.map(trace_batch_with_worker_system, batches):
-            rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+        next_submit = 0
+        next_ingest = 0
+        pending = {}
+        ready = {}
+
+        def _submit_more():
+            nonlocal next_submit
+            while next_submit < len(batches) and len(pending) < max_in_flight:
+                future = pool.submit(trace_batch_with_worker_system, batches[next_submit])
+                pending[future] = next_submit
+                next_submit += 1
+
+        _submit_more()
+        while pending or ready:
+            if pending:
+                done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
+                for future in done:
+                    batch_index = pending.pop(future)
+                    ready[batch_index] = future.result()
+            while next_ingest in ready:
+                batch = ready.pop(next_ingest)
+                rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+                next_ingest += 1
+            _submit_more()
         trace_elapsed = time.perf_counter() - trace_start
 
     total_elapsed = time.perf_counter() - total_start
