@@ -117,7 +117,7 @@ def trace_batch_with_system(system, batch):
     results = []
     for ray in batch:
         system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
-        result = Kos.extract_ray_result(system)
+        result = Kos.extract_ray_result(system, copy=True)
         result["index"] = ray["index"]
         results.append(result)
     return results
@@ -137,8 +137,16 @@ def trace_sequential(rays):
     return sorted(results, key=lambda item: item["index"]), elapsed
 
 
-def trace_parallel(rays, workers):
-    batch_size = max(1, math.ceil(len(rays) / workers))
+def trace_parallel(rays, workers, batch_size=25, return_flat=False):
+    """Trace rays in parallel with bounded batches.
+
+    Prefer ``trace_parallel_into_raykeeper`` for production: it streams each
+    completed batch into a raykeeper and drops the batch immediately.
+
+    This helper materializes all worker batches (needed for timing/validation).
+    ``return_flat=True`` builds a sorted list from those batches and drops the
+    group list so both are not retained together.
+    """
     batches = chunked(rays, batch_size)
 
     total_start = time.perf_counter()
@@ -154,8 +162,13 @@ def trace_parallel(rays, workers):
         trace_elapsed = time.perf_counter() - trace_start
 
     total_elapsed = time.perf_counter() - total_start
-    results = [result for group in grouped_results for result in group]
-    return sorted(results, key=lambda item: item["index"]), total_elapsed, trace_elapsed
+
+    if return_flat:
+        results = [result for group in grouped_results for result in group]
+        del grouped_results
+        return sorted(results, key=lambda item: item["index"]), total_elapsed, trace_elapsed
+
+    return (None, total_elapsed, trace_elapsed, grouped_results)
 
 
 def result_last_lmn(result):
@@ -190,6 +203,41 @@ def check_results_match(sequential, parallel):
     return True
 
 
+def trace_parallel_into_raykeeper(rays, workers, batch_size):
+    """Trace rays in parallel, streaming results directly into a raykeeper.
+
+    Unlike ``trace_parallel``, this function never materializes all result
+    dicts at once.  Each batch is consumed and discarded before the next
+    batch is received from the executor.
+
+    Because ``ProcessPoolExecutor.map`` yields in input order and batches
+    are created in increasing ray-index order, incremental appends preserve
+    global ray order without a global sort.
+    """
+    import KrakenOS as Kos
+
+    batches = chunked(rays, batch_size)
+
+    total_start = time.perf_counter()
+    with ProcessPoolExecutor(
+        max_workers=workers,
+        mp_context=get_context("spawn"),
+        initializer=init_worker_system,
+    ) as pool:
+        list(pool.map(trace_batch_with_worker_system, make_warmup_batches(workers)))
+
+        system = build_simple_system(build=0)
+        rk = Kos.raykeeper(system)
+
+        trace_start = time.perf_counter()
+        for batch in pool.map(trace_batch_with_worker_system, batches):
+            rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+        trace_elapsed = time.perf_counter() - trace_start
+
+    total_elapsed = time.perf_counter() - total_start
+    return rk, total_elapsed, trace_elapsed
+
+
 def build_raykeeper_from_results(results):
     import KrakenOS as Kos
 
@@ -199,15 +247,53 @@ def build_raykeeper_from_results(results):
     return rays
 
 
+def build_raykeeper_from_batches(grouped_results):
+    """Ingest one batch at a time to limit peak retained result dicts."""
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    for batch in grouped_results:
+        rays.extend_results(sorted(batch, key=lambda item: item["index"]))
+    return rays
+
+
+def build_classic_raykeeper(rays_to_trace):
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    for ray in rays_to_trace:
+        system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
+        rays.push()
+    return rays
+
+
 def main():
     ray_count = 1000
     workers = min(4, os.cpu_count() or 1)
+    batch_size = 25  # bounded batches → low peak IPC retention
     rays = generate_rays(ray_count)
 
     sequential, sequential_time = trace_sequential(rays)
-    parallel, parallel_total_time, parallel_trace_time = trace_parallel(rays, workers)
-    reconstructed_rays = build_raykeeper_from_results(parallel)
 
+    # Production path: stream batches into raykeeper (no global result list).
+    rk, stream_total, stream_trace = trace_parallel_into_raykeeper(
+        rays, workers, batch_size
+    )
+    stream_speedup = sequential_time / stream_trace if stream_trace else float("inf")
+
+    classic = build_classic_raykeeper(rays)
+    raykeepers_match = (
+        classic.nrays == rk.nrays
+        and np.array_equal(classic.vld, rk.vld)
+        and len(classic.XYZ) == len(rk.XYZ)
+    )
+
+    # Timing-only materializing path (bounded batch_size; results discarded).
+    _, parallel_total_time, parallel_trace_time, _ = trace_parallel(
+        rays, workers, batch_size=batch_size, return_flat=False
+    )
     total_speedup = sequential_time / parallel_total_time if parallel_total_time else float("inf")
     warm_speedup = sequential_time / parallel_trace_time if parallel_trace_time else float("inf")
 
@@ -215,13 +301,17 @@ def main():
     print(f"Rays: {ray_count}")
     print(f"CPU count: {os.cpu_count()}")
     print(f"Workers: {workers}")
+    print(f"Batch size: {batch_size}")
     print(f"Sequential warm trace time: {sequential_time:.6f} s")
-    print(f"Parallel total time:        {parallel_total_time:.6f} s")
-    print(f"Parallel warm trace time:   {parallel_trace_time:.6f} s")
-    print(f"Total speedup:              {total_speedup:.3f}x")
-    print(f"Warm trace speedup:         {warm_speedup:.3f}x")
-    print(f"Numerical match:            {check_results_match(sequential, parallel)}")
-    print(f"Reconstructed raykeeper:    {reconstructed_rays.nrays} rays")
+    print(f"Streaming total time:       {stream_total:.6f} s")
+    print(f"Streaming warm trace time:  {stream_trace:.6f} s")
+    print(f"Streaming trace speedup:    {stream_speedup:.3f}x")
+    print(f"Materialize total time:     {parallel_total_time:.6f} s")
+    print(f"Materialize warm trace:     {parallel_trace_time:.6f} s")
+    print(f"Materialize total speedup:  {total_speedup:.3f}x")
+    print(f"Materialize warm speedup:   {warm_speedup:.3f}x")
+    print(f"Streaming vs classic match: {raykeepers_match}")
+    print(f"Streaming raykeeper rays:   {rk.nrays}")
     print(
         "\nFor small ray counts, total parallel time can be slower because Windows "
         "must start worker processes. The warm trace time is the useful number "
