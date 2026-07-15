@@ -306,6 +306,32 @@ def test_extract_snapshot_copy_is_independent_after_pickle_roundtrip():
     assert not np.allclose(np.asarray(rays.XYZ[0], dtype=float)[-1], [1000.0, 0.0, 0.0])
 
 
+def test_valid_and_invalid_views_are_read_only_sequences_with_live_updates():
+    import KrakenOS as Kos
+
+    system = build_simple_system(build=0)
+    rays = Kos.raykeeper(system)
+    for origin in ([0.0, 0.0, 0.0], [1000.0, 0.0, 0.0], [1.0, 0.0, 0.0]):
+        system.Trace(origin, [0.0, 0.0, 1.0], 0.55)
+        rays.push()
+
+    valid_xyz = rays.valid_XYZ
+    invalid_xyz = rays.invalid_XYZ
+    assert rays._ray_valid == [True, False, True]
+    assert [item is rays.XYZ[index] for item, index in zip(valid_xyz, (0, 2))] == [True, True]
+    assert valid_xyz[0] is rays.XYZ[0]
+    assert valid_xyz[-1] is rays.XYZ[2]
+    assert [item is rays.XYZ[index] for item, index in zip(valid_xyz[:], (0, 2))] == [True, True]
+    assert invalid_xyz[0] is rays.XYZ[1]
+    assert invalid_xyz[-1] is rays.XYZ[1]
+    assert invalid_xyz[:] == [rays.XYZ[1]]
+
+    system.Trace([2.0, 0.0, 0.0], [0.0, 0.0, 1.0], 0.55)
+    rays.push()
+    assert len(valid_xyz) == 3
+    assert valid_xyz[-1] is rays.XYZ[3]
+
+
 def test_streaming_parallel_memory_scales_near_linearly():
     """Peak memory for streaming parallel ingestion should grow ~linearly.
 

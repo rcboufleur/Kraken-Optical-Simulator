@@ -124,7 +124,13 @@ def extract_ray_result(System, copy=False):
 
 
 class _BucketView:
-    """Read-only view over the universal ray lists filtered by validity."""
+    """Read-only sequence-like view of rays filtered by validity.
+
+    Supports iteration, positive and negative integer indexing, and slicing.
+    The view reflects rays added after it was created.  It is not a ``list``:
+    mutation, concatenation, and list-specific APIs are intentionally
+    unsupported.
+    """
 
     __slots__ = ("_owner", "_attr", "_want_valid")
 
@@ -161,6 +167,11 @@ class _BucketView:
 
 class raykeeper():
     """raykeeper.
+
+    ``valid_*`` and ``invalid_*`` result collections are read-only,
+    sequence-like views.  They support iteration, integer indexing, and
+    slicing, and dynamically reflect subsequent :meth:`push` calls.  They are
+    not mutable lists.
     """
 
 
