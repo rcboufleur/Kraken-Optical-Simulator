@@ -48,6 +48,7 @@ from .SeidelTool import *
 from .SourceRand import *
 from .LibRMS import *
 from .TraceLoopTool import *
+from .ParallelTrace import *
 from .PhaseCalc import *
 from .WavePlot import *
 from .KrakenSys import *
