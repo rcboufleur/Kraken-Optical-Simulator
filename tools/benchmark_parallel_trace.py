@@ -104,7 +104,7 @@ def trace_batch_with_system(system, batch):
     results = []
     for ray in batch:
         system.Trace(ray["origin"], ray["direction"], ray["wavelength"])
-        result = Kos.extract_ray_result(system)
+        result = Kos.extract_ray_result(system, copy=True)
         result["index"] = ray["index"]
         results.append(result)
     return results
@@ -128,7 +128,7 @@ def trace_sequential(rays):
     return sorted(results, key=lambda item: item["index"]), elapsed
 
 
-def trace_parallel(rays, workers, batch_size):
+def trace_parallel(rays, workers, batch_size, return_flat=False):
     batches = chunked(rays, batch_size)
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -141,8 +141,43 @@ def trace_parallel(rays, workers, batch_size):
         grouped_results = list(pool.map(trace_batch_with_worker_system, batches))
         trace_elapsed = time.perf_counter() - trace_start
     total_elapsed = time.perf_counter() - total_start
-    results = [result for group in grouped_results for result in group]
-    return sorted(results, key=lambda item: item["index"]), total_elapsed, trace_elapsed
+
+    if return_flat:
+        results = [result for group in grouped_results for result in group]
+        del grouped_results
+        return (
+            sorted(results, key=lambda item: item["index"]),
+            total_elapsed,
+            trace_elapsed,
+        )
+
+    return (None, total_elapsed, trace_elapsed)
+
+
+def trace_parallel_into_raykeeper(rays, workers, batch_size):
+    """Trace rays in parallel, streaming results directly into a raykeeper."""
+    import KrakenOS as Kos
+
+    batches = chunked(rays, batch_size)
+
+    total_start = time.perf_counter()
+    with ProcessPoolExecutor(
+        max_workers=workers,
+        mp_context=get_context("spawn"),
+        initializer=init_worker_system,
+    ) as pool:
+        list(pool.map(trace_batch_with_worker_system, make_warmup_batches(workers)))
+
+        system = build_simple_system(build=0)
+        rk = Kos.raykeeper(system)
+
+        trace_start = time.perf_counter()
+        for batch in pool.map(trace_batch_with_worker_system, batches):
+            rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+        trace_elapsed = time.perf_counter() - trace_start
+
+    total_elapsed = time.perf_counter() - total_start
+    return rk, total_elapsed, trace_elapsed
 
 
 def result_last_lmn(result):
@@ -207,11 +242,12 @@ def run_benchmark(ray_counts, worker_counts):
         for workers in worker_counts:
             if workers > (os.cpu_count() or workers):
                 continue
-            batch_size = max(1, math.ceil(ray_count / workers))
+            batch_size = 25
             parallel, parallel_total_time, parallel_trace_time = trace_parallel(
                 rays,
                 workers=workers,
                 batch_size=batch_size,
+                return_flat=True,
             )
             assert_results_match(sequential, parallel)
 
