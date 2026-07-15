@@ -23,13 +23,15 @@ import math
 import os
 import sys
 import time
-from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, wait
+from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import get_context
 from pathlib import Path
 
 import numpy as np
 
 sys.path.append(str(Path(__file__).resolve().parents[2]))
+
+from KrakenOS.ParallelTrace import resolve_max_in_flight, run_bounded_ordered_batches
 
 
 _WORKER_SYSTEM = None
@@ -214,10 +216,7 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None)
     import KrakenOS as Kos
 
     batches = chunked(rays, batch_size)
-    if max_in_flight is None:
-        max_in_flight = max(1, workers * 2)
-    elif max_in_flight < 1:
-        raise ValueError("max_in_flight must be >= 1")
+    max_in_flight = resolve_max_in_flight(workers, max_in_flight)
 
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -231,33 +230,14 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None)
         rk = Kos.raykeeper(system)
 
         trace_start = time.perf_counter()
-        next_submit = 0
-        next_ingest = 0
-        pending = {}
-        ready = {}
-
-        def _submit_more():
-            nonlocal next_submit
-            while (
-                next_submit < len(batches)
-                and len(pending) + len(ready) < max_in_flight
-            ):
-                future = pool.submit(trace_batch_with_worker_system, batches[next_submit])
-                pending[future] = next_submit
-                next_submit += 1
-
-        _submit_more()
-        while pending or ready:
-            if pending:
-                done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
-                for future in done:
-                    batch_index = pending.pop(future)
-                    ready[batch_index] = future.result()
-            while next_ingest in ready:
-                batch = ready.pop(next_ingest)
-                rk.extend_results(batch)
-                next_ingest += 1
-            _submit_more()
+        run_bounded_ordered_batches(
+            len(batches),
+            max_in_flight,
+            submit_batch=lambda index: pool.submit(
+                trace_batch_with_worker_system, batches[index]
+            ),
+            ingest_batch=lambda _index, batch: rk.extend_results(batch),
+        )
         trace_elapsed = time.perf_counter() - trace_start
 
     total_elapsed = time.perf_counter() - total_start
