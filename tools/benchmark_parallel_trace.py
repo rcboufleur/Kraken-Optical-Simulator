@@ -161,6 +161,8 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None)
     batches = chunked(rays, batch_size)
     if max_in_flight is None:
         max_in_flight = max(1, workers * 2)
+    elif max_in_flight < 1:
+        raise ValueError("max_in_flight must be >= 1")
 
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -181,7 +183,10 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None)
 
         def _submit_more():
             nonlocal next_submit
-            while next_submit < len(batches) and len(pending) < max_in_flight:
+            while (
+                next_submit < len(batches)
+                and len(pending) + len(ready) < max_in_flight
+            ):
                 future = pool.submit(trace_batch_with_worker_system, batches[next_submit])
                 pending[future] = next_submit
                 next_submit += 1
@@ -195,7 +200,7 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None)
                     ready[batch_index] = future.result()
             while next_ingest in ready:
                 batch = ready.pop(next_ingest)
-                rk.extend_results(sorted(batch, key=lambda item: item["index"]))
+                rk.extend_results(batch)
                 next_ingest += 1
             _submit_more()
         trace_elapsed = time.perf_counter() - trace_start

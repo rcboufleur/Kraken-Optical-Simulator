@@ -174,19 +174,67 @@ def assert_results_match(sequential, parallel):
             assert np.allclose(seq_lmn, par_lmn, rtol=1e-10, atol=1e-10)
 
 
+def run_bounded_ordered_batches(n_batches, max_in_flight, submit_batch, ingest_batch):
+    """Submit/consume batches with ``pending + ready`` capped at ``max_in_flight``.
+
+    Batches are ingested in input order.  Returns the peak of
+    ``len(pending) + len(ready)`` observed during the run.
+    """
+    if max_in_flight < 1:
+        raise ValueError("max_in_flight must be >= 1")
+
+    next_submit = 0
+    next_ingest = 0
+    pending = {}
+    ready = {}
+    peak_in_flight = 0
+
+    def _submit_more():
+        nonlocal next_submit
+        while (
+            next_submit < n_batches
+            and len(pending) + len(ready) < max_in_flight
+        ):
+            future = submit_batch(next_submit)
+            pending[future] = next_submit
+            next_submit += 1
+
+    def _note_peak():
+        nonlocal peak_in_flight
+        peak_in_flight = max(peak_in_flight, len(pending) + len(ready))
+
+    _submit_more()
+    _note_peak()
+    while pending or ready:
+        if pending:
+            done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
+            for future in done:
+                batch_index = pending.pop(future)
+                ready[batch_index] = future.result()
+                _note_peak()
+        while next_ingest in ready:
+            ingest_batch(next_ingest, ready.pop(next_ingest))
+            next_ingest += 1
+        _submit_more()
+        _note_peak()
+    return peak_in_flight
+
+
 def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None):
     """Trace rays in parallel with a bounded in-flight batch window.
 
-    At most ``max_in_flight`` (default ``2 * workers``) batches are submitted
-    at once.  Completed batches are ingested in input order via a small
-    reorder buffer, so peak retained worker results stay bounded even when
-    later batches finish before earlier ones.
+    At most ``max_in_flight`` (default ``2 * workers``) batches may be in
+    ``pending`` or ``ready`` combined.  Completed batches are ingested in
+    input order via a small reorder buffer, so peak retained worker results
+    stay bounded even when later batches finish before earlier ones.
     """
     import KrakenOS as Kos
 
     batches = chunked(rays, batch_size)
     if max_in_flight is None:
         max_in_flight = max(1, workers * 2)
+    elif max_in_flight < 1:
+        raise ValueError("max_in_flight must be >= 1")
 
     total_start = time.perf_counter()
     with ProcessPoolExecutor(
@@ -200,30 +248,14 @@ def trace_parallel_into_raykeeper(rays, workers, batch_size, max_in_flight=None)
         rk = Kos.raykeeper(system)
 
         trace_start = time.perf_counter()
-        next_submit = 0
-        next_ingest = 0
-        pending = {}
-        ready = {}
-
-        def _submit_more():
-            nonlocal next_submit
-            while next_submit < len(batches) and len(pending) < max_in_flight:
-                future = pool.submit(trace_batch_with_worker_system, batches[next_submit])
-                pending[future] = next_submit
-                next_submit += 1
-
-        _submit_more()
-        while pending or ready:
-            if pending:
-                done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
-                for future in done:
-                    batch_index = pending.pop(future)
-                    ready[batch_index] = future.result()
-            while next_ingest in ready:
-                batch = ready.pop(next_ingest)
-                rk.extend_results(sorted(batch, key=lambda item: item["index"]))
-                next_ingest += 1
-            _submit_more()
+        run_bounded_ordered_batches(
+            len(batches),
+            max_in_flight,
+            submit_batch=lambda index: pool.submit(
+                trace_batch_with_worker_system, batches[index]
+            ),
+            ingest_batch=lambda _index, batch: rk.extend_results(batch),
+        )
         trace_elapsed = time.perf_counter() - trace_start
 
     total_elapsed = time.perf_counter() - total_start
@@ -350,6 +382,53 @@ def test_push_retains_stable_snapshot_after_next_trace():
     assert np.allclose(np.asarray(rays.XYZ[0], dtype=float), xyz_a)
     assert np.allclose(np.asarray(rays.CC[0], dtype=float), cc_a)
     assert not np.allclose(np.asarray(rays.XYZ[1], dtype=float), xyz_a)
+
+
+def test_bounded_window_counts_pending_plus_ready():
+    """Slow batch 0 must not let ready grow past max_in_flight."""
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+
+    max_in_flight = 2
+    n_batches = 8
+    release_batch0 = threading.Event()
+    later_lock = threading.Lock()
+    later_done = 0
+    ingested = []
+
+    def work(batch_index):
+        nonlocal later_done
+        if batch_index == 0:
+            assert release_batch0.wait(timeout=5.0)
+            return [batch_index]
+        with later_lock:
+            later_done += 1
+            # With the cap, only max_in_flight-1 later batches can finish while
+            # batch 0 is still pending; release once that has happened.
+            if later_done >= max_in_flight - 1:
+                release_batch0.set()
+        return [batch_index]
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        peak = run_bounded_ordered_batches(
+            n_batches,
+            max_in_flight,
+            submit_batch=lambda index: pool.submit(work, index),
+            ingest_batch=lambda index, payload: ingested.append(index),
+        )
+
+    assert peak <= max_in_flight
+    assert ingested == list(range(n_batches))
+
+
+def test_max_in_flight_must_be_positive():
+    with pytest.raises(ValueError, match="max_in_flight"):
+        run_bounded_ordered_batches(
+            1,
+            0,
+            submit_batch=lambda index: None,
+            ingest_batch=lambda index, payload: None,
+        )
 
 
 def test_valid_and_invalid_views_are_read_only_sequences_with_live_updates():
